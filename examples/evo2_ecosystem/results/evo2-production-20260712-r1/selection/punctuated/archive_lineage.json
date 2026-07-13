@@ -1,0 +1,960 @@
+{
+  "correct_program_count": 16,
+  "program_count": 16,
+  "programs": [
+    {
+      "archive_inspiration_ids": [],
+      "candidate_source_sha256": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+      "code_diff": "",
+      "complexity": 0.098,
+      "correct": true,
+      "generation": 0,
+      "island": 1,
+      "parent_id": null,
+      "patch": {
+        "api_costs": 0.0,
+        "diff_summary": null,
+        "model_name": null,
+        "patch_description": "Initial program setup",
+        "patch_name": "initial_program",
+        "patch_type": "init"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.08467362821102142,
+          0.0858561098575592,
+          0.087117038667202
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "1471b15d-e9bd-48c4-89ed-a9c0188fd90e",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 15.5,
+        "mean_final_alive": 8.875,
+        "mixed_fraction": 1.0,
+        "parametric_fraction": 0.0,
+        "score": 0.0858561098575592,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.75
+      },
+      "score": 0.0858561098575592,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [],
+      "candidate_source_sha256": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+      "code_diff": "",
+      "complexity": 0.098,
+      "correct": true,
+      "generation": 0,
+      "island": 0,
+      "parent_id": null,
+      "patch": {
+        "api_costs": 0.0,
+        "diff_summary": null,
+        "model_name": null,
+        "patch_description": "Initial program setup",
+        "patch_name": "initial_program",
+        "patch_type": "init"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.08467362821102142,
+          0.0858561098575592,
+          0.087117038667202
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "8f5f23fe-c0c2-4db5-8825-480fd3c4813d",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 15.5,
+        "mean_final_alive": 8.875,
+        "mixed_fraction": 1.0,
+        "parametric_fraction": 0.0,
+        "score": 0.0858561098575592,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.75
+      },
+      "score": 0.0858561098575592,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [],
+      "candidate_source_sha256": "ef849893c7e72702e1756a0431e9764192dba1021be3b8067c0912b38ec3453c",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,13 +1,30 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n-    return jnp.array(\n-        [0.0, 0.0, 0.0, 1.0],\n+    node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n+    conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n+    energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n+    intake = jnp.tanh(parent_stats[1])\n+    alive = jnp.clip(population_stats[0], 0.0, 1.0)\n+    pop_delta = jnp.tanh(population_stats[1])\n+    action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n+    lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n+    complexity = 0.55 * node_frac + 0.45 * conn_frac\n+    scarcity = 1.0 - alive\n+    low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n+    stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n+    productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n+    clone = -0.35 + 0.75 * productive + 0.35 * pop_delta - 0.55 * low_diversity - 0.65 * stress\n+    parametric = 0.35 + 0.80 * stress + 0.45 * complexity + 0.25 * productive - 0.25 * low_diversity\n+    structural = 0.05 + 0.70 * scarcity + 0.80 * low_diversity + 0.25 * productive - 0.45 * complexity\n+    mixed = 0.10 + 0.55 * low_diversity + 0.45 * jnp.maximum(-pop_delta, 0.0) + 0.25 * productive - 0.35 * complexity\n+    return jnp.asarray(\n+        [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.504,
+      "correct": true,
+      "generation": 1,
+      "island": 1,
+      "parent_id": "1471b15d-e9bd-48c4-89ed-a9c0188fd90e",
+      "patch": {
+        "api_costs": 0.122305,
+        "diff_summary": {
+          "added": 17,
+          "deleted": 0,
+          "modified": 2
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Replace the always-mixed policy with a bounded adaptive heredity policy. The edit favors parametric refinement when resources or population are stressed, uses structural/mixed exploration when the population is sparse or diversity is low, and allows cloning only for high-energy parents in stable/growing populations. This should reduce destructive over-mutation after events while still injecting topology changes when recovery or diversity calls for it.",
+        "patch_name": "adaptive_operator_pressure",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "ef849893c7e72702e1756a0431e9764192dba1021be3b8067c0912b38ec3453c",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.08863966166973114,
+          0.09682939201593399,
+          0.09130002558231354
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "afcdeead-6d93-4800-8b44-a995af632e2c",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 16.25,
+        "mean_final_alive": 9.625,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.015384615384615385,
+        "score": 0.09130002558231354,
+        "structural_fraction": 0.9846153846153847,
+        "survival_rate": 0.375
+      },
+      "score": 0.09130002558231354,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [
+        "1471b15d-e9bd-48c4-89ed-a9c0188fd90e"
+      ],
+      "candidate_source_sha256": "7ae9b0e166464d7529f0428fdd635e6483daa2218fefc8a43f947245818986e3",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,30 +1,33 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n-    clone = -0.35 + 0.75 * productive + 0.35 * pop_delta - 0.55 * low_diversity - 0.65 * stress\n-    parametric = 0.35 + 0.80 * stress + 0.45 * complexity + 0.25 * productive - 0.25 * low_diversity\n-    structural = 0.05 + 0.70 * scarcity + 0.80 * low_diversity + 0.25 * productive - 0.45 * complexity\n-    mixed = 0.10 + 0.55 * low_diversity + 0.45 * jnp.maximum(-pop_delta, 0.0) + 0.25 * productive - 0.35 * complexity\n+    decline = jnp.maximum(-pop_delta, 0.0)\n+    stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n+    exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n+    clone = -0.45 + 1.05 * stable - 0.70 * exploration_need - 0.35 * decline\n+    parametric = 0.20 + 0.65 * productive + 0.45 * stress + 0.25 * complexity - 0.35 * low_diversity\n+    structural = 0.15 + 0.95 * exploration_need + 0.25 * productive - 0.35 * stress - 0.50 * complexity\n+    mixed = 0.05 + 0.80 * decline + 0.55 * stress + 0.40 * low_diversity + 0.15 * productive - 0.30 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.516,
+      "correct": true,
+      "generation": 2,
+      "island": 1,
+      "parent_id": "afcdeead-6d93-4800-8b44-a995af632e2c",
+      "patch": {
+        "api_costs": 0.12335,
+        "diff_summary": {
+          "added": 3,
+          "deleted": 0,
+          "modified": 4
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Shift from nearly always choosing structural mutation to a stress-gated heredity policy. Structural edits remain favored when diversity is low and the population is not collapsing, but mixed mutation takes over under real demographic stress, parametric mutation is favored for productive parents, and cloning gets a narrow role for stable high-energy lineages. This should preserve the current birth-rate advantage from structural exploration while reducing the survival penalty from excessive topology churn.",
+        "patch_name": "stress_gated_diversification",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "7ae9b0e166464d7529f0428fdd635e6483daa2218fefc8a43f947245818986e3",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.15247038006782532,
+          0.15077924728393555,
+          0.15650705993175507
+        ],
+        "selected_repeat_index": 0,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "e40677ed-e8a3-4c92-aaa3-492a0a424553",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 27.875,
+        "mean_final_alive": 17.25,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.49327354260089684,
+        "score": 0.15247038006782532,
+        "structural_fraction": 0.5067264573991032,
+        "survival_rate": 0.875
+      },
+      "score": 0.15247038006782532,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [
+        "1471b15d-e9bd-48c4-89ed-a9c0188fd90e"
+      ],
+      "candidate_source_sha256": "01b5454bf911ae689d47009ec1ed3a42c79588a9ad6339523fe22b1bc14d20fc",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,33 +1,36 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n     exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n-    clone = -0.45 + 1.05 * stable - 0.70 * exploration_need - 0.35 * decline\n-    parametric = 0.20 + 0.65 * productive + 0.45 * stress + 0.25 * complexity - 0.35 * low_diversity\n-    structural = 0.15 + 0.95 * exploration_need + 0.25 * productive - 0.35 * stress - 0.50 * complexity\n-    mixed = 0.05 + 0.80 * decline + 0.55 * stress + 0.40 * low_diversity + 0.15 * productive - 0.30 * complexity\n+    crisis = jnp.clip(decline * (0.45 + 0.35 * low_diversity + 0.20 * scarcity), 0.0, 1.0)\n+    exploit = jnp.clip(stable * productive * (1.0 - exploration_need), 0.0, 1.0)\n+    simple_open = jnp.clip((1.0 - complexity) * exploration_need * (0.65 + 0.35 * productive), 0.0, 1.0)\n+    clone = -0.42 + 1.25 * exploit - 0.78 * exploration_need - 0.45 * decline\n+    parametric = 0.22 + 0.72 * productive + 0.36 * stress + 0.30 * complexity - 0.30 * low_diversity - 0.18 * crisis\n+    structural = 0.10 + 0.82 * exploration_need + 0.38 * simple_open + 0.20 * productive - 0.30 * stress - 0.52 * complexity\n+    mixed = -0.02 + 1.05 * crisis + 0.42 * stress + 0.30 * low_diversity + 0.12 * productive - 0.28 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.535,
+      "correct": true,
+      "generation": 3,
+      "island": 1,
+      "parent_id": "e40677ed-e8a3-4c92-aaa3-492a0a424553",
+      "patch": {
+        "api_costs": 0.124775,
+        "diff_summary": {
+          "added": 3,
+          "deleted": 0,
+          "modified": 4
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Add a small adaptive niche for cloning only when parents look productive and the population is not under exploration pressure, preserving successful phenotypes after recovery. Also let mixed mutation win only under compound crisis conditions: decline plus low diversity or scarcity. This keeps the strong parametric/structural split from the current program while adding two context-specific escape paths that were previously never selected.",
+        "patch_name": "crisis_mixed_exploit_clone",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "01b5454bf911ae689d47009ec1ed3a42c79588a9ad6339523fe22b1bc14d20fc",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.13308516144752502,
+          0.14476992189884186,
+          0.1384015828371048
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "709ed5e6-6ecf-4171-9ccf-eebb668afd21",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 25.5,
+        "mean_final_alive": 14.875,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.5882352941176471,
+        "score": 0.1384015828371048,
+        "structural_fraction": 0.4117647058823529,
+        "survival_rate": 0.875
+      },
+      "score": 0.1384015828371048,
+      "top_k_inspiration_ids": [
+        "afcdeead-6d93-4800-8b44-a995af632e2c"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "e40677ed-e8a3-4c92-aaa3-492a0a424553"
+      ],
+      "candidate_source_sha256": "7f51609551a1081f09f6a9948ad50575698a7d4d5b846b381a162a7fa3e1693b",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,36 +1,37 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n     exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n-    crisis = jnp.clip(decline * (0.45 + 0.35 * low_diversity + 0.20 * scarcity), 0.0, 1.0)\n-    exploit = jnp.clip(stable * productive * (1.0 - exploration_need), 0.0, 1.0)\n-    simple_open = jnp.clip((1.0 - complexity) * exploration_need * (0.65 + 0.35 * productive), 0.0, 1.0)\n-    clone = -0.42 + 1.25 * exploit - 0.78 * exploration_need - 0.45 * decline\n-    parametric = 0.22 + 0.72 * productive + 0.36 * stress + 0.30 * complexity - 0.30 * low_diversity - 0.18 * crisis\n-    structural = 0.10 + 0.82 * exploration_need + 0.38 * simple_open + 0.20 * productive - 0.30 * stress - 0.52 * complexity\n-    mixed = -0.02 + 1.05 * crisis + 0.42 * stress + 0.30 * low_diversity + 0.12 * productive - 0.28 * complexity\n+    crisis = jnp.clip(decline * (0.55 + 0.30 * low_diversity + 0.15 * scarcity), 0.0, 1.0)\n+    exploit = jnp.clip(stable * productive * (1.0 - 0.75 * exploration_need), 0.0, 1.0)\n+    simple_open = jnp.clip((1.0 - complexity) * exploration_need * (0.70 + 0.30 * productive), 0.0, 1.0)\n+    recovery_opening = jnp.clip(simple_open + 0.35 * scarcity * low_diversity, 0.0, 1.0)\n+    clone = -0.46 + 1.05 * exploit - 0.70 * exploration_need - 0.38 * decline\n+    parametric = 0.18 + 0.68 * productive + 0.40 * stress + 0.24 * complexity - 0.38 * low_diversity - 0.16 * scarcity\n+    structural = 0.13 + 0.86 * exploration_need + 0.42 * recovery_opening + 0.22 * productive - 0.24 * stress - 0.48 * complexity\n+    mixed = -0.08 + 0.82 * crisis + 0.30 * stress + 0.24 * low_diversity + 0.10 * productive - 0.30 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.54,
+      "correct": true,
+      "generation": 4,
+      "island": 1,
+      "parent_id": "709ed5e6-6ecf-4171-9ccf-eebb668afd21",
+      "patch": {
+        "api_costs": 0.133875,
+        "diff_summary": {
+          "added": 1,
+          "deleted": 0,
+          "modified": 7
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Shift the policy back toward the stronger structural/parametric balance seen in the best prior run. The current policy over-selects parametric mutation and introduces mixed-crisis logic that is not actually being selected, while reducing births and final alive count. This edit makes structural mutation more competitive when the population has open niche capacity or low behavioral/lineage diversity, while keeping parametric mutation favored for productive parents in less exploratory conditions. Mixed remains available only for real decline, but no longer competes broadly during ordinary stress.",
+        "patch_name": "rebalance_structural_recovery",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "7f51609551a1081f09f6a9948ad50575698a7d4d5b846b381a162a7fa3e1693b",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.12299848347902298,
+          0.11900299042463303,
+          0.12046417593955994
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "aefb6d07-5df3-420e-a19d-9d42e81653cb",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 21.0,
+        "mean_final_alive": 12.875,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.125,
+        "score": 0.12046417593955994,
+        "structural_fraction": 0.875,
+        "survival_rate": 0.75
+      },
+      "score": 0.12046417593955994,
+      "top_k_inspiration_ids": [
+        "afcdeead-6d93-4800-8b44-a995af632e2c"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "1471b15d-e9bd-48c4-89ed-a9c0188fd90e"
+      ],
+      "candidate_source_sha256": "90f60511cd8ad961c77b0e8f3ab206854c5f72f3bcae17586fae762428fb4c21",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,33 +1,38 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n     exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n-    clone = -0.45 + 1.05 * stable - 0.70 * exploration_need - 0.35 * decline\n-    parametric = 0.20 + 0.65 * productive + 0.45 * stress + 0.25 * complexity - 0.35 * low_diversity\n-    structural = 0.15 + 0.95 * exploration_need + 0.25 * productive - 0.35 * stress - 0.50 * complexity\n-    mixed = 0.05 + 0.80 * decline + 0.55 * stress + 0.40 * low_diversity + 0.15 * productive - 0.30 * complexity\n+    simple = 1.0 - complexity\n+    rebound_room = jnp.clip(scarcity * (0.55 + 0.45 * productive), 0.0, 1.0)\n+    crisis = jnp.clip(decline * (0.45 + 0.35 * stress + 0.20 * low_diversity), 0.0, 1.0)\n+    refine = jnp.clip(productive * (0.55 + 0.45 * complexity) * (1.0 - 0.55 * low_diversity), 0.0, 1.0)\n+    novelty = jnp.clip(exploration_need * simple * (0.45 + 0.55 * rebound_room), 0.0, 1.0)\n+    clone = -0.56 + 1.00 * stable - 0.82 * exploration_need - 0.42 * decline\n+    parametric = 0.22 + 0.72 * productive + 0.34 * stress + 0.34 * complexity + 0.28 * refine - 0.28 * low_diversity\n+    structural = 0.12 + 0.90 * exploration_need + 0.46 * novelty + 0.18 * productive - 0.30 * stress - 0.56 * complexity\n+    mixed = -0.08 + 0.95 * crisis + 0.28 * rebound_room + 0.24 * low_diversity - 0.22 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.539,
+      "correct": true,
+      "generation": 5,
+      "island": 1,
+      "parent_id": "e40677ed-e8a3-4c92-aaa3-492a0a424553",
+      "patch": {
+        "api_costs": 0.057995,
+        "diff_summary": {
+          "added": 5,
+          "deleted": 0,
+          "modified": 4
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Add a bounded crisis/productivity gate so structural mutation is favored mainly for sparse, low-diversity, simple genomes, while parametric mutation gets extra weight for productive or complex parents. Mixed remains a rare rescue option only under sharp decline plus stress, avoiding the all-mixed failure mode while giving the policy a fallback during post-event crashes.",
+        "patch_name": "crisis_gated_exploration",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "90f60511cd8ad961c77b0e8f3ab206854c5f72f3bcae17586fae762428fb4c21",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.14561599493026733,
+          0.1427181214094162,
+          0.1383996307849884
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "1d747132-f56d-4915-a418-e0490e400d0c",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 26.0,
+        "mean_final_alive": 15.375,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.875,
+        "score": 0.1427181214094162,
+        "structural_fraction": 0.125,
+        "survival_rate": 0.875
+      },
+      "score": 0.1427181214094162,
+      "top_k_inspiration_ids": [
+        "709ed5e6-6ecf-4171-9ccf-eebb668afd21"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "e40677ed-e8a3-4c92-aaa3-492a0a424553"
+      ],
+      "candidate_source_sha256": "e869da94fe89ea541286d37476a555d479e2f4691adc3ca33c885efd9cf22fac",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,38 +1,38 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n     exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n     simple = 1.0 - complexity\n     rebound_room = jnp.clip(scarcity * (0.55 + 0.45 * productive), 0.0, 1.0)\n     crisis = jnp.clip(decline * (0.45 + 0.35 * stress + 0.20 * low_diversity), 0.0, 1.0)\n     refine = jnp.clip(productive * (0.55 + 0.45 * complexity) * (1.0 - 0.55 * low_diversity), 0.0, 1.0)\n     novelty = jnp.clip(exploration_need * simple * (0.45 + 0.55 * rebound_room), 0.0, 1.0)\n     clone = -0.56 + 1.00 * stable - 0.82 * exploration_need - 0.42 * decline\n-    parametric = 0.22 + 0.72 * productive + 0.34 * stress + 0.34 * complexity + 0.28 * refine - 0.28 * low_diversity\n-    structural = 0.12 + 0.90 * exploration_need + 0.46 * novelty + 0.18 * productive - 0.30 * stress - 0.56 * complexity\n-    mixed = -0.08 + 0.95 * crisis + 0.28 * rebound_room + 0.24 * low_diversity - 0.22 * complexity\n+    parametric = 0.18 + 0.64 * productive + 0.30 * stress + 0.26 * complexity + 0.16 * refine - 0.38 * exploration_need - 0.08 * scarcity\n+    structural = 0.18 + 1.04 * exploration_need + 0.52 * novelty + 0.22 * productive + 0.14 * rebound_room - 0.24 * stress - 0.48 * complexity\n+    mixed = -0.06 + 0.92 * crisis + 0.34 * rebound_room + 0.28 * low_diversity + 0.08 * productive - 0.24 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.545,
+      "correct": true,
+      "generation": 6,
+      "island": 1,
+      "parent_id": "1d747132-f56d-4915-a418-e0490e400d0c",
+      "patch": {
+        "api_costs": 0.127805,
+        "diff_summary": {
+          "added": 0,
+          "deleted": 0,
+          "modified": 3
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "The current policy over-selects parametric mutation, which likely under-explores topology after population shocks. This edit gates parametric mutation more strongly on low exploration need, while boosting structural mutation when scarcity, low diversity, and rebound room indicate that new topology may improve post-event resource productivity. Mixed remains mostly crisis-focused but gets a small productive/rebound signal so it can compete only during genuine recovery pressure.",
+        "patch_name": "rebalance_structural_recovery",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "e869da94fe89ea541286d37476a555d479e2f4691adc3ca33c885efd9cf22fac",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.1465933471918106,
+          0.14299432933330536,
+          0.13579799234867096
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "cb328da3-2a6c-4210-986f-6a840f51dd7a",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 20.125,
+        "mean_final_alive": 13.75,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.018633540372670808,
+        "score": 0.14299432933330536,
+        "structural_fraction": 0.9813664596273292,
+        "survival_rate": 0.625
+      },
+      "score": 0.14299432933330536,
+      "top_k_inspiration_ids": [
+        "709ed5e6-6ecf-4171-9ccf-eebb668afd21"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [],
+      "candidate_source_sha256": "19329697abfa743fcd1e84910edf584a89194506da42be8467c7da5760ec0df1",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,13 +1,47 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n-    return jnp.array(\n-        [0.0, 0.0, 0.0, 1.0],\n-        dtype=jnp.float32,\n+    node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n+    conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n+    energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n+    intake = jnp.tanh(parent_stats[1])\n+    alive = jnp.clip(population_stats[0], 0.0, 1.0)\n+    pop_delta = jnp.tanh(population_stats[1])\n+    diversity = jnp.clip(population_stats[2], 0.0, 1.0)\n+    entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n+    complexity = 0.55 * node_frac + 0.45 * conn_frac\n+    productivity = jnp.clip(0.68 * energy + 0.32 * (0.5 + 0.5 * intake), 0.0, 1.0)\n+    fragility = jnp.clip(0.55 * (1.0 - alive) + 0.45 * (0.5 - 0.5 * pop_delta), 0.0, 1.0)\n+    convergence = jnp.clip(0.55 * (1.0 - diversity) + 0.45 * (1.0 - entropy), 0.0, 1.0)\n+    headroom = 1.0 - complexity\n+    clone = (\n+        0.95 * fragility\n+        + 0.55 * productivity\n+        - 0.35 * convergence\n+        - 0.25 * headroom\n     )\n-\n-\n+    parametric = (\n+        0.78 * productivity\n+        + 0.36 * fragility\n+        + 0.24 * complexity\n+        - 0.22 * convergence\n+    )\n+    structural = (\n+        0.72 * convergence\n+        + 0.48 * headroom\n+        + 0.24 * productivity\n+        - 0.74 * fragility\n+        - 0.20 * complexity\n+    )\n+    mixed = (\n+        0.66 * convergence\n+        + 0.54 * productivity\n+        + 0.28 * headroom\n+        - 0.46 * fragility\n+    )\n+    scores = jnp.array([clone, parametric, structural, mixed], dtype=jnp.float32)\n+    return jnp.clip(scores, -4.0, 4.0)\n # EVOLVE-BLOCK-END\n",
+      "complexity": 0.512,
+      "correct": true,
+      "generation": 7,
+      "island": 0,
+      "parent_id": "8f5f23fe-c0c2-4db5-8825-480fd3c4813d",
+      "patch": {
+        "api_costs": 0.12491,
+        "diff_summary": {
+          "added": 34,
+          "deleted": 0,
+          "modified": 5
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Uses a bounded homeostatic controller instead of a fixed operator. It protects productive lineages with clone/parametric edits during low-energy or population-collapse phases, then opens structural and mixed exploration only when parents have enough energy and the population has capacity or low diversity. This should improve resource-productivity AUC by avoiding costly topology churn during fragile periods while still injecting novelty when stagnation or convergence appears.",
+        "patch_name": "homeostatic_novelty_gate",
+        "patch_type": "full"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "19329697abfa743fcd1e84910edf584a89194506da42be8467c7da5760ec0df1",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.17764735221862793,
+          0.17114248871803284,
+          0.19246579706668854
+        ],
+        "selected_repeat_index": 0,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "c8674bbf-efac-4785-b594-85c52e2918f5",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 28.125,
+        "mean_final_alive": 17.5,
+        "mixed_fraction": 0.6711111111111111,
+        "parametric_fraction": 0.3288888888888889,
+        "score": 0.17764735221862793,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.875
+      },
+      "score": 0.17764735221862793,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [
+        "8f5f23fe-c0c2-4db5-8825-480fd3c4813d"
+      ],
+      "candidate_source_sha256": "7c26b7daf6e7e634f0976c8ca1800ae54a0b8b1f2e9dcb2b094a88ebed227183",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,47 +1,51 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     diversity = jnp.clip(population_stats[2], 0.0, 1.0)\n     entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     productivity = jnp.clip(0.68 * energy + 0.32 * (0.5 + 0.5 * intake), 0.0, 1.0)\n     fragility = jnp.clip(0.55 * (1.0 - alive) + 0.45 * (0.5 - 0.5 * pop_delta), 0.0, 1.0)\n     convergence = jnp.clip(0.55 * (1.0 - diversity) + 0.45 * (1.0 - entropy), 0.0, 1.0)\n     headroom = 1.0 - complexity\n+    stability = jnp.clip(0.62 * alive + 0.38 * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n+    innovation = jnp.clip(convergence * (0.35 + 0.65 * headroom), 0.0, 1.0)\n+    recovery = jnp.clip(fragility * (1.0 - convergence), 0.0, 1.0)\n     clone = (\n-        0.95 * fragility\n-        + 0.55 * productivity\n-        - 0.35 * convergence\n-        - 0.25 * headroom\n+        0.70 * recovery\n+        + 0.34 * productivity\n+        - 0.42 * innovation\n+        - 0.18 * headroom\n     )\n     parametric = (\n-        0.78 * productivity\n-        + 0.36 * fragility\n-        + 0.24 * complexity\n-        - 0.22 * convergence\n+        0.88 * productivity\n+        + 0.42 * fragility\n+        + 0.20 * complexity\n+        - 0.18 * innovation\n     )\n     structural = (\n-        0.72 * convergence\n-        + 0.48 * headroom\n-        + 0.24 * productivity\n-        - 0.74 * fragility\n-        - 0.20 * complexity\n+        0.96 * innovation * stability\n+        + 0.34 * productivity\n+        + 0.22 * headroom\n+        - 0.62 * fragility\n+        - 0.10 * complexity\n     )\n     mixed = (\n-        0.66 * convergence\n-        + 0.54 * productivity\n-        + 0.28 * headroom\n-        - 0.46 * fragility\n+        0.72 * innovation\n+        + 0.58 * productivity\n+        + 0.24 * headroom\n+        + 0.14 * stability\n+        - 0.38 * fragility\n     )\n     scores = jnp.array([clone, parametric, structural, mixed], dtype=jnp.float32)\n     return jnp.clip(scores, -4.0, 4.0)\n # EVOLVE-BLOCK-END",
+      "complexity": 0.529,
+      "correct": true,
+      "generation": 8,
+      "island": 0,
+      "parent_id": "c8674bbf-efac-4785-b594-85c52e2918f5",
+      "patch": {
+        "api_costs": 0.087312,
+        "diff_summary": {
+          "added": 4,
+          "deleted": 0,
+          "modified": 17
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "This edit adds an explicit stability gate so structural changes are reserved for healthier, non-crashing populations, while fragile or declining populations lean toward parametric and mixed mutations that preserve viable lineages. The current policy already improved by moving away from always-mixed, but structural is never selected; this introduces a bounded, state-dependent structural bonus only when there is genome headroom, convergence pressure, and enough population stability to absorb topology changes. Clone remains mostly a recovery fallback rather than a common choice.",
+        "patch_name": "stability_gated_exploration",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "7c26b7daf6e7e634f0976c8ca1800ae54a0b8b1f2e9dcb2b094a88ebed227183",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.15404488146305084,
+          0.15811900794506073,
+          0.16092614829540253
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "b2953675-290e-4665-b99c-c29b3f9be535",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 27.875,
+        "mean_final_alive": 17.25,
+        "mixed_fraction": 0.5112107623318386,
+        "parametric_fraction": 0.48878923766816146,
+        "score": 0.15811900794506073,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.875
+      },
+      "score": 0.15811900794506073,
+      "top_k_inspiration_ids": []
+    },
+    {
+      "archive_inspiration_ids": [
+        "8f5f23fe-c0c2-4db5-8825-480fd3c4813d"
+      ],
+      "candidate_source_sha256": "98bc1f928c9a86d151ada7135f9282abaef9834845d3f226a3cce0ff10987292",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,47 +1,50 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     diversity = jnp.clip(population_stats[2], 0.0, 1.0)\n     entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     productivity = jnp.clip(0.68 * energy + 0.32 * (0.5 + 0.5 * intake), 0.0, 1.0)\n     fragility = jnp.clip(0.55 * (1.0 - alive) + 0.45 * (0.5 - 0.5 * pop_delta), 0.0, 1.0)\n     convergence = jnp.clip(0.55 * (1.0 - diversity) + 0.45 * (1.0 - entropy), 0.0, 1.0)\n     headroom = 1.0 - complexity\n+    stability = jnp.clip(0.64 * alive + 0.36 * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n+    innovation = jnp.clip(convergence * (0.28 + 0.72 * headroom) * (0.35 + 0.65 * stability), 0.0, 1.0)\n     clone = (\n-        0.95 * fragility\n-        + 0.55 * productivity\n-        - 0.35 * convergence\n-        - 0.25 * headroom\n+        0.82 * fragility\n+        + 0.48 * productivity\n+        - 0.30 * convergence\n+        - 0.18 * headroom\n     )\n     parametric = (\n-        0.78 * productivity\n-        + 0.36 * fragility\n-        + 0.24 * complexity\n-        - 0.22 * convergence\n+        0.82 * productivity\n+        + 0.42 * fragility\n+        + 0.25 * complexity\n+        - 0.18 * innovation\n     )\n     structural = (\n-        0.72 * convergence\n-        + 0.48 * headroom\n-        + 0.24 * productivity\n-        - 0.74 * fragility\n-        - 0.20 * complexity\n+        0.86 * innovation\n+        + 0.30 * productivity\n+        + 0.18 * headroom\n+        - 0.70 * fragility\n+        - 0.16 * complexity\n     )\n     mixed = (\n-        0.66 * convergence\n-        + 0.54 * productivity\n-        + 0.28 * headroom\n-        - 0.46 * fragility\n+        0.74 * innovation\n+        + 0.57 * productivity\n+        + 0.22 * headroom\n+        + 0.10 * stability\n+        - 0.40 * fragility\n     )\n     scores = jnp.array([clone, parametric, structural, mixed], dtype=jnp.float32)\n     return jnp.clip(scores, -4.0, 4.0)\n # EVOLVE-BLOCK-END",
+      "complexity": 0.529,
+      "correct": true,
+      "generation": 9,
+      "island": 0,
+      "parent_id": "c8674bbf-efac-4785-b594-85c52e2918f5",
+      "patch": {
+        "api_costs": 0.13219,
+        "diff_summary": {
+          "added": 3,
+          "deleted": 0,
+          "modified": 17
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Add a bounded stability signal from alive fraction and population trend, then use it to slightly favor mixed mutation when the population is stable and there is convergence/headroom, while preserving parametric mutation for productive or stressed parents. This keeps the successful parametric/mixed balance but makes mixed less blindly tied to convergence during fragile periods and gives structural mutation a small chance only under stable, low-fragility expansion conditions.",
+        "patch_name": "stability_gated_exploitation",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "98bc1f928c9a86d151ada7135f9282abaef9834845d3f226a3cce0ff10987292",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.11692559719085693,
+          0.12478005141019821,
+          0.12438783794641495
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "8f9bc291-e306-44fc-8dfd-6587159bc0f0",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 21.5,
+        "mean_final_alive": 13.125,
+        "mixed_fraction": 0.20930232558139536,
+        "parametric_fraction": 0.7906976744186046,
+        "score": 0.12438783794641495,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.75
+      },
+      "score": 0.12438783794641495,
+      "top_k_inspiration_ids": [
+        "b2953675-290e-4665-b99c-c29b3f9be535"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "c8674bbf-efac-4785-b594-85c52e2918f5"
+      ],
+      "candidate_source_sha256": "0d3de9e82ecedb0d33be3f22e51826da8f1a61b784feecdba5dadab6735bce35",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,51 +1,53 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     diversity = jnp.clip(population_stats[2], 0.0, 1.0)\n     entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     productivity = jnp.clip(0.68 * energy + 0.32 * (0.5 + 0.5 * intake), 0.0, 1.0)\n     fragility = jnp.clip(0.55 * (1.0 - alive) + 0.45 * (0.5 - 0.5 * pop_delta), 0.0, 1.0)\n     convergence = jnp.clip(0.55 * (1.0 - diversity) + 0.45 * (1.0 - entropy), 0.0, 1.0)\n     headroom = 1.0 - complexity\n     stability = jnp.clip(0.62 * alive + 0.38 * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n-    innovation = jnp.clip(convergence * (0.35 + 0.65 * headroom), 0.0, 1.0)\n+    innovation = jnp.clip(convergence * (0.32 + 0.68 * headroom), 0.0, 1.0)\n     recovery = jnp.clip(fragility * (1.0 - convergence), 0.0, 1.0)\n+    expansion = jnp.clip(productivity * stability * (0.30 + 0.70 * headroom), 0.0, 1.0)\n     clone = (\n         0.70 * recovery\n         + 0.34 * productivity\n         - 0.42 * innovation\n         - 0.18 * headroom\n     )\n     parametric = (\n-        0.88 * productivity\n-        + 0.42 * fragility\n-        + 0.20 * complexity\n+        0.78 * productivity\n+        + 0.36 * fragility\n+        + 0.24 * complexity\n         - 0.18 * innovation\n+        - 0.08 * expansion\n     )\n     structural = (\n-        0.96 * innovation * stability\n-        + 0.34 * productivity\n-        + 0.22 * headroom\n-        - 0.62 * fragility\n-        - 0.10 * complexity\n+        0.82 * innovation * stability\n+        + 0.28 * productivity\n+        + 0.20 * headroom\n+        - 0.70 * fragility\n+        - 0.14 * complexity\n     )\n     mixed = (\n-        0.72 * innovation\n-        + 0.58 * productivity\n-        + 0.24 * headroom\n-        + 0.14 * stability\n-        - 0.38 * fragility\n+        0.76 * innovation\n+        + 0.56 * productivity\n+        + 0.28 * headroom\n+        + 0.18 * expansion\n+        - 0.40 * fragility\n     )\n     scores = jnp.array([clone, parametric, structural, mixed], dtype=jnp.float32)\n     return jnp.clip(scores, -4.0, 4.0)\n # EVOLVE-BLOCK-END",
+      "complexity": 0.535,
+      "correct": true,
+      "generation": 10,
+      "island": 0,
+      "parent_id": "b2953675-290e-4665-b99c-c29b3f9be535",
+      "patch": {
+        "api_costs": 0.092937,
+        "diff_summary": {
+          "added": 2,
+          "deleted": 0,
+          "modified": 14
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Shift selection pressure toward mixed mutation in stable, productive, converged populations while keeping structural mutation conservative and clone mostly reserved for recovery. The current policy splits parametric and mixed almost evenly, while the strongest prior run favored mixed about two-thirds of the time. This edit adds a bounded expansion signal and slightly reduces parametric's broad advantage, encouraging mixed offspring when there is headroom and population stability without increasing risky structural operations.",
+        "patch_name": "mixed_exploit_bias",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "0d3de9e82ecedb0d33be3f22e51826da8f1a61b784feecdba5dadab6735bce35",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.15689054131507874,
+          0.13900920748710632,
+          0.16966217756271362
+        ],
+        "selected_repeat_index": 0,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "8687d185-5af7-45ae-9cd3-5368e2416cba",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 25.625,
+        "mean_final_alive": 17.5,
+        "mixed_fraction": 0.7609756097560976,
+        "parametric_fraction": 0.23902439024390243,
+        "score": 0.15689054131507874,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.75
+      },
+      "score": 0.15689054131507874,
+      "top_k_inspiration_ids": [
+        "8f9bc291-e306-44fc-8dfd-6587159bc0f0"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "aefb6d07-5df3-420e-a19d-9d42e81653cb"
+      ],
+      "candidate_source_sha256": "4fe0b2cbe32b967afd032c77f46e96aa6e0c427f533c23a9d90136c7e1418a83",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,38 +1,38 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n     exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n     simple = 1.0 - complexity\n     rebound_room = jnp.clip(scarcity * (0.55 + 0.45 * productive), 0.0, 1.0)\n     crisis = jnp.clip(decline * (0.45 + 0.35 * stress + 0.20 * low_diversity), 0.0, 1.0)\n     refine = jnp.clip(productive * (0.55 + 0.45 * complexity) * (1.0 - 0.55 * low_diversity), 0.0, 1.0)\n     novelty = jnp.clip(exploration_need * simple * (0.45 + 0.55 * rebound_room), 0.0, 1.0)\n     clone = -0.56 + 1.00 * stable - 0.82 * exploration_need - 0.42 * decline\n-    parametric = 0.22 + 0.72 * productive + 0.34 * stress + 0.34 * complexity + 0.28 * refine - 0.28 * low_diversity\n-    structural = 0.12 + 0.90 * exploration_need + 0.46 * novelty + 0.18 * productive - 0.30 * stress - 0.56 * complexity\n-    mixed = -0.08 + 0.95 * crisis + 0.28 * rebound_room + 0.24 * low_diversity - 0.22 * complexity\n+    parametric = 0.18 + 0.64 * productive + 0.40 * stress + 0.24 * complexity + 0.14 * refine - 0.38 * low_diversity - 0.10 * scarcity\n+    structural = 0.16 + 1.02 * exploration_need + 0.52 * novelty + 0.22 * productive + 0.14 * rebound_room - 0.24 * stress - 0.48 * complexity\n+    mixed = -0.06 + 0.96 * crisis + 0.34 * rebound_room + 0.26 * low_diversity - 0.24 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.543,
+      "correct": true,
+      "generation": 11,
+      "island": 1,
+      "parent_id": "1d747132-f56d-4915-a418-e0490e400d0c",
+      "patch": {
+        "api_costs": 0.12764,
+        "diff_summary": {
+          "added": 0,
+          "deleted": 0,
+          "modified": 3
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "The current policy over-selects parametric mutation, suggesting it is exploiting short-term productive parents too aggressively and underusing structural search after population shocks. This edit makes structural mutation more competitive when diversity is low or rebound room exists, while reducing the broad parametric bonus from refine and complexity. Mixed remains reserved for decline/crisis states but gets a slightly stronger rebound signal.",
+        "patch_name": "diversity_weighted_structural",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "4fe0b2cbe32b967afd032c77f46e96aa6e0c427f533c23a9d90136c7e1418a83",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.13359536230564117,
+          0.13167142868041992,
+          0.12029432505369186
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "0a7d9b0c-6985-4571-81c3-7052827344be",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 20.0,
+        "mean_final_alive": 13.625,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.00625,
+        "score": 0.13167142868041992,
+        "structural_fraction": 0.99375,
+        "survival_rate": 0.625
+      },
+      "score": 0.13167142868041992,
+      "top_k_inspiration_ids": [
+        "e40677ed-e8a3-4c92-aaa3-492a0a424553"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "709ed5e6-6ecf-4171-9ccf-eebb668afd21"
+      ],
+      "candidate_source_sha256": "e360f1dc8ad5ad33189cdf0723b051d0bcb181424118ffa45274aea281e72d3e",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,33 +1,37 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n-    exploration_need = jnp.clip(0.65 * low_diversity + 0.35 * scarcity, 0.0, 1.0)\n-    clone = -0.45 + 1.05 * stable - 0.70 * exploration_need - 0.35 * decline\n-    parametric = 0.20 + 0.65 * productive + 0.45 * stress + 0.25 * complexity - 0.35 * low_diversity\n-    structural = 0.15 + 0.95 * exploration_need + 0.25 * productive - 0.35 * stress - 0.50 * complexity\n-    mixed = 0.05 + 0.80 * decline + 0.55 * stress + 0.40 * low_diversity + 0.15 * productive - 0.30 * complexity\n+    exploration_need = jnp.clip(0.62 * low_diversity + 0.38 * scarcity, 0.0, 1.0)\n+    simplicity = 1.0 - complexity\n+    refine = jnp.clip(productive * (0.45 + 0.55 * complexity) * (1.0 - 0.45 * low_diversity), 0.0, 1.0)\n+    novelty = jnp.clip(exploration_need * simplicity * (0.55 + 0.45 * productive), 0.0, 1.0)\n+    crisis = jnp.clip(decline * (0.40 + 0.35 * stress + 0.25 * scarcity), 0.0, 1.0)\n+    clone = -0.48 + 1.08 * stable - 0.72 * exploration_need - 0.42 * decline\n+    parametric = 0.18 + 0.62 * productive + 0.34 * stress + 0.28 * complexity + 0.22 * refine - 0.28 * low_diversity\n+    structural = 0.13 + 0.86 * exploration_need + 0.32 * novelty + 0.22 * productive - 0.30 * stress - 0.46 * complexity\n+    mixed = -0.08 + 1.08 * crisis + 0.34 * stress + 0.34 * low_diversity + 0.18 * productive - 0.24 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.539,
+      "correct": true,
+      "generation": 12,
+      "island": 1,
+      "parent_id": "e40677ed-e8a3-4c92-aaa3-492a0a424553",
+      "patch": {
+        "api_costs": 0.066011,
+        "diff_summary": {
+          "added": 4,
+          "deleted": 0,
+          "modified": 5
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "This edit keeps the current successful parametric/structural balance but makes the policy more state-conditional. It adds a compact refinement signal for productive, complex parents, a novelty signal for simple genomes when diversity is low, and a crisis signal for post-event declines. Parametric is slightly favored for productive complex lineages, structural is focused on low-complexity novelty opportunities, and mixed receives a gated boost only during population decline plus stress/scarcity. This should preserve the high survival/birth profile while giving the evaluator a chance to use mixed mutations in the rare recovery states where combined structural and parametric change is likely more productive.",
+        "patch_name": "crisis_mixed_refine_balance",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "e360f1dc8ad5ad33189cdf0723b051d0bcb181424118ffa45274aea281e72d3e",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.16167300939559937,
+          0.15810982882976532,
+          0.15096719563007355
+        ],
+        "selected_repeat_index": 1,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "ccffc7f7-d3f2-416c-ba97-1dfaecbf6aa7",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 27.375,
+        "mean_final_alive": 16.75,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.502283105022831,
+        "score": 0.15810982882976532,
+        "structural_fraction": 0.4977168949771689,
+        "survival_rate": 0.875
+      },
+      "score": 0.15810982882976532,
+      "top_k_inspiration_ids": [
+        "cb328da3-2a6c-4210-986f-6a840f51dd7a"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "c8674bbf-efac-4785-b594-85c52e2918f5"
+      ],
+      "candidate_source_sha256": "126f2a3410bdec88599883c0a92b6d1ea8be858cdb51b966a3fa73e969e6ac29",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,51 +1,51 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     diversity = jnp.clip(population_stats[2], 0.0, 1.0)\n     entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     productivity = jnp.clip(0.68 * energy + 0.32 * (0.5 + 0.5 * intake), 0.0, 1.0)\n     fragility = jnp.clip(0.55 * (1.0 - alive) + 0.45 * (0.5 - 0.5 * pop_delta), 0.0, 1.0)\n     convergence = jnp.clip(0.55 * (1.0 - diversity) + 0.45 * (1.0 - entropy), 0.0, 1.0)\n     headroom = 1.0 - complexity\n     stability = jnp.clip(0.62 * alive + 0.38 * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n-    innovation = jnp.clip(convergence * (0.35 + 0.65 * headroom), 0.0, 1.0)\n+    innovation = jnp.clip(convergence * (0.42 + 0.58 * headroom), 0.0, 1.0)\n     recovery = jnp.clip(fragility * (1.0 - convergence), 0.0, 1.0)\n     clone = (\n-        0.70 * recovery\n-        + 0.34 * productivity\n-        - 0.42 * innovation\n+        0.68 * recovery\n+        + 0.32 * productivity\n+        - 0.44 * innovation\n         - 0.18 * headroom\n     )\n     parametric = (\n-        0.88 * productivity\n-        + 0.42 * fragility\n-        + 0.20 * complexity\n-        - 0.18 * innovation\n+        0.78 * productivity\n+        + 0.34 * fragility\n+        + 0.22 * complexity\n+        - 0.22 * innovation\n     )\n     structural = (\n-        0.96 * innovation * stability\n-        + 0.34 * productivity\n-        + 0.22 * headroom\n-        - 0.62 * fragility\n-        - 0.10 * complexity\n+        0.82 * innovation * stability\n+        + 0.30 * productivity\n+        + 0.18 * headroom\n+        - 0.66 * fragility\n+        - 0.12 * complexity\n     )\n     mixed = (\n-        0.72 * innovation\n-        + 0.58 * productivity\n-        + 0.24 * headroom\n-        + 0.14 * stability\n-        - 0.38 * fragility\n+        0.78 * innovation\n+        + 0.56 * productivity\n+        + 0.30 * headroom\n+        + 0.10 * stability\n+        - 0.34 * fragility\n     )\n     scores = jnp.array([clone, parametric, structural, mixed], dtype=jnp.float32)\n     return jnp.clip(scores, -4.0, 4.0)\n # EVOLVE-BLOCK-END",
+      "complexity": 0.529,
+      "correct": true,
+      "generation": 13,
+      "island": 0,
+      "parent_id": "b2953675-290e-4665-b99c-c29b3f9be535",
+      "patch": {
+        "api_costs": 0.133845,
+        "diff_summary": {
+          "added": 0,
+          "deleted": 0,
+          "modified": 18
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Shift the policy back toward the higher-performing parametric/mixed balance seen in the prior run. The current edit over-rewards parametric mutation under fragile conditions, producing an even split and lower score. This change reduces parametric\u2019s fragility bonus, lets convergence contribute more directly through innovation, and raises mixed when there is ecological convergence plus remaining genome headroom. Structural remains conservative because prior evaluations selected it rarely, while clone stays as a recovery fallback.",
+        "patch_name": "restore_mixed_bias",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "126f2a3410bdec88599883c0a92b6d1ea8be858cdb51b966a3fa73e969e6ac29",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.06829740107059479,
+          0.09093443304300308,
+          0.07144980877637863
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "91a86aee-f8f5-4905-8e30-d484469487cb",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 17.75,
+        "mean_final_alive": 10.375,
+        "mixed_fraction": 0.7535211267605634,
+        "parametric_fraction": 0.24647887323943662,
+        "score": 0.07144980877637863,
+        "structural_fraction": 0.0,
+        "survival_rate": 0.75
+      },
+      "score": 0.07144980877637863,
+      "top_k_inspiration_ids": [
+        "8687d185-5af7-45ae-9cd3-5368e2416cba"
+      ]
+    },
+    {
+      "archive_inspiration_ids": [
+        "0a7d9b0c-6985-4571-81c3-7052827344be"
+      ],
+      "candidate_source_sha256": "82a2615193069b8b7e086185b7cc912ffd5185b5f4e2b3eaae50a29c7820c682",
+      "code_diff": "--- a/original.py\n+++ b/original.py\n@@ -1,37 +1,38 @@\n import jax.numpy as jnp\n \n \n # EVOLVE-BLOCK-START\n def make_offspring(parent_genome, parent_stats, population_stats, rng):\n     \"\"\"Score clone, parametric, structural, and mixed mutation.\"\"\"\n     node_frac = jnp.clip(parent_genome[0], 0.0, 1.0)\n     conn_frac = jnp.clip(parent_genome[1], 0.0, 1.0)\n     energy = jnp.clip(parent_stats[0], 0.0, 1.0)\n     intake = jnp.tanh(parent_stats[1])\n     alive = jnp.clip(population_stats[0], 0.0, 1.0)\n     pop_delta = jnp.tanh(population_stats[1])\n     action_div = jnp.clip(population_stats[2], 0.0, 1.0)\n     lineage_entropy = jnp.clip(population_stats[3], 0.0, 1.0)\n     complexity = 0.55 * node_frac + 0.45 * conn_frac\n     scarcity = 1.0 - alive\n     low_diversity = 1.0 - 0.5 * (action_div + lineage_entropy)\n     stress = jnp.clip(0.45 * scarcity + 0.35 * (1.0 - energy) + 0.20 * jnp.maximum(-pop_delta, 0.0), 0.0, 1.0)\n     productive = jnp.clip(0.65 * energy + 0.35 * jnp.maximum(intake, 0.0), 0.0, 1.0)\n     decline = jnp.maximum(-pop_delta, 0.0)\n     stable = jnp.clip(productive * (1.0 - stress) * (0.5 + 0.5 * pop_delta), 0.0, 1.0)\n-    exploration_need = jnp.clip(0.62 * low_diversity + 0.38 * scarcity, 0.0, 1.0)\n+    exploration_need = jnp.clip(0.60 * low_diversity + 0.40 * scarcity, 0.0, 1.0)\n     simplicity = 1.0 - complexity\n-    refine = jnp.clip(productive * (0.45 + 0.55 * complexity) * (1.0 - 0.45 * low_diversity), 0.0, 1.0)\n-    novelty = jnp.clip(exploration_need * simplicity * (0.55 + 0.45 * productive), 0.0, 1.0)\n-    crisis = jnp.clip(decline * (0.40 + 0.35 * stress + 0.25 * scarcity), 0.0, 1.0)\n-    clone = -0.48 + 1.08 * stable - 0.72 * exploration_need - 0.42 * decline\n-    parametric = 0.18 + 0.62 * productive + 0.34 * stress + 0.28 * complexity + 0.22 * refine - 0.28 * low_diversity\n-    structural = 0.13 + 0.86 * exploration_need + 0.32 * novelty + 0.22 * productive - 0.30 * stress - 0.46 * complexity\n-    mixed = -0.08 + 1.08 * crisis + 0.34 * stress + 0.34 * low_diversity + 0.18 * productive - 0.24 * complexity\n+    refine = jnp.clip(productive * (0.48 + 0.52 * complexity) * (1.0 - 0.42 * low_diversity), 0.0, 1.0)\n+    novelty = jnp.clip(exploration_need * simplicity * (0.50 + 0.50 * productive), 0.0, 1.0)\n+    crisis = jnp.clip(decline * (0.38 + 0.34 * stress + 0.28 * scarcity), 0.0, 1.0)\n+    recovery = jnp.clip(scarcity * productive * (0.35 + 0.65 * low_diversity) * (0.45 + 0.55 * decline), 0.0, 1.0)\n+    clone = -0.50 + 1.10 * stable - 0.76 * exploration_need - 0.44 * decline\n+    parametric = 0.19 + 0.64 * productive + 0.30 * stress + 0.29 * complexity + 0.25 * refine - 0.30 * low_diversity - 0.08 * scarcity\n+    structural = 0.12 + 0.82 * exploration_need + 0.34 * novelty + 0.20 * productive - 0.28 * stress - 0.48 * complexity - 0.10 * recovery\n+    mixed = -0.05 + 0.92 * crisis + 0.44 * recovery + 0.30 * stress + 0.30 * low_diversity + 0.20 * productive - 0.22 * complexity\n     return jnp.asarray(\n         [clone, parametric, structural, mixed],\n         dtype=jnp.float32,\n     )\n \n \n # EVOLVE-BLOCK-END",
+      "complexity": 0.55,
+      "correct": true,
+      "generation": 14,
+      "island": 1,
+      "parent_id": "ccffc7f7-d3f2-416c-ba97-1dfaecbf6aa7",
+      "patch": {
+        "api_costs": 0.102397,
+        "diff_summary": {
+          "added": 1,
+          "deleted": 0,
+          "modified": 8
+        },
+        "model_name": "headless/codex@gpt-5.5?effort=high",
+        "patch_description": "Add a bounded recovery signal that only boosts mixed mutation when population pressure is high but the parent still has usable resource intake/energy. This keeps the proven parametric/structural balance for normal conditions, while giving mixed mutation a chance in post-event recovery windows where simultaneous topology and parameter changes can improve resource-productivity AUC. The clone path remains conservative because prior runs show it is not selected and likely hurts exploration.",
+        "patch_name": "selective_recovery_mixed",
+        "patch_type": "diff"
+      },
+      "private_metrics": {
+        "backend": "gpu",
+        "candidate_sha256": "82a2615193069b8b7e086185b7cc912ffd5185b5f4e2b3eaae50a29c7820c682",
+        "evaluator_source_sha256": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "jax_version": "0.8.1",
+        "jaxlib_version": "0.8.1",
+        "manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+        "numerical_repeats": 3,
+        "policy_violation_count": 0,
+        "python_version": "3.13.14",
+        "repeat_scores": [
+          0.1367201805114746,
+          0.14383943378925323,
+          0.13803549110889435
+        ],
+        "selected_repeat_index": 2,
+        "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+        "simulator_source_sha256": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7",
+        "xla_flags": ""
+      },
+      "program_id": "ba999a7a-d787-48a4-bd29-3ebde55827a4",
+      "public_metrics": {
+        "clone_fraction": 0.0,
+        "mean_births": 25.25,
+        "mean_final_alive": 14.625,
+        "mixed_fraction": 0.0,
+        "parametric_fraction": 0.5495049504950495,
+        "score": 0.13803549110889435,
+        "structural_fraction": 0.4504950495049505,
+        "survival_rate": 0.875
+      },
+      "score": 0.13803549110889435,
+      "top_k_inspiration_ids": [
+        "e40677ed-e8a3-4c92-aaa3-492a0a424553"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "task_source_sha256": {
+    "evaluate.py": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+    "initial.py": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+    "run_evo.py": "1a9ea49f1f9799ea7804b69ef569c7e2395abbf3270f6ad80f9825a0e41592b5"
+  }
+}

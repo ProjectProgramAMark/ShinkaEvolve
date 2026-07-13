@@ -1,0 +1,257 @@
+{
+  "archive_config": {
+    "archive_size": 16,
+    "num_archive_inspirations": 1,
+    "num_islands": 2,
+    "num_top_k_inspirations": 1
+  },
+  "archive_correct_program_count": 16,
+  "archive_lineage_record": "archive_lineage.json",
+  "archive_lineage_sha256": "ee94f486396ddc06ec45e76db3d20bf2aa326e481daedf2cc13e069f51b257f4",
+  "archive_program_count": 16,
+  "baselines": [
+    "clone",
+    "fixed_parametric",
+    "fixed_mixed",
+    "stress_responsive"
+  ],
+  "bootstrap_config": {
+    "confidence": 0.95,
+    "replicates": 10000,
+    "seed": 20260712
+  },
+  "candidate_source_sha256": "7c26b7daf6e7e634f0976c8ca1800ae54a0b8b1f2e9dcb2b094a88ebed227183",
+  "database_sha256": "20bcb4105cab3f416e1002582ad0d6c409bd82ff32893945aa10f71b33867c0a",
+  "development_evaluation_record": "gen_8_7c26b7daf6e7.json",
+  "development_integrity_valid": true,
+  "development_manifest_sha256": "563c614250054089bbdbbdae06f78adae27da1d13b29be923c3d70fa99602ace",
+  "development_score": 0.06824055314064026,
+  "matched_run_counts": {
+    "punctuated": {
+      "archive_correct_program_count": 16,
+      "archive_program_count": 16,
+      "command_record_sha256": {
+        "launch.json": "569efdb8918e61a5c2e562310cef0e66074fb2db0749edec3da5b5157392fe42"
+      },
+      "completed_evaluation_count": 15,
+      "completion_marker_sha256": "92934ee08929dca51d5e55953abbfee1ef1e7d3288e1c4d0765ba5fc6eca12ca",
+      "correct_evaluation_count": 15,
+      "database_sha256": "20bcb4105cab3f416e1002582ad0d6c409bd82ff32893945aa10f71b33867c0a",
+      "full_evaluation_count": 15,
+      "generation_budget": 15,
+      "integrity_failed_evaluation_count": 0,
+      "invalid_proposal_count": 0
+    },
+    "stable": {
+      "archive_correct_program_count": 15,
+      "archive_program_count": 16,
+      "command_record_sha256": {
+        "launch.json": "eb72c4aa596423747a89a361d6003210ad3ba3a235080d4a9c17eb5b2db36df5"
+      },
+      "completed_evaluation_count": 15,
+      "completion_marker_sha256": "588f937618fa8f7e357f5e07725c3951417e9ce152161270b8fdcd89006267e1",
+      "correct_evaluation_count": 14,
+      "database_sha256": "8effa13ecef569d87a8581dd52b33ffd79e5fe31d6cc827de9f5c9cbea37cae5",
+      "full_evaluation_count": 14,
+      "generation_budget": 15,
+      "integrity_failed_evaluation_count": 0,
+      "invalid_proposal_count": 1
+    }
+  },
+  "numerical_repeats": 3,
+  "post_unlock_infrastructure_amendment": {
+    "candidate_sources_or_scores_changed": false,
+    "failure_stage": "provenance_serialization_before_atomic_result_write",
+    "new_sealed_workflow_sha256": "60026d109af5afab77f4e696c4cb9980f336eb3c2e12f76570920b188b7598ff",
+    "prior_sealed_workflow_sha256": "3046dbe61fa2649ad0ef4fb066b7c173d05677b0eb676c77b1c4e1b6e75e7bea",
+    "sealed_results_published": false
+  },
+  "preregistration_complete": true,
+  "preregistration_sha256": "09cdea4de1575317e9430c1c226e7cef6a462088c1e40b2f8e3adf4b1744700a",
+  "ranked_development_candidates": [
+    {
+      "candidate_source_sha256": "7c26b7daf6e7e634f0976c8ca1800ae54a0b8b1f2e9dcb2b094a88ebed227183",
+      "development_integrity_valid": true,
+      "development_score": 0.06824055314064026,
+      "generation": 8,
+      "numerical_repeats": 3,
+      "repeat_scores": [
+        0.06606405973434448,
+        0.06824055314064026,
+        0.07025736570358276
+      ],
+      "selected_repeat_index": 1,
+      "training_score": 0.15811900794506073
+    },
+    {
+      "candidate_source_sha256": "19329697abfa743fcd1e84910edf584a89194506da42be8467c7da5760ec0df1",
+      "development_integrity_valid": true,
+      "development_score": 0.06717823445796967,
+      "generation": 7,
+      "numerical_repeats": 3,
+      "repeat_scores": [
+        0.06676200032234192,
+        0.07087630033493042,
+        0.06717823445796967
+      ],
+      "selected_repeat_index": 2,
+      "training_score": 0.17764735221862793
+    },
+    {
+      "candidate_source_sha256": "e360f1dc8ad5ad33189cdf0723b051d0bcb181424118ffa45274aea281e72d3e",
+      "development_integrity_valid": true,
+      "development_score": 0.06680888682603836,
+      "generation": 12,
+      "numerical_repeats": 3,
+      "repeat_scores": [
+        0.06680888682603836,
+        0.06583230942487717,
+        0.06777676939964294
+      ],
+      "selected_repeat_index": 0,
+      "training_score": 0.15810982882976532
+    }
+  ],
+  "regime": "punctuated",
+  "repeat_scores": [
+    0.06606405973434448,
+    0.06824055314064026,
+    0.07025736570358276
+  ],
+  "run_id": "evo2-production-20260712-r1",
+  "run_spec": {
+    "archive": {
+      "archive_size": 16,
+      "num_archive_inspirations": 1,
+      "num_islands": 2,
+      "num_top_k_inspirations": 1
+    },
+    "baselines": [
+      "clone",
+      "fixed_parametric",
+      "fixed_mixed",
+      "stress_responsive"
+    ],
+    "bootstrap": {
+      "confidence": 0.95,
+      "replicates": 10000,
+      "seed": 20260712
+    },
+    "generations": 15,
+    "headless_command": "npx -y @roberttlange/headless@0.4.0",
+    "manifest_sha256": {
+      "development": "563c614250054089bbdbbdae06f78adae27da1d13b29be923c3d70fa99602ace",
+      "sealed": "ff361145bfa4a06572f15c52310d87c44cdd6178eb38e0b7d294e3ad41d00077",
+      "training_punctuated": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+      "training_stable": "716f306f684646cfa2ea62c36c3cef5735e1d682425de3eeee5ca1018ae1b021"
+    },
+    "model": "headless/codex@gpt-5.5?effort=high",
+    "numerical_repeats": 3,
+    "outer_seed": 17,
+    "run_id": "evo2-production-20260712-r1",
+    "schema_version": 1,
+    "search": {
+      "evaluation_timeout": "00:10:00",
+      "max_db_workers": 1,
+      "max_evaluation_jobs": 1,
+      "max_novelty_attempts": 1,
+      "max_patch_attempts": 2,
+      "max_patch_resamples": 2,
+      "max_proposal_jobs": 1,
+      "max_tokens": 8192,
+      "patch_type_probs": [
+        0.7,
+        0.3
+      ],
+      "patch_types": [
+        "diff",
+        "full"
+      ],
+      "reasoning_effort": "high",
+      "temperature": 0.0
+    },
+    "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+    "source_sha256": {
+      "analysis": "ad346fc54bfd8f698073ecbaa5a9a96faee167acf5126306221de3469ac6b45d",
+      "baseline": "5b94a602682551db94e4df1fe52e838859b5f1135870c6bf90c0bc138c2257db",
+      "dependency_lock": "d0500d8ed41fd4757bb14454ac03532f0f409217e68cbfed90c36cc14c8c6ace",
+      "evaluator": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+      "initial": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+      "preregistration": "09cdea4de1575317e9430c1c226e7cef6a462088c1e40b2f8e3adf4b1744700a",
+      "simulator": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7"
+    },
+    "top_k": 3
+  },
+  "run_spec_sha256": "47ac4c3261a64ec37d04f1303b52846329eeffc6efd92f0bf52276adb4ed304f",
+  "schema_version": 2,
+  "sealed_manifest_locked": true,
+  "sealed_manifest_sha256": "ff361145bfa4a06572f15c52310d87c44cdd6178eb38e0b7d294e3ad41d00077",
+  "selected_generation": 8,
+  "selected_repeat_index": 1,
+  "selection_artifact_sha256": {
+    "archive_lineage.json": "ee94f486396ddc06ec45e76db3d20bf2aa326e481daedf2cc13e069f51b257f4",
+    "gen_12_e360f1dc8ad5.json": "12f66d67d9f608fd57619d9459f896b6b5d3c32a27111ef7f81b7963b8693a70",
+    "gen_7_19329697abfa.json": "ea5e4666a23a07c9ff1f5a8637eb0a221c122ca2e2ef5659aa7510de64119e22",
+    "gen_8_7c26b7daf6e7.json": "f3b69a513684410c8b13ce851fdc1ca0fb9dd68e5bc3aae98f2741200c5222aa"
+  },
+  "selection_rule": {
+    "development_rank": "integrity, median repeated score, then generation",
+    "name": "development_score_desc_then_generation_asc",
+    "numerical_repeats": 3,
+    "top_k": 3,
+    "training_rank": "descending combined_score, then generation"
+  },
+  "simulator_config": {
+    "actuation_power_coefficient": 0.002,
+    "assimilation_efficiency": 0.9,
+    "basal_metabolism": 0.01,
+    "bending_stiffness": 0.5,
+    "birth_transfer_efficiency": 0.8,
+    "dt": 0.01,
+    "fluid_enabled": true,
+    "grid_shape": [
+      64,
+      64
+    ],
+    "initial_energy": 2.0,
+    "initial_population": 8,
+    "initial_resource": 1.0,
+    "maturity_age": 50,
+    "max_bending_delta": 0.35,
+    "max_creatures": 32,
+    "maximum_lifespan": 5000,
+    "node_spacing": 2.0,
+    "nodes_per_creature": 8,
+    "placement_candidates": 16,
+    "position_margin": 1.0,
+    "reproduction_cost": 1.5,
+    "reproduction_threshold": 3.0,
+    "resource_capacity": 1.0,
+    "resource_diffusion_rate": 0.0,
+    "resource_patch_center": [
+      48.0,
+      32.0
+    ],
+    "resource_patch_radius": 12.0,
+    "resource_regeneration_rate": 0.03,
+    "spawn_separation": null,
+    "uptake_rate": 1.0
+  },
+  "simulator_config_sha256": "cd3278775210c4859ab2e4f0a8b391d45ec1b6d05a506df17d2ea59df2b9a10b",
+  "source_sha256": {
+    "analysis": "ad346fc54bfd8f698073ecbaa5a9a96faee167acf5126306221de3469ac6b45d",
+    "baseline": "5b94a602682551db94e4df1fe52e838859b5f1135870c6bf90c0bc138c2257db",
+    "dependency_lock": "d0500d8ed41fd4757bb14454ac03532f0f409217e68cbfed90c36cc14c8c6ace",
+    "evaluator": "5bee5491d45cc985aed539c80a87d8da4a1e5fa79424bdbb72dd85b8db3e4934",
+    "finalist_selector": "56f032c8a5b4b3d7001ba7004d88accb8054882366f82738299dbe45c7c81425",
+    "heredity": "3a96e42254f70adfca2d2133a0a0a9783cb1b79e8a848d2b1fcfffacf82186a8",
+    "initial": "e9831cc257f00c0735808e828b04b22f9260bef0094d3f3c88d7ea8b94de5c8a",
+    "launcher": "1a9ea49f1f9799ea7804b69ef569c7e2395abbf3270f6ad80f9825a0e41592b5",
+    "preregistration": "09cdea4de1575317e9430c1c226e7cef6a462088c1e40b2f8e3adf4b1744700a",
+    "run_spec_module": "0720ac393c486754710b30ffbe44f02e77db71a59457e50a2da8874c423c521e",
+    "sealed_workflow": "60026d109af5afab77f4e696c4cb9980f336eb3c2e12f76570920b188b7598ff",
+    "simulator": "d483f02938d686cbac4d2d2539135877dc6a6c2079ce40da430655af758143f7"
+  },
+  "training_manifest_sha256": "535b759c613bb91252934d3b91645b4017add1379b78b7164e984fc58d3e8fbf",
+  "training_score": 0.15811900794506073
+}

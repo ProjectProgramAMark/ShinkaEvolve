@@ -1,11 +1,13 @@
-import subprocess
-import time
-import threading
-import os
-from pathlib import Path
-from typing import Optional, Tuple, TextIO, Dict
-from shinka.utils import load_results, parse_time_to_seconds
 import logging
+import os
+import signal
+import subprocess
+import threading
+import time
+from pathlib import Path
+from typing import Dict, Optional, TextIO, Tuple
+
+from shinka.utils import load_results, parse_time_to_seconds
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +20,12 @@ class ProcessWithLogging:
         process: subprocess.Popen,
         log_files: Tuple[TextIO, TextIO],
         log_threads: Tuple[threading.Thread, threading.Thread],
+        owns_process_group: bool = False,
     ):
         self.process = process
         self.log_files = log_files
         self.log_threads = log_threads
+        self.owns_process_group = owns_process_group
 
     def __getattr__(self, name):
         """Delegate attribute access to the wrapped process."""
@@ -47,6 +51,64 @@ class ProcessWithLogging:
                 file_handle.close()
             except Exception as e:
                 logger.error(f"Error closing log file: {e}")
+
+    def kill(self) -> None:
+        """Kill this evaluator and its descendants, then reap the evaluator.
+
+        Local evaluator commands are launched in their own process group.  Killing
+        only the direct child is insufficient for wrappers such as ``conda run``:
+        the Python evaluator (and any processes it spawned) would otherwise keep
+        running after a timeout.
+        """
+        group_killed = False
+
+        if self.owns_process_group and os.name == "posix":
+            try:
+                os.killpg(self.process.pid, signal.SIGKILL)
+                group_killed = True
+            except ProcessLookupError:
+                # The group has already exited.
+                group_killed = True
+            except OSError as exc:
+                logger.warning(
+                    "Could not kill process group %s: %s; killing the evaluator "
+                    "process directly.",
+                    self.process.pid,
+                    exc,
+                )
+        elif self.owns_process_group and os.name == "nt":
+            try:
+                completed = subprocess.run(
+                    ["taskkill", "/PID", str(self.process.pid), "/T", "/F"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                group_killed = completed.returncode == 0
+            except OSError as exc:
+                logger.warning(
+                    "Could not kill process tree rooted at %s: %s; killing the "
+                    "evaluator process directly.",
+                    self.process.pid,
+                    exc,
+                )
+
+        if not group_killed and self.process.poll() is None:
+            try:
+                self.process.kill()
+            except ProcessLookupError:
+                pass
+
+        try:
+            self.process.wait(timeout=5.0)
+        except subprocess.TimeoutExpired:
+            # A platform-specific group termination may have failed despite
+            # reporting success. Fall back once more to the direct child.
+            try:
+                self.process.kill()
+            except ProcessLookupError:
+                pass
+            self.process.wait()
 
 
 def _stream_output(pipe, file_handle, verbose_prefix=None):
@@ -101,6 +163,14 @@ def submit(
     if env_overrides:
         env.update(env_overrides)
 
+    # Isolate every evaluator in a process group so a timeout can terminate
+    # wrappers, the evaluator, and any descendants as a unit.
+    process_group_kwargs = {}
+    if os.name == "posix":
+        process_group_kwargs["start_new_session"] = True
+    elif os.name == "nt":
+        process_group_kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+
     # Use PIPE to capture output and redirect to files in real-time
     process = subprocess.Popen(
         cmd,
@@ -110,6 +180,7 @@ def submit(
         bufsize=1,  # Line buffered
         universal_newlines=True,
         env=env,
+        **process_group_kwargs,
     )
 
     # Open log files for writing with line buffering
@@ -133,7 +204,10 @@ def submit(
 
     # Create wrapper with logging capabilities
     wrapped_process = ProcessWithLogging(
-        process, (stdout_file, stderr_file), (stdout_thread, stderr_thread)
+        process,
+        (stdout_file, stderr_file),
+        (stdout_thread, stderr_thread),
+        owns_process_group=bool(process_group_kwargs),
     )
 
     if verbose:
