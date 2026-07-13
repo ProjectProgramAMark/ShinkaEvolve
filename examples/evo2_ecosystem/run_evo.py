@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 from pathlib import Path
 import random
 import shlex
 import sqlite3
+import subprocess
 import sys
-from typing import Any, TYPE_CHECKING
+from types import ModuleType
+from typing import Any, Callable, Mapping, TYPE_CHECKING
 
 import numpy as np
 
@@ -37,6 +40,217 @@ HEADLESS_COMMAND_ENV = "SHINKA_HEADLESS_COMMAND"
 ANALYSIS_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "analysis.py"
 BASELINE_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "run_baselines.py"
 R4_TOOL_ROOT = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
+
+
+def _git_output(repository: Path, *arguments: str) -> bytes:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repository), *arguments],
+            check=True,
+            capture_output=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise RuntimeError(
+            f"cannot authenticate r5 repository state: {repository}"
+        ) from error
+    return completed.stdout
+
+
+def _path_is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
+
+
+def _has_symlink_component(path: Path, root: Path) -> bool:
+    current = root
+    for part in path.relative_to(root).parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+    return False
+
+
+def _allowed_generated_path(
+    repository_name: str,
+    relative: Path,
+    spec: dict[str, Any],
+) -> bool:
+    if repository_name == "microcosmos":
+        artifact_root = Path(run_spec.R5_ARTIFACT_ROOT).relative_to("microcosmos")
+        stop_report = Path(run_spec.R5_STOP_REPORT_PATH).relative_to("microcosmos")
+        return _path_is_within(relative, artifact_root) or relative == stop_report
+
+    exact_profiles = {
+        Path(run_spec.R5_PROFILE_PATH).relative_to("ShinkaEvolve"),
+        Path(run_spec.R5_PROFILE_HASH_PATH).relative_to("ShinkaEvolve"),
+    }
+    artifact_roots = {
+        Path(value).relative_to("ShinkaEvolve")
+        for value in spec["artifact_roots"].values()
+    }
+    return relative in exact_profiles or any(
+        _path_is_within(relative, root) for root in artifact_roots
+    )
+
+
+def _verify_repository_state(spec: dict[str, Any]) -> None:
+    """Bind an r5 launch to clean source commits plus declared outputs."""
+    if run_spec.schema_version(spec) != 4:
+        return
+    project_root = run_spec.PROJECT_ROOT.resolve()
+    repositories = {
+        "microcosmos": project_root / "microcosmos",
+        "shinkaevolve": project_root / "ShinkaEvolve",
+    }
+    for name, unresolved in repositories.items():
+        if unresolved.is_symlink():
+            raise RuntimeError(f"r5 repository root may not be a symlink: {unresolved}")
+        repository = unresolved.resolve()
+        if not repository.is_dir() or not _path_is_within(repository, project_root):
+            raise RuntimeError(f"r5 repository path escapes project root: {unresolved}")
+        head = _git_output(repository, "rev-parse", "HEAD").decode().strip()
+        if head != spec["repository_commits"][name]:
+            raise RuntimeError(f"{name} HEAD does not match the r5 run specification")
+        tracked = _git_output(
+            repository,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=no",
+            "-z",
+        )
+        if tracked:
+            raise RuntimeError(f"{name} has tracked modifications at r5 launch")
+
+        untracked = set()
+        for ignored_flag in ((), ("--ignored",)):
+            untracked.update(
+                _git_output(
+                    repository,
+                    "ls-files",
+                    "--others",
+                    *ignored_flag,
+                    "--exclude-standard",
+                    "-z",
+                ).split(b"\0")
+            )
+        for encoded in untracked - {b""}:
+            relative = Path(encoded.decode("utf-8", errors="surrogateescape"))
+            if relative.is_absolute() or ".." in relative.parts:
+                raise RuntimeError(f"unsafe untracked path in {name}: {relative}")
+            path = repository / relative
+            if (
+                _has_symlink_component(path, repository)
+                or not _path_is_within(path.resolve(strict=False), repository)
+                or not _allowed_generated_path(name, relative, spec)
+            ):
+                raise RuntimeError(
+                    f"undeclared untracked path in {name} at r5 launch: {relative}"
+                )
+
+
+def _import_protocol_module(path: Path, source_hash: str) -> ModuleType:
+    """Import one authenticated experiment-local protocol module."""
+    relative = path.relative_to(MICROCOSMOS_ROOT)
+    package_name = ".".join(relative.parent.parts)
+    module_name = (
+        f"{package_name}.__shinka_bound_{path.stem}_{source_hash[:16]}"
+    )
+    module_spec = importlib.util.spec_from_file_location(module_name, path)
+    if module_spec is None or module_spec.loader is None:
+        raise RuntimeError(f"cannot import bound protocol tool: {path}")
+    module = importlib.util.module_from_spec(module_spec)
+    sys.modules[module_name] = module
+    try:
+        module_spec.loader.exec_module(module)
+    except Exception as error:
+        sys.modules.pop(module_name, None)
+        raise RuntimeError(f"bound protocol tool failed to import: {path}") from error
+    return module
+
+
+def _resolve_protocol_tools(spec: dict[str, Any]) -> dict[str, Callable[..., Any]]:
+    """Import the exact schema-v4 role-to-callable bindings, failing closed."""
+    if run_spec.schema_version(spec) != 4:
+        return {}
+    try:
+        paths = run_spec.protocol_tool_paths(spec)
+    except ValueError as error:
+        raise RuntimeError("r5 protocol-tool authentication failed") from error
+    modules: dict[Path, ModuleType] = {}
+    resolved: dict[str, Callable[..., Any]] = {}
+    for role, callable_name in run_spec.R5_PROTOCOL_TOOL_CALLABLES.items():
+        path = paths[role]
+        binding = spec["protocol_tools"][role]
+        module = modules.get(path)
+        if module is None:
+            module = _import_protocol_module(path, binding["sha256"])
+            modules[path] = module
+        function = getattr(module, callable_name, None)
+        if not callable(function):
+            raise RuntimeError(
+                f"{role} protocol tool does not export callable {callable_name}"
+            )
+        if run_spec.sha256_file(path) != binding["sha256"]:
+            raise RuntimeError(f"{role} protocol tool changed while importing")
+        resolved[role] = function
+    return resolved
+
+
+def _verify_prerequisite_artifacts(
+    spec: dict[str, Any],
+    protocol_tools: Mapping[str, Callable[..., Any]],
+) -> dict[str, dict[str, Any]]:
+    """Authenticate canonical prerequisite evidence before either search arm."""
+    if run_spec.schema_version(spec) != 4:
+        return {}
+    try:
+        paths = run_spec.prerequisite_artifact_paths(spec)
+    except ValueError as error:
+        raise RuntimeError("r5 prerequisite path validation failed") from error
+    evidence: dict[str, dict[str, Any]] = {}
+    for role, path in paths.items():
+        binding = spec["prerequisite_artifacts"][role]
+        raw = path.read_bytes()
+        if run_spec.sha256_bytes(raw) != binding["sha256"]:
+            raise RuntimeError(f"{role} prerequisite SHA-256 does not match")
+        try:
+            payload = json.loads(raw)
+        except (json.JSONDecodeError, UnicodeDecodeError) as error:
+            raise RuntimeError(f"{role} prerequisite is not valid JSON") from error
+        try:
+            canonical = (
+                run_spec.canonical_json_bytes(payload)
+                if isinstance(payload, dict)
+                else None
+            )
+        except (TypeError, ValueError) as error:
+            raise RuntimeError(
+                f"{role} prerequisite is not canonical passing evidence"
+            ) from error
+        if (
+            not isinstance(payload, dict)
+            or raw != canonical
+            or payload.get("passed") is not True
+            or binding["passed"] is not True
+        ):
+            raise RuntimeError(
+                f"{role} prerequisite is not canonical passing evidence"
+            )
+        evidence[role] = payload
+
+    validator = protocol_tools.get("world_qualification")
+    if not callable(validator):
+        raise RuntimeError("world-qualification validator is unavailable")
+    result = validator(
+        paths["world_qualification"],
+        expected_implementation_commit=spec["repository_commits"]["microcosmos"],
+    )
+    if not isinstance(result, Mapping):
+        raise RuntimeError("world-qualification validator returned invalid evidence")
+    return evidence
 
 
 def _require_holdouts_locked(spec: dict[str, Any] | None = None) -> None:
@@ -92,6 +306,9 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
     root = str(MICROCOSMOS_ROOT)
     if root not in _sys.path:
         _sys.path.insert(0, root)
+    _verify_repository_state(spec)
+    protocol_tools = _resolve_protocol_tools(spec)
+    _verify_prerequisite_artifacts(spec, protocol_tools)
     from experiments.evo2_ecosystem.episode import (  # noqa: PLC0415
         SimulatorConfig,
         simulator_config_sha256,
@@ -111,12 +328,20 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
     )
     from experiments.evo2_ecosystem.protocol import manifest_sha256  # noqa: PLC0415
 
+    if run_spec.schema_version(spec) == 4:
+        analysis_path = run_spec.protocol_tool_paths(spec)["final_analysis"]
+        baseline_path = (
+            run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
+        ).resolve()
+    else:
+        analysis_path = ANALYSIS_PATH
+        baseline_path = BASELINE_PATH
     source_paths = {
         "initial": run_spec.sha256_file(run_spec.initial_program_path(spec)),
         "evaluator": run_spec.sha256_file(TASK_DIR / "evaluate.py"),
         "simulator": simulator_source_sha256(),
-        "analysis": run_spec.sha256_file(ANALYSIS_PATH),
-        "baseline": run_spec.sha256_file(BASELINE_PATH),
+        "analysis": run_spec.sha256_file(analysis_path),
+        "baseline": run_spec.sha256_file(baseline_path),
         "dependency_lock": run_spec.sha256_file(run_spec.DEPENDENCY_LOCK_PATH),
         "launcher": run_spec.sha256_file(Path(__file__)),
         "finalist_selector": run_spec.sha256_file(TASK_DIR / "freeze_finalist.py"),

@@ -199,14 +199,17 @@ def _r4_episode() -> SimpleNamespace:
         operator_success_ema=np.full(6, 0.5),
         operator_usage_ema=np.full(6, 1 / 6),
         operator_evidence_ema=np.full(6, 0.2),
+        integrity_valid=True,
     )
 
 
 def test_stable_feedback_cannot_observe_executed_shock_results() -> None:
     evaluator = _evaluator()
+    sham = _r4_episode()
     evaluation = SimpleNamespace(
-        episodes=(_r4_episode(),),
-        sham_episodes=(_r4_episode(),),
+        episodes=(sham,),
+        sham_episodes=(sham,),
+        ancestor_episodes=(_r4_episode(),),
         integrity_valid=True,
         candidate_score=0.03,
         repeat_scores=np.array([0.01, 0.03, 0.04]),
@@ -219,6 +222,41 @@ def test_stable_feedback_cannot_observe_executed_shock_results() -> None:
     assert "shock" not in stable["text_feedback"]
     punctuated = evaluator._episode_metrics_r4(evaluation, "punctuated")
     assert punctuated["public"]["shock_auc_delta"] == pytest.approx(0.99)
+
+
+def test_hidden_shock_failure_cannot_invalidate_stable_sham_score() -> None:
+    evaluator = _evaluator()
+    sham = _r4_episode()
+    shock = _r4_episode()
+    shock.survived = False
+    shock.integrity_valid = False
+    ancestor_sham = _r4_episode()
+    ancestor_shock = _r4_episode()
+    evaluation = SimpleNamespace(
+        episodes=(sham, shock),
+        sham_episodes=(sham,),
+        ancestor_episodes=(ancestor_sham, ancestor_shock),
+        integrity_valid=False,
+        candidate_score=0.03,
+        repeat_scores=np.array([0.01, 0.03, 0.04]),
+        selected_repeat_index=1,
+        sham_auc_delta=np.array([0.02]),
+        shock_auc_delta=np.array([-0.99]),
+    )
+
+    stable = evaluator._episode_metrics_r4(evaluation, "stable")
+    assert stable["combined_score"] == pytest.approx(0.03)
+    assert stable["private"]["integrity_valid"] is True
+    assert "shock" not in stable["text_feedback"]
+
+    punctuated = evaluator._episode_metrics_r4(evaluation, "punctuated")
+    assert punctuated["combined_score"] == -2.0
+    assert punctuated["private"]["integrity_valid"] is False
+
+    ancestor_sham.survived = False
+    stable = evaluator._episode_metrics_r4(evaluation, "stable")
+    assert stable["combined_score"] == -2.0
+    assert stable["private"]["integrity_valid"] is False
 
 
 def test_r4_task_message_names_credit_and_six_trusted_actions(tmp_path: Path) -> None:

@@ -100,6 +100,7 @@ _ALLOWED_NODES = (
     ast.Add,
     ast.Sub,
     ast.Mult,
+    ast.MatMult,
     ast.Div,
     ast.Mod,
     ast.BitAnd,
@@ -650,9 +651,26 @@ def _episode_metrics_r4(evaluation: Any, regime: str) -> dict[str, Any]:
         episodes = getattr(evaluation, "sham_episodes", None)
         if episodes is None:
             raise ValueError("stable r4 feedback requires explicit sham-only episodes")
+        all_episodes = tuple(evaluation.episodes)
+        ancestor_episodes = tuple(getattr(evaluation, "ancestor_episodes", ()))
+        sham_ids = {id(episode) for episode in episodes}
+        sham_indices = [
+            index for index, episode in enumerate(all_episodes) if id(episode) in sham_ids
+        ]
+        if len(sham_indices) != len(episodes) or len(ancestor_episodes) != len(all_episodes):
+            raise ValueError("stable r4 feedback requires paired ancestor sham episodes")
+        integrity = all(
+            bool(np.asarray(getattr(all_episodes[index], "integrity_valid", True)))
+            and bool(np.asarray(all_episodes[index].survived))
+            and bool(
+                np.asarray(getattr(ancestor_episodes[index], "integrity_valid", True))
+            )
+            and bool(np.asarray(ancestor_episodes[index].survived))
+            for index in sham_indices
+        )
     else:
         episodes = evaluation.episodes
-    integrity = bool(np.asarray(evaluation.integrity_valid))
+        integrity = bool(np.asarray(evaluation.integrity_valid))
     raw_score = float(np.asarray(evaluation.candidate_score))
     score = raw_score if integrity and math.isfinite(raw_score) else -2.0
     births = np.asarray([episode.birth_count for episode in episodes], dtype=float)

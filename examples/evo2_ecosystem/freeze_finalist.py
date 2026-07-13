@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict, dataclass
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -12,6 +13,8 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import subprocess
+import sys
 import tempfile
 from types import ModuleType
 from typing import Any
@@ -51,6 +54,67 @@ class Candidate:
     source_sha256: str
     training_score: float
     training_metrics: dict[str, Any]
+
+
+def _require_stored_run_spec(
+    run_root: Path,
+    spec_raw: bytes,
+    spec_hash: str,
+) -> Path:
+    """Authenticate the canonical run specification stored with run artifacts."""
+    stored_spec = run_root / "run_spec.json"
+    stored_hash = run_root / "run_spec.sha256"
+    if (
+        not stored_spec.is_file()
+        or stored_spec.read_bytes() != spec_raw
+        or not stored_hash.is_file()
+        or stored_hash.read_text(encoding="utf-8")
+        != f"{spec_hash}  run_spec.json\n"
+    ):
+        raise RuntimeError("stored run specification does not match the canonical spec")
+    return stored_spec
+
+
+def _load_r5_baselines(spec: dict[str, Any]) -> ModuleType:
+    """Load the source-bound Microcosmos r5 baseline module."""
+    if run_spec.schema_version(spec) != 4:
+        raise ValueError("r5 baselines require a schema-v4 run specification")
+    expected_path = (
+        run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
+    ).resolve()
+    if (
+        not expected_path.is_file()
+        or run_spec.sha256_file(expected_path) != spec["source_sha256"]["baseline"]
+    ):
+        raise RuntimeError("r5 baseline source does not match the run specification")
+    root = str(MICROCOSMOS_ROOT)
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    module = importlib.import_module("experiments.evo2_ecosystem.r5.baselines")
+    module_path = Path(module.__file__).resolve()
+    if (
+        module_path != expected_path
+        or run_spec.sha256_file(module_path) != spec["source_sha256"]["baseline"]
+    ):
+        raise RuntimeError("loaded r5 baseline module is not the bound source")
+    for name in (
+        "publish_structured_random_roster",
+        "load_structured_random_roster",
+    ):
+        if not callable(getattr(module, name, None)):
+            raise RuntimeError(f"r5 baseline module lacks {name}")
+    return module
+
+
+def _verify_structured_training_inputs(spec: dict[str, Any]) -> None:
+    """Apply the same schema-v4 source, prerequisite, and holdout preflight."""
+    if __package__:
+        from examples.evo2_ecosystem import run_evo  # noqa: PLC0415
+    else:
+        import run_evo  # type: ignore[no-redef]  # noqa: PLC0415
+
+    run_evo._require_holdouts_locked(spec)
+    run_evo._verify_search_inputs(spec, "punctuated")
 
 
 def discover_candidates(
@@ -681,6 +745,387 @@ def _write_atomic(path: Path, payload: bytes) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def _write_terminal_directory(
+    destination: Path,
+    source: bytes,
+    metrics: dict[str, Any],
+    correct: dict[str, Any],
+) -> None:
+    """Publish one complete structured-random slot without partial records."""
+    expected = {
+        "main.py": source,
+        "results/metrics.json": _json_bytes(metrics),
+        "results/correct.json": _json_bytes(correct),
+    }
+    if destination.exists():
+        if all(
+            (destination / relative).is_file()
+            and (destination / relative).read_bytes() == payload
+            for relative, payload in expected.items()
+        ):
+            return
+        raise FileExistsError(
+            f"refusing to replace structured-random terminal record at {destination}"
+        )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(
+        tempfile.mkdtemp(prefix=f".{destination.name}.", dir=destination.parent)
+    )
+    try:
+        for relative, payload in expected.items():
+            target = staging / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+        os.replace(staging, destination)
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
+
+
+def _structured_expected_private(
+    spec: dict[str, Any],
+    spec_hash: str,
+) -> dict[str, Any]:
+    return {
+        "manifest_sha256": run_spec.manifest_hash(spec, "training_punctuated"),
+        "evaluator_source_sha256": spec["source_sha256"]["evaluator"],
+        "simulator_source_sha256": spec["source_sha256"]["simulator"],
+        "simulator_config_sha256": spec["simulator_config_sha256"],
+        "run_spec_sha256": spec_hash,
+        "run_spec_schema_version": 4,
+        "candidate_output_width": run_spec.candidate_output_width(spec),
+        "candidate_contract_version": run_spec.candidate_contract_version(spec),
+        "initial_program_sha256": spec["initial_program"]["sha256"],
+        "founder_index_sha256": spec["founder_index"]["sha256"],
+        "full_evaluation_performed": True,
+    }
+
+
+def _structured_terminal_records(
+    training: Path,
+    roster: tuple[Any, ...],
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    require_complete: bool = True,
+) -> list[dict[str, Any]]:
+    """Authenticate every terminal training slot against its frozen source."""
+    if require_complete and len(roster) != 50:
+        raise RuntimeError("structured-random roster must contain exactly 50 sources")
+    expected_private = _structured_expected_private(spec, spec_hash)
+    records: list[dict[str, Any]] = []
+    for generation, source_record in enumerate(roster):
+        generation_dir = training / f"gen_{generation}"
+        source_path = generation_dir / "main.py"
+        metrics_path = generation_dir / "results" / "metrics.json"
+        correct_path = generation_dir / "results" / "correct.json"
+        if not all(
+            path.is_file() for path in (source_path, metrics_path, correct_path)
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} is not terminal"
+            )
+        source = source_path.read_bytes()
+        if (
+            source != source_record.source.encode("utf-8")
+            or hashlib.sha256(source).hexdigest() != source_record.sha256
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} source does not match roster"
+            )
+        try:
+            metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+            correct = json.loads(correct_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as error:
+            raise RuntimeError(
+                f"structured-random slot {generation} has invalid JSON"
+            ) from error
+        if not isinstance(metrics, dict) or not isinstance(correct, dict):
+            raise RuntimeError(
+                f"structured-random slot {generation} has invalid records"
+            )
+        private = metrics.get("private", {})
+        if (
+            not isinstance(private, dict)
+            or private.get("candidate_sha256") != source_record.sha256
+            or private.get("structured_random_candidate_id")
+            != source_record.candidate_id
+            or private.get("structured_random_generation") != generation
+            or any(
+                private.get(key) != value
+                for key, value in expected_private.items()
+                if key != "full_evaluation_performed"
+            )
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} protocol mismatch"
+            )
+        was_evaluated = private.get("full_evaluation_performed") is True
+        is_correct = correct.get("correct") is True
+        if is_correct != (private.get("integrity_valid") is True) or (
+            is_correct and not was_evaluated
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} correctness mismatch"
+            )
+        score = metrics.get("combined_score")
+        if (
+            isinstance(score, bool)
+            or not isinstance(score, (int, float))
+            or not math.isfinite(float(score))
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} has invalid score"
+            )
+        if was_evaluated:
+            repeat_scores = private.get("repeat_scores")
+            selected_repeat = private.get("selected_repeat_index")
+            if (
+                private.get("numerical_repeats") != spec["numerical_repeats"]
+                or not isinstance(repeat_scores, list)
+                or len(repeat_scores) != spec["numerical_repeats"]
+                or any(
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not math.isfinite(float(value))
+                    for value in repeat_scores
+                )
+                or isinstance(selected_repeat, bool)
+                or not isinstance(selected_repeat, int)
+                or not 0 <= selected_repeat < len(repeat_scores)
+                or float(score) != float(repeat_scores[selected_repeat])
+            ):
+                raise RuntimeError(
+                    f"structured-random slot {generation} full audit mismatch"
+                )
+        elif (
+            private.get("numerical_repeats") != 0
+            or private.get("repeat_scores") != []
+            or private.get("selected_repeat_index") is not None
+        ):
+            raise RuntimeError(
+                f"structured-random slot {generation} invalid audit mismatch"
+            )
+        records.append(
+            {
+                "candidate_id": source_record.candidate_id,
+                "family": source_record.family,
+                "generation": generation,
+                "source_sha256": source_record.sha256,
+                "metrics_sha256": run_spec.sha256_file(metrics_path),
+                "correct_sha256": run_spec.sha256_file(correct_path),
+                "correct": is_correct,
+                "full_evaluation_performed": was_evaluated,
+                "training_score": float(score),
+            }
+        )
+    if require_complete:
+        unexpected = {
+            path.name
+            for path in training.glob("gen_*")
+            if path.name not in {f"gen_{index}" for index in range(50)}
+        }
+        if unexpected:
+            raise RuntimeError(
+                f"unexpected structured-random training slots: {sorted(unexpected)}"
+            )
+    return records
+
+
+def _structured_completion(
+    paths: run_spec.StructuredRandomPaths,
+    roster: tuple[Any, ...],
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+) -> dict[str, Any]:
+    index_path = paths.roster / "index.json"
+    records = _structured_terminal_records(
+        paths.training,
+        roster,
+        spec=spec,
+        spec_hash=spec_hash,
+    )
+    unique_valid = {
+        record["source_sha256"] for record in records if record["correct"]
+    }
+    return {
+        "schema_version": 1,
+        "run_id": spec["run_id"],
+        "control": "structured_random",
+        "regime": "punctuated",
+        "run_spec_sha256": spec_hash,
+        "roster_index_sha256": run_spec.sha256_file(index_path),
+        "terminal_evaluation_count": len(records),
+        "full_evaluation_count": sum(
+            record["full_evaluation_performed"] for record in records
+        ),
+        "valid_evaluation_count": sum(record["correct"] for record in records),
+        "unique_valid_candidate_count": len(unique_valid),
+        "passed": len(unique_valid) >= spec["top_k"],
+        "terminal_records": records,
+    }
+
+
+def _evaluation_timeout_seconds(spec: dict[str, Any]) -> int:
+    """Parse the already-frozen Shinka wall-clock timeout for one control slot."""
+    value = spec["search"]["evaluation_timeout"]
+    try:
+        hours, minutes, seconds = (int(part) for part in value.split(":"))
+    except (AttributeError, TypeError, ValueError) as error:
+        raise ValueError("invalid structured-random evaluation timeout") from error
+    timeout = hours * 3600 + minutes * 60 + seconds
+    if hours < 0 or not 0 <= minutes < 60 or not 0 <= seconds < 60 or timeout <= 0:
+        raise ValueError("invalid structured-random evaluation timeout")
+    return timeout
+
+
+def _evaluate_structured_source(
+    source_path: Path,
+    *,
+    stored_spec: Path,
+    spec: dict[str, Any],
+    spec_hash: str,
+) -> tuple[dict[str, Any], bool, str | None]:
+    """Run one source through the existing evaluator in a fresh JAX process."""
+    with tempfile.TemporaryDirectory(prefix="evo2-r5-structured-") as directory:
+        results = Path(directory) / "results"
+        command = [
+            sys.executable,
+            str(TASK_DIR / "evaluate.py"),
+            "--program_path",
+            str(source_path),
+            "--results_dir",
+            str(results),
+            "--training_regime",
+            "punctuated",
+            "--run_spec_path",
+            str(stored_spec),
+            "--run_spec_sha256",
+            spec_hash,
+        ]
+        error_code: str | None = None
+        error: str | None = None
+        try:
+            completed = subprocess.run(
+                command,
+                check=False,
+                capture_output=True,
+                timeout=_evaluation_timeout_seconds(spec),
+            )
+            if completed.returncode:
+                error_code = "evaluation_failed"
+                error = "candidate evaluator process failed"
+        except subprocess.TimeoutExpired:
+            error_code = "timeout"
+            error = "candidate evaluation timed out"
+
+        metrics_path = results / "metrics.json"
+        correct_path = results / "correct.json"
+        if error_code is None and metrics_path.is_file() and correct_path.is_file():
+            try:
+                metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+                correct = json.loads(correct_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                error_code = "evaluation_failed"
+                error = "candidate evaluator emitted invalid records"
+            else:
+                if isinstance(metrics, dict) and isinstance(correct, dict):
+                    return metrics, correct.get("correct") is True, correct.get("error")
+                error_code = "evaluation_failed"
+                error = "candidate evaluator emitted invalid records"
+        elif error_code is None:
+            error_code = "evaluation_failed"
+            error = "candidate evaluator emitted incomplete records"
+
+        assert error_code is not None
+        metrics = task_evaluator._failure_metrics(
+            error_code,
+            source_path,
+            "punctuated",
+            run_spec_path=stored_spec,
+            expected_run_spec_sha256=spec_hash,
+        )
+        return metrics, False, error
+
+
+def run_structured_random_training(
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+) -> dict[str, Any]:
+    """Evaluate the prospectively frozen 50-source control exactly once each."""
+    if run_spec.schema_version(spec) != 4 or spec["top_k"] != 5:
+        raise ValueError("structured-random training requires the frozen r5 protocol")
+    paths = run_spec.structured_random_paths(spec)
+    stored_spec = _require_stored_run_spec(paths.run_root, spec_raw, spec_hash)
+    _verify_structured_training_inputs(spec)
+    baselines = _load_r5_baselines(spec)
+    baselines.publish_structured_random_roster(paths.roster)
+    roster = tuple(baselines.load_structured_random_roster(paths.roster))
+    if len(roster) != 50:
+        raise RuntimeError("structured-random roster has the wrong frozen size")
+
+    for generation, source_record in enumerate(roster):
+        destination = paths.training / f"gen_{generation}"
+        if destination.exists():
+            # Resume accepts only a complete, authenticated terminal directory.
+            _structured_terminal_records(
+                paths.training,
+                roster[: generation + 1],
+                spec=spec,
+                spec_hash=spec_hash,
+                require_complete=False,
+            )
+            continue
+        metrics, correct_value, error = _evaluate_structured_source(
+            paths.roster / f"{source_record.candidate_id}.py",
+            stored_spec=stored_spec,
+            spec=spec,
+            spec_hash=spec_hash,
+        )
+        metrics = dict(metrics)
+        private = dict(metrics.get("private", {}))
+        private.update(
+            {
+                "structured_random_candidate_id": source_record.candidate_id,
+                "structured_random_generation": generation,
+            }
+        )
+        metrics["private"] = private
+        _write_terminal_directory(
+            destination,
+            source_record.source.encode("utf-8"),
+            metrics,
+            {"correct": correct_value, "error": error},
+        )
+
+    completion = _structured_completion(
+        paths,
+        roster,
+        spec=spec,
+        spec_hash=spec_hash,
+    )
+    completion_path = paths.control_root / "complete.json"
+    _write_atomic(completion_path, _json_bytes(completion))
+    if not completion["passed"]:
+        failure = {
+            "schema_version": 1,
+            "run_id": spec["run_id"],
+            "control": "structured_random",
+            "reason": "fewer_than_five_unique_valid_candidates",
+            "run_spec_sha256": spec_hash,
+            "completion_sha256": run_spec.sha256_file(completion_path),
+            "unique_valid_candidate_count": completion[
+                "unique_valid_candidate_count"
+            ],
+            "passed": False,
+        }
+        _write_atomic(paths.control_root / "search_failure.json", _json_bytes(failure))
+    return completion
+
+
 def _load_development_record(
     path: Path,
     *,
@@ -718,24 +1163,46 @@ def _load_development_record(
 
 
 def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str, Any]:
+    analysis_path = ANALYSIS_PATH
+    baseline_path = BASELINE_PATH
+    if run_spec.schema_version(spec) == 4:
+        analysis_path = run_spec.protocol_tool_paths(spec)["final_analysis"]
+        baseline_path = (
+            run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
+        ).resolve()
     all_sources = {
         "initial": run_spec.sha256_file(run_spec.initial_program_path(spec)),
         "evaluator": run_spec.sha256_file(TASK_DIR / "evaluate.py"),
         "simulator": dependencies["simulator_source_sha256"](),
-        "analysis": run_spec.sha256_file(ANALYSIS_PATH),
-        "baseline": run_spec.sha256_file(BASELINE_PATH),
+        "analysis": run_spec.sha256_file(analysis_path),
+        "baseline": run_spec.sha256_file(baseline_path),
         "dependency_lock": run_spec.sha256_file(run_spec.DEPENDENCY_LOCK_PATH),
-        "preregistration": run_spec.sha256_file(run_spec.PREREGISTRATION_PATH),
         "launcher": run_spec.sha256_file(TASK_DIR / "run_evo.py"),
         "finalist_selector": run_spec.sha256_file(Path(__file__)),
         "lineage_selector": run_spec.sha256_file(TASK_DIR / "program_lineage.py"),
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
         "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
-        "r4_final_analysis": run_spec.sha256_file(R4_TOOL_ROOT / "analysis.py"),
-        "r4_manifest_generator": run_spec.sha256_file(R4_TOOL_ROOT / "manifest_generator.py"),
-        "r4_qualification": run_spec.sha256_file(R4_TOOL_ROOT / "qualification.py"),
-        "r4_opportunity": run_spec.sha256_file(R4_TOOL_ROOT / "opportunity.py"),
     }
+    if run_spec.schema_version(spec) != 4:
+        all_sources.update(
+            {
+                "preregistration": run_spec.sha256_file(
+                    run_spec.PREREGISTRATION_PATH
+                ),
+                "r4_final_analysis": run_spec.sha256_file(
+                    R4_TOOL_ROOT / "analysis.py"
+                ),
+                "r4_manifest_generator": run_spec.sha256_file(
+                    R4_TOOL_ROOT / "manifest_generator.py"
+                ),
+                "r4_qualification": run_spec.sha256_file(
+                    R4_TOOL_ROOT / "qualification.py"
+                ),
+                "r4_opportunity": run_spec.sha256_file(
+                    R4_TOOL_ROOT / "opportunity.py"
+                ),
+            }
+        )
     actual_sources = {name: all_sources[name] for name in spec["source_sha256"]}
     if actual_sources != spec["source_sha256"]:
         raise RuntimeError("trusted source no longer matches the production run spec")
@@ -830,24 +1297,170 @@ def _freeze(
             shutil.rmtree(staging)
 
 
+def _protocol_freeze_fields(
+    spec: dict[str, Any],
+    source_hashes: dict[str, Any],
+) -> dict[str, Any]:
+    """Preserve legacy records while using r5's single protocol document."""
+    version = run_spec.schema_version(spec)
+    if version == 4:
+        return {
+            "protocol_document_sha256": spec["protocol_document"]["sha256"],
+            "protocol_document_complete": True,
+        }
+    return {
+        "preregistration_sha256": (
+            source_hashes["preregistration"]
+            if version == 1
+            else spec["preregistration"]["sha256"]
+        ),
+        "implementation_plan_sha256": (
+            None if version == 1 else spec["implementation_plan"]["sha256"]
+        ),
+        "preregistration_complete": True,
+    }
+
+
+_DEVELOPMENT_COMPLETE_NAME = "development.complete.json"
+
+
+def _development_complete_path(spec: dict[str, Any], label: str) -> Path:
+    if label in run_spec.REGIMES:
+        return run_spec.paths_for(spec, label).selection / _DEVELOPMENT_COMPLETE_NAME
+    if label == "structured_random":
+        return (
+            run_spec.structured_random_paths(spec).selection
+            / _DEVELOPMENT_COMPLETE_NAME
+        )
+    raise ValueError(f"unknown development label: {label}")
+
+
+def _publish_development_completion(
+    spec: dict[str, Any],
+    spec_hash: str,
+    label: str,
+    candidates: list[Candidate],
+    selection_directory: Path,
+) -> dict[str, Any]:
+    records = []
+    for candidate in candidates:
+        filename = f"gen_{candidate.generation}_{candidate.source_sha256[:12]}.json"
+        path = selection_directory / filename
+        if not path.is_file():
+            raise RuntimeError(f"missing development evaluation: {path}")
+        records.append(
+            {
+                "generation": candidate.generation,
+                "candidate_source_sha256": candidate.source_sha256,
+                "record": filename,
+                "record_sha256": run_spec.sha256_file(path),
+            }
+        )
+    archive = selection_directory / "archive_lineage.json"
+    if not archive.is_file():
+        raise RuntimeError("development archive lineage is missing")
+    completion = {
+        "schema_version": 1,
+        "complete": True,
+        "run_id": spec["run_id"],
+        "label": label,
+        "run_spec_sha256": spec_hash,
+        "top_k": spec["top_k"],
+        "archive_lineage_sha256": run_spec.sha256_file(archive),
+        "records": records,
+    }
+    _write_atomic(
+        selection_directory / _DEVELOPMENT_COMPLETE_NAME,
+        _json_bytes(completion),
+    )
+    return completion
+
+
+def _load_development_completion(
+    spec: dict[str, Any],
+    spec_hash: str,
+    label: str,
+) -> dict[str, Any]:
+    path = _development_complete_path(spec, label)
+    try:
+        completion = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"development evaluation is incomplete for {label}") from error
+    expected = {
+        "schema_version": 1,
+        "complete": True,
+        "run_id": spec["run_id"],
+        "label": label,
+        "run_spec_sha256": spec_hash,
+        "top_k": spec["top_k"],
+    }
+    if not isinstance(completion, dict) or any(
+        completion.get(key) != value for key, value in expected.items()
+    ):
+        raise RuntimeError(f"development completion marker is invalid for {label}")
+    selection = path.parent
+    archive = selection / "archive_lineage.json"
+    records = completion.get("records")
+    if (
+        not archive.is_file()
+        or run_spec.sha256_file(archive)
+        != completion.get("archive_lineage_sha256")
+        or not isinstance(records, list)
+        or len(records) != spec["top_k"]
+    ):
+        raise RuntimeError(f"development artifacts do not authenticate for {label}")
+    seen: set[str] = set()
+    for record in records:
+        if not isinstance(record, dict) or set(record) != {
+            "generation",
+            "candidate_source_sha256",
+            "record",
+            "record_sha256",
+        }:
+            raise RuntimeError(f"development record index is invalid for {label}")
+        record_path = selection / record["record"]
+        source_hash = record["candidate_source_sha256"]
+        if (
+            Path(record["record"]).name != record["record"]
+            or source_hash in seen
+            or not record_path.is_file()
+            or run_spec.sha256_file(record_path) != record["record_sha256"]
+        ):
+            raise RuntimeError(f"development record does not authenticate for {label}")
+        seen.add(source_hash)
+    if path.read_bytes() != _json_bytes(completion):
+        raise RuntimeError(f"development completion is not canonical for {label}")
+    return completion
+
+
+def _require_all_development_evaluations(
+    spec: dict[str, Any], spec_hash: str
+) -> None:
+    """Prevent any r5 freeze until all 15 development records authenticate."""
+    for label in (*run_spec.REGIMES, "structured_random"):
+        _load_development_completion(spec, spec_hash, label)
+
+
 def select_and_freeze(
     regime: str,
     *,
     spec: dict[str, Any],
     spec_hash: str,
     spec_raw: bytes,
+    _phase: str | None = None,
 ) -> dict[str, Any]:
     """Sequentially evaluate the fixed top-K and freeze the development winner."""
+    version = run_spec.schema_version(spec)
+    if _phase not in {None, "evaluate", "freeze"}:
+        raise ValueError("unknown development phase")
+    if version == 4 and _phase is None:
+        raise RuntimeError("schema-v4 development requires an explicit phase")
+    if version != 4 and _phase is not None:
+        raise ValueError("split development phases require schema v4")
+    if _phase == "freeze":
+        _require_all_development_evaluations(spec, spec_hash)
     paths = run_spec.paths_for(spec, regime)
-    stored_spec = paths.run_root / "run_spec.json"
-    stored_hash = paths.run_root / "run_spec.sha256"
-    if (
-        not stored_spec.is_file()
-        or stored_spec.read_bytes() != spec_raw
-        or not stored_hash.is_file()
-        or stored_hash.read_text(encoding="utf-8") != f"{spec_hash}  run_spec.json\n"
-    ):
-        raise RuntimeError("stored run specification does not match the canonical spec")
+    _require_stored_run_spec(paths.run_root, spec_raw, spec_hash)
     matched_counts = audit_matched_run(spec)
     dependencies = _dependencies()
     source_hashes = _provenance(spec, dependencies)
@@ -911,6 +1524,10 @@ def select_and_freeze(
             spec_hash=spec_hash,
         )
         if record is None:
+            if _phase == "freeze":
+                raise RuntimeError(
+                    f"freeze-only cannot fill missing development record: {path}"
+                )
             record = reevaluate_candidate(
                 regime,
                 candidate,
@@ -924,13 +1541,32 @@ def select_and_freeze(
                 contract_version=run_spec.candidate_contract_version(spec),
                 initial_source_path=run_spec.initial_program_path(spec),
             )
+            if version == 4:
+                try:
+                    eligibility = r4_selection.classify_adaptive(
+                        record.get("adaptive_observations", ()),
+                        bootstrap_replicates=spec["bootstrap"]["replicates"],
+                        bootstrap_seed=spec["bootstrap"]["seed"],
+                    )
+                    record["adaptive_eligibility"] = asdict(eligibility)
+                except ValueError as error:
+                    record["adaptive_eligibility"] = {
+                        "eligible": False,
+                        "reason": str(error),
+                    }
             _write_atomic(path, _json_bytes(record))
+        elif version == 4 and "adaptive_eligibility" not in record:
+            raise RuntimeError(
+                f"r5 development record lacks frozen adaptive eligibility: {path}"
+            )
         evaluations.append(record)
 
     if not any(item["development_integrity_valid"] for item in evaluations):
         raise RuntimeError("no development candidate passed integrity checks")
-    if run_spec.schema_version(spec) >= 3:
+    if version >= 3:
         for item in evaluations:
+            if "adaptive_eligibility" in item:
+                continue
             try:
                 eligibility = r4_selection.classify_adaptive(
                     item.get("adaptive_observations", ()),
@@ -950,6 +1586,14 @@ def select_and_freeze(
             item["generation"],
         )
     )
+    if _phase == "evaluate":
+        return _publish_development_completion(
+            spec,
+            spec_hash,
+            regime,
+            candidates,
+            paths.selection,
+        )
     winner_record = evaluations[0]
     winner = candidate_by_hash[winner_record["candidate_source_sha256"]]
     archive_path = paths.selection / "archive_lineage.json"
@@ -986,23 +1630,12 @@ def select_and_freeze(
         "sealed_manifest_sha256": run_spec.manifest_hash(spec, "sealed"),
         "sealed_manifest_locked": True,
         "source_sha256": source_hashes,
-        "preregistration_sha256": (
-            source_hashes["preregistration"]
-            if run_spec.schema_version(spec) == 1
-            else spec["preregistration"]["sha256"]
-        ),
-        "implementation_plan_sha256": (
-            None
-            if run_spec.schema_version(spec) == 1
-            else spec["implementation_plan"]["sha256"]
-        ),
         "founder_index_sha256": (
             None
             if run_spec.schema_version(spec) == 1
             else spec["founder_index"]["sha256"]
         ),
         "candidate_output_width": run_spec.candidate_output_width(spec),
-        "preregistration_complete": True,
         "matched_run_counts": matched_counts,
         "archive_config": spec["archive"],
         "baselines": spec["baselines"],
@@ -1031,7 +1664,8 @@ def select_and_freeze(
             for item in evaluations
         ],
     }
-    if run_spec.schema_version(spec) < 3:
+    freeze_record.update(_protocol_freeze_fields(spec, source_hashes))
+    if version < 3:
         _freeze(paths.frozen, winner, freeze_record, archive_bytes)
         return freeze_record
 
@@ -1070,13 +1704,288 @@ def select_and_freeze(
     return result
 
 
+def evaluate_development_candidates(
+    regime: str,
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+) -> dict[str, Any]:
+    """Write and authenticate one arm's five r5 development evaluations only."""
+    return select_and_freeze(
+        regime,
+        spec=spec,
+        spec_hash=spec_hash,
+        spec_raw=spec_raw,
+        _phase="evaluate",
+    )
+
+
+def freeze_development_finalist(
+    regime: str,
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+) -> dict[str, Any]:
+    """Freeze from complete existing r5 records without running evaluation."""
+    return select_and_freeze(
+        regime,
+        spec=spec,
+        spec_hash=spec_hash,
+        spec_raw=spec_raw,
+        _phase="freeze",
+    )
+
+
+def select_and_freeze_structured_random(
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+    _phase: str,
+) -> dict[str, Any]:
+    """Development-rank the fixed control top five and freeze one champion."""
+    if run_spec.schema_version(spec) != 4 or spec["top_k"] != 5:
+        raise ValueError("structured-random selection requires the frozen r5 protocol")
+    if _phase not in {"evaluate", "freeze"}:
+        raise ValueError("structured-random development requires an explicit phase")
+    if _phase == "freeze":
+        _require_all_development_evaluations(spec, spec_hash)
+    paths = run_spec.structured_random_paths(spec)
+    _require_stored_run_spec(paths.run_root, spec_raw, spec_hash)
+    baselines = _load_r5_baselines(spec)
+    roster = tuple(baselines.load_structured_random_roster(paths.roster))
+    completion = _structured_completion(
+        paths,
+        roster,
+        spec=spec,
+        spec_hash=spec_hash,
+    )
+    completion_path = paths.control_root / "complete.json"
+    if (
+        not completion_path.is_file()
+        or completion_path.read_bytes() != _json_bytes(completion)
+    ):
+        raise RuntimeError("structured-random completion marker does not authenticate")
+    if not completion["passed"]:
+        raise RuntimeError("structured-random search has fewer than five valid sources")
+
+    matched_counts = audit_matched_run(spec)
+    dependencies = _dependencies()
+    source_hashes = _provenance(spec, dependencies)
+    candidates = discover_candidates(
+        paths.training,
+        _structured_expected_private(spec, spec_hash),
+    )[: spec["top_k"]]
+    if len(candidates) != spec["top_k"]:
+        raise RuntimeError(
+            "structured-random control lacks five unique valid training candidates"
+        )
+
+    archive_record = {
+        "schema_version": 1,
+        "control": "structured_random",
+        "run_spec_sha256": spec_hash,
+        "roster_index_sha256": completion["roster_index_sha256"],
+        "terminal_evaluation_count": completion["terminal_evaluation_count"],
+        "records": completion["terminal_records"],
+    }
+    archive_path = paths.selection / "archive_lineage.json"
+    _write_atomic(archive_path, _json_bytes(archive_record))
+
+    manifest = _load_development_manifest(spec, dependencies)
+    if manifest.partition != "development":
+        raise RuntimeError("development loader returned the wrong partition")
+    config = dependencies["SimulatorConfig"]()
+    development_manifest_hash = dependencies["manifest_sha256"](manifest)
+    simulator_config_hash = dependencies["simulator_config_sha256"](config)
+    if development_manifest_hash != run_spec.manifest_hash(spec, "development"):
+        raise RuntimeError("development manifest does not match the run spec")
+    if simulator_config_hash != spec["simulator_config_sha256"]:
+        raise RuntimeError("simulator configuration does not match the run spec")
+    founder_index_path = _verified_founder_index_path(spec, dependencies)
+
+    evaluations: list[dict[str, Any]] = []
+    candidate_by_hash = {candidate.source_sha256: candidate for candidate in candidates}
+    for candidate in candidates:
+        path = paths.selection / (
+            f"gen_{candidate.generation}_{candidate.source_sha256[:12]}.json"
+        )
+        record = _load_development_record(
+            path,
+            regime="punctuated",
+            candidate=candidate,
+            development_manifest_sha256=development_manifest_hash,
+            simulator_config_sha256=simulator_config_hash,
+            numerical_repeats=spec["numerical_repeats"],
+            spec_hash=spec_hash,
+        )
+        if record is None:
+            if _phase == "freeze":
+                raise RuntimeError(
+                    f"freeze-only cannot fill missing development record: {path}"
+                )
+            record = reevaluate_candidate(
+                "punctuated",
+                candidate,
+                manifest,
+                config,
+                dependencies,
+                numerical_repeats=spec["numerical_repeats"],
+                spec_hash=spec_hash,
+                candidate_output_width=run_spec.candidate_output_width(spec),
+                founder_index_path=founder_index_path,
+                contract_version=run_spec.candidate_contract_version(spec),
+                initial_source_path=run_spec.initial_program_path(spec),
+            )
+            _write_atomic(path, _json_bytes(record))
+        evaluations.append(record)
+
+    evaluations.sort(
+        key=lambda item: (
+            not item["development_integrity_valid"],
+            -item["development_score"],
+            item["generation"],
+        )
+    )
+    if not evaluations[0]["development_integrity_valid"]:
+        raise RuntimeError("no structured-random candidate passed development integrity")
+    if _phase == "evaluate":
+        return _publish_development_completion(
+            spec,
+            spec_hash,
+            "structured_random",
+            candidates,
+            paths.selection,
+        )
+    winner_record = evaluations[0]
+    winner = candidate_by_hash[winner_record["candidate_source_sha256"]]
+    archive_bytes = archive_path.read_bytes()
+    selection_artifacts = {
+        path.name: run_spec.sha256_file(path)
+        for path in sorted(paths.selection.glob("*.json"))
+    }
+    freeze_record = {
+        "schema_version": 2,
+        "run_id": spec["run_id"],
+        "regime": "punctuated",
+        "control": "structured_random",
+        "run_spec_sha256": spec_hash,
+        "run_spec": spec,
+        "selection_rule": {
+            "name": "development_score_desc_then_generation_asc",
+            "training_rank": "descending combined_score, then generation",
+            "top_k": spec["top_k"],
+            "development_rank": "integrity, median repeated score, then generation",
+            "numerical_repeats": spec["numerical_repeats"],
+        },
+        "selected_generation": winner.generation,
+        "candidate_source_sha256": winner.source_sha256,
+        "training_score": winner.training_score,
+        "training_manifest_sha256": winner_record["training_manifest_sha256"],
+        "development_score": winner_record["development_score"],
+        "development_integrity_valid": winner_record[
+            "development_integrity_valid"
+        ],
+        "numerical_repeats": winner_record["numerical_repeats"],
+        "repeat_scores": winner_record["repeat_scores"],
+        "selected_repeat_index": winner_record["selected_repeat_index"],
+        "development_manifest_sha256": winner_record[
+            "development_manifest_sha256"
+        ],
+        "simulator_config_sha256": winner_record["simulator_config_sha256"],
+        "simulator_config": asdict(config),
+        "sealed_manifest_sha256": run_spec.manifest_hash(spec, "sealed"),
+        "sealed_manifest_locked": True,
+        "source_sha256": source_hashes,
+        "founder_index_sha256": spec["founder_index"]["sha256"],
+        "candidate_output_width": run_spec.candidate_output_width(spec),
+        "matched_run_counts": matched_counts,
+        "structured_random_completion_sha256": run_spec.sha256_file(
+            completion_path
+        ),
+        "archive_config": spec["archive"],
+        "baselines": spec["baselines"],
+        "bootstrap_config": spec["bootstrap"],
+        "archive_lineage_record": "archive_lineage.json",
+        "archive_lineage_sha256": run_spec.sha256_bytes(archive_bytes),
+        "archive_program_count": len(archive_record["records"]),
+        "archive_correct_program_count": completion["valid_evaluation_count"],
+        "selection_artifact_sha256": selection_artifacts,
+        "development_evaluation_record": (
+            f"gen_{winner.generation}_{winner.source_sha256[:12]}.json"
+        ),
+        "ranked_development_candidates": [
+            {
+                "generation": item["generation"],
+                "candidate_source_sha256": item["candidate_source_sha256"],
+                "training_score": item["training_score"],
+                "development_score": item["development_score"],
+                "development_integrity_valid": item[
+                    "development_integrity_valid"
+                ],
+                "numerical_repeats": item["numerical_repeats"],
+                "repeat_scores": item["repeat_scores"],
+                "selected_repeat_index": item["selected_repeat_index"],
+            }
+            for item in evaluations
+        ],
+    }
+    freeze_record.update(_protocol_freeze_fields(spec, source_hashes))
+    _freeze(paths.frozen, winner, freeze_record, archive_bytes)
+    return freeze_record
+
+
+def evaluate_structured_random_development(
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+) -> dict[str, Any]:
+    """Write and authenticate the control's five development evaluations only."""
+    return select_and_freeze_structured_random(
+        spec=spec,
+        spec_hash=spec_hash,
+        spec_raw=spec_raw,
+        _phase="evaluate",
+    )
+
+
+def freeze_structured_random_finalist(
+    *,
+    spec: dict[str, Any],
+    spec_hash: str,
+    spec_raw: bytes,
+) -> dict[str, Any]:
+    """Freeze the control champion from complete existing records only."""
+    return select_and_freeze_structured_random(
+        spec=spec,
+        spec_hash=spec_hash,
+        spec_raw=spec_raw,
+        _phase="freeze",
+    )
+
+
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--regime", choices=task_evaluator.REGIMES, required=True)
+    operation = parser.add_mutually_exclusive_group(required=True)
+    operation.add_argument("--regime", choices=task_evaluator.REGIMES)
+    operation.add_argument(
+        "--structured-random-phase",
+        choices=("training", "evaluate", "freeze"),
+    )
+    parser.add_argument("--development-phase", choices=("evaluate", "freeze"))
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--run-spec", type=Path)
     selection.add_argument("--profile")
-    return parser.parse_args()
+    arguments = parser.parse_args()
+    if (
+        arguments.structured_random_phase is not None
+        and arguments.development_phase is not None
+    ):
+        parser.error("--development-phase applies only with --regime")
+    return arguments
 
 
 def main() -> None:
@@ -1085,12 +1994,45 @@ def main() -> None:
         arguments.run_spec,
         profile=arguments.profile,
     )
-    freeze_record = select_and_freeze(
-        arguments.regime,
-        spec=spec,
-        spec_hash=spec_hash,
-        spec_raw=spec_raw,
-    )
+    if arguments.structured_random_phase == "training":
+        freeze_record = run_structured_random_training(
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
+    elif arguments.structured_random_phase == "evaluate":
+        freeze_record = evaluate_structured_random_development(
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
+    elif arguments.structured_random_phase == "freeze":
+        freeze_record = freeze_structured_random_finalist(
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
+    elif arguments.development_phase == "evaluate":
+        freeze_record = evaluate_development_candidates(
+            arguments.regime,
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
+    elif arguments.development_phase == "freeze":
+        freeze_record = freeze_development_finalist(
+            arguments.regime,
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
+    else:
+        freeze_record = select_and_freeze(
+            arguments.regime,
+            spec=spec,
+            spec_hash=spec_hash,
+            spec_raw=spec_raw,
+        )
     print(json.dumps(freeze_record, sort_keys=True, indent=2))
 
 
