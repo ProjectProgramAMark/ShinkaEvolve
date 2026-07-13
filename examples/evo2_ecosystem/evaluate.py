@@ -11,6 +11,7 @@ import math
 import os
 import platform
 from pathlib import Path
+import time
 from types import ModuleType
 from typing import Any
 
@@ -117,7 +118,24 @@ class CandidateValidationError(ValueError):
     """Candidate source or output violates the bounded policy contract."""
 
 
-def _candidate_source(program_path: str | Path) -> str:
+def _initial_source_path(
+    contract_version: str,
+    initial_source_path: str | Path | None = None,
+) -> Path:
+    if initial_source_path is not None:
+        return Path(initial_source_path)
+    if contract_version == run_spec.R4_CONTRACT:
+        return TASK_DIR / "initial_r4.py"
+    if contract_version == run_spec.LEGACY_CONTRACT:
+        return TASK_DIR / "initial.py"
+    raise CandidateValidationError("unknown candidate contract")
+
+
+def _candidate_source(
+    program_path: str | Path,
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+    initial_source_path: str | Path | None = None,
+) -> str:
     path = Path(program_path)
     source_bytes = path.read_bytes()
     if len(source_bytes) > MAX_SOURCE_BYTES:
@@ -128,7 +146,10 @@ def _candidate_source(program_path: str | Path) -> str:
         raise CandidateValidationError("source must be UTF-8") from error
     if sum(bool(line.strip()) for line in source.splitlines()) > MAX_NONBLANK_LINES:
         raise CandidateValidationError("source exceeds the line limit")
-    _validate_immutable_regions(source)
+    _validate_immutable_regions(
+        source,
+        _initial_source_path(contract_version, initial_source_path),
+    )
     return source
 
 
@@ -142,8 +163,8 @@ def _split_evolve_block(source: str) -> tuple[str, str, str]:
     return source[:start], source[start:end], source[end:]
 
 
-def _validate_immutable_regions(source: str) -> None:
-    expected = (TASK_DIR / "initial.py").read_text(encoding="utf-8")
+def _validate_immutable_regions(source: str, initial_source_path: Path) -> None:
+    expected = initial_source_path.read_text(encoding="utf-8")
     expected_prefix, _, expected_suffix = _split_evolve_block(expected)
     prefix, _, suffix = _split_evolve_block(source)
     normalized_suffix = suffix.rstrip("\r\n")
@@ -158,7 +179,10 @@ def _validate_immutable_regions(source: str) -> None:
         raise CandidateValidationError("immutable task code was modified")
 
 
-def _validate_candidate_source(source: str) -> ast.Module:
+def _validate_candidate_source(
+    source: str,
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+) -> ast.Module:
     """Accept one pure array expression function and no ambient capabilities."""
     try:
         tree = ast.parse(source)
@@ -199,10 +223,26 @@ def _validate_candidate_source(source: str) -> ast.Module:
     function = functions[0]
     arguments = function.args
     argument_names = [argument.arg for argument in arguments.args]
+    expected_arguments = {
+        run_spec.LEGACY_CONTRACT: [
+            "parent_genome",
+            "parent_stats",
+            "population_stats",
+            "rng",
+        ],
+        run_spec.R4_CONTRACT: [
+            "parent_genome_summary",
+            "parent_stats",
+            "population_stats",
+            "operator_stats",
+            "rng",
+        ],
+    }.get(contract_version)
+    if expected_arguments is None:
+        raise CandidateValidationError("unknown candidate contract")
     if (
         function.name != "make_offspring"
-        or argument_names
-        != ["parent_genome", "parent_stats", "population_stats", "rng"]
+        or argument_names != expected_arguments
         or arguments.posonlyargs
         or arguments.kwonlyargs
         or arguments.vararg is not None
@@ -267,9 +307,13 @@ def _validate_candidate_source(source: str) -> ast.Module:
     return tree
 
 
-def _load_candidate(program_path: str | Path) -> ModuleType:
-    source = _candidate_source(program_path)
-    tree = _validate_candidate_source(source)
+def _load_candidate(
+    program_path: str | Path,
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+    initial_source_path: str | Path | None = None,
+) -> ModuleType:
+    source = _candidate_source(program_path, contract_version, initial_source_path)
+    tree = _validate_candidate_source(source, contract_version)
     source_digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
     function = next(node for node in tree.body if isinstance(node, ast.FunctionDef))
     executable = ast.fix_missing_locations(ast.Module(body=[function], type_ignores=[]))
@@ -287,6 +331,7 @@ def _load_candidate(program_path: str | Path) -> ModuleType:
     if not callable(function):
         raise CandidateValidationError("make_offspring is not callable")
     module.__dict__["_evo2_source_sha256"] = source_digest
+    module.__dict__["_evo2_contract_version"] = contract_version
     return module
 
 
@@ -300,17 +345,57 @@ def _scrub_sensitive_environment() -> None:
             os.environ.pop(name, None)
 
 
-def _smoke_validate_candidate(module: ModuleType, output_width: int = 4) -> None:
+def _smoke_validate_candidate(
+    module: ModuleType,
+    output_width: int = 4,
+    *,
+    contract_version: str | None = None,
+    runtime_budget_ms: float | None = None,
+) -> None:
     function = module.make_offspring
-    inputs = (
-        jnp.array([[0.0, 0.0], [1.0, 1.0], [0.4, 0.3]], dtype=jnp.float32),
-        jnp.array([[0.0, 0.0], [1.0, 1.0], [0.7, 0.6]], dtype=jnp.float32),
-        jnp.array(
-            [[0.0, -1.0, 0.0, 0.0], [1.0, 0.0, 1.0, 1.0], [0.5, -0.1, 0.2, 0.8]],
-            dtype=jnp.float32,
-        ),
-        jnp.zeros((3,), dtype=jnp.float32),
+    contract_version = contract_version or getattr(
+        module, "_evo2_contract_version", run_spec.LEGACY_CONTRACT
     )
+    if contract_version == run_spec.R4_CONTRACT:
+        inputs = (
+            jnp.array([[0.0, 0.0], [1.0, 1.0], [0.4, 0.3]], dtype=jnp.float32),
+            jnp.array(
+                [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [0.7, 0.6, 0.5]],
+                dtype=jnp.float32,
+            ),
+            jnp.array(
+                [
+                    [0.0, 0.0, -1.0, 0.0, 0.0, 0.0],
+                    [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                    [0.5, 0.4, -0.1, 0.2, 0.3, 0.8],
+                ],
+                dtype=jnp.float32,
+            ),
+            jnp.array(
+                [
+                    jnp.zeros((3, 6), dtype=jnp.float32),
+                    jnp.ones((3, 6), dtype=jnp.float32),
+                    jnp.full((3, 6), 0.5, dtype=jnp.float32),
+                ]
+            ),
+            jnp.zeros((3,), dtype=jnp.float32),
+        )
+    elif contract_version == run_spec.LEGACY_CONTRACT:
+        inputs = (
+            jnp.array([[0.0, 0.0], [1.0, 1.0], [0.4, 0.3]], dtype=jnp.float32),
+            jnp.array([[0.0, 0.0], [1.0, 1.0], [0.7, 0.6]], dtype=jnp.float32),
+            jnp.array(
+                [
+                    [0.0, -1.0, 0.0, 0.0],
+                    [1.0, 0.0, 1.0, 1.0],
+                    [0.5, -0.1, 0.2, 0.8],
+                ],
+                dtype=jnp.float32,
+            ),
+            jnp.zeros((3,), dtype=jnp.float32),
+        )
+    else:
+        raise CandidateValidationError("unknown candidate contract")
     batched = jax.vmap(function)
     try:
         eager_scores = np.asarray(batched(*inputs))
@@ -318,6 +403,14 @@ def _smoke_validate_candidate(module: ModuleType, output_width: int = 4) -> None
         compiled = jax.jit(batched)
         scores = np.asarray(compiled(*inputs))
         replay = np.asarray(compiled(*inputs))
+        if runtime_budget_ms is not None:
+            start = time.perf_counter()
+            for _ in range(16):
+                timed = compiled(*inputs)
+            jax.block_until_ready(timed)
+            elapsed_ms = (time.perf_counter() - start) * 1000.0 / 16.0
+            if elapsed_ms > runtime_budget_ms:
+                raise CandidateValidationError("candidate exceeds runtime budget")
     except Exception as error:
         raise CandidateValidationError("candidate is not JAX-compatible") from error
     if (
@@ -360,6 +453,17 @@ def _imports() -> dict[str, Any]:
     )
     from microcosmos.heredity import mutate_cppn  # noqa: PLC0415
 
+    try:
+        from microcosmos.heredity import mutate_cppn_r4  # noqa: PLC0415
+    except ImportError:
+        mutate_cppn_r4 = None
+    try:
+        from experiments.evo2_ecosystem.episode import (  # noqa: PLC0415
+            evaluate_manifest_paired_delta,
+        )
+    except ImportError:
+        evaluate_manifest_paired_delta = None
+
     return {
         "SimulatorConfig": SimulatorConfig,
         "evaluate_manifest": evaluate_manifest,
@@ -369,6 +473,8 @@ def _imports() -> dict[str, Any]:
         "founder_index_sha256": founder_index_sha256,
         "load_founder_index": load_founder_index,
         "mutate_cppn": mutate_cppn,
+        "mutate_cppn_r4": mutate_cppn_r4,
+        "evaluate_manifest_paired_delta": evaluate_manifest_paired_delta,
         "simulator_config_sha256": simulator_config_sha256,
         "simulator_source_sha256": simulator_source_sha256,
     }
@@ -405,38 +511,114 @@ def _verified_founder_index_path(
     return path
 
 
-def _build_policy(candidate: ModuleType, mutate_cppn):
+def _build_policy(
+    candidate: ModuleType,
+    mutate_cppn,
+    *,
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+):
     """Expose summaries to the candidate and retain mutations in trusted code."""
     function = candidate.make_offspring
 
+    if contract_version == run_spec.LEGACY_CONTRACT:
+
+        def policy(parent_genome, parent_stats, population_stats, mutation_context):
+            safe_genome = jnp.stack(
+                [parent_stats.node_fraction, parent_stats.connection_fraction]
+            )
+            safe_parent = jnp.stack(
+                [parent_stats.energy_fraction, parent_stats.intake_ema]
+            )
+            safe_population = jnp.stack(
+                [
+                    population_stats.alive_fraction,
+                    population_stats.population_change_ema,
+                    population_stats.action_diversity,
+                    population_stats.lineage_entropy,
+                ]
+            )
+            scores = jnp.asarray(
+                function(
+                    safe_genome,
+                    safe_parent,
+                    safe_population,
+                    jnp.array(0.0, dtype=jnp.float32),
+                ),
+                dtype=jnp.float32,
+            )
+            return mutate_cppn(parent_genome, scores, mutation_context)
+
+        return policy
+
+    if contract_version != run_spec.R4_CONTRACT:
+        raise CandidateValidationError("unknown candidate contract")
+
     def policy(parent_genome, parent_stats, population_stats, mutation_context):
-        safe_genome = jnp.stack(
-            [parent_stats.node_fraction, parent_stats.connection_fraction]
+        safe_genome = jnp.clip(
+            jnp.stack([parent_stats.node_fraction, parent_stats.connection_fraction]),
+            0.0,
+            1.0,
         )
-        safe_parent = jnp.stack([parent_stats.energy_fraction, parent_stats.intake_ema])
+        safe_parent = jnp.clip(
+            jnp.stack(
+                [
+                    parent_stats.energy_fraction,
+                    parent_stats.intake_ema,
+                    parent_stats.age_fraction,
+                ]
+            ),
+            0.0,
+            1.0,
+        )
         safe_population = jnp.stack(
             [
                 population_stats.alive_fraction,
+                population_stats.mean_energy_fraction,
                 population_stats.population_change_ema,
-                population_stats.action_diversity,
-                population_stats.lineage_entropy,
+                population_stats.birth_rate_ema,
+                population_stats.death_rate_ema,
+                population_stats.mean_intake_ema,
             ]
         )
-        scores = jnp.asarray(
+        safe_population = safe_population.at[0].set(
+            jnp.clip(safe_population[0], 0.0, 1.0)
+        )
+        safe_population = safe_population.at[1].set(
+            jnp.clip(safe_population[1], 0.0, 1.0)
+        )
+        safe_population = safe_population.at[2].set(
+            jnp.clip(safe_population[2], -1.0, 1.0)
+        )
+        safe_population = safe_population.at[3:].set(
+            jnp.clip(safe_population[3:], 0.0, 1.0)
+        )
+        safe_operator = jnp.clip(
+            jnp.stack(
+                [
+                    population_stats.operator_success_ema,
+                    population_stats.operator_usage_ema,
+                    population_stats.operator_evidence_ema,
+                ]
+            ),
+            0.0,
+            1.0,
+        )
+        logits = jnp.asarray(
             function(
                 safe_genome,
                 safe_parent,
                 safe_population,
+                safe_operator,
                 jnp.array(0.0, dtype=jnp.float32),
             ),
             dtype=jnp.float32,
         )
-        return mutate_cppn(parent_genome, scores, mutation_context)
+        return mutate_cppn(parent_genome, logits, mutation_context)
 
     return policy
 
 
-def _episode_metrics(evaluation) -> dict[str, Any]:
+def _episode_metrics_legacy(evaluation) -> dict[str, Any]:
     episodes = evaluation.episodes
     integrity = bool(np.asarray(evaluation.integrity_valid))
     raw_score = float(np.asarray(evaluation.candidate_score))
@@ -495,6 +677,179 @@ def _episode_metrics(evaluation) -> dict[str, Any]:
     }
 
 
+_R4_OPERATOR_NAMES = (
+    "clone",
+    "parametric_conservative",
+    "parametric_standard",
+    "parametric_exploratory",
+    "structural",
+    "mixed",
+)
+
+
+def _mean_optional(value: Any, default: float = 0.0) -> float:
+    if value is None:
+        return default
+    array = np.asarray(value, dtype=float)
+    return float(np.mean(array)) if array.size else default
+
+
+def _r4_episode_vector(episodes: Any, name: str) -> np.ndarray:
+    values = [np.asarray(getattr(episode, name), dtype=float) for episode in episodes]
+    if not values:
+        return np.zeros(6, dtype=float)
+    result = np.sum(np.stack(values), axis=0)
+    if result.shape != (6,):
+        raise ValueError(f"r4 telemetry {name} must have shape (6,)")
+    return result
+
+
+def _episode_metrics_r4(evaluation: Any, regime: str) -> dict[str, Any]:
+    """Return only training-visible r4 diagnostics for one outer arm."""
+    if regime == "stable":
+        episodes = getattr(evaluation, "sham_episodes", None)
+        if episodes is None:
+            raise ValueError("stable r4 feedback requires explicit sham-only episodes")
+    else:
+        episodes = evaluation.episodes
+    integrity = bool(np.asarray(evaluation.integrity_valid))
+    raw_score = float(np.asarray(evaluation.candidate_score))
+    score = raw_score if integrity and math.isfinite(raw_score) else -2.0
+    births = np.asarray([episode.birth_count for episode in episodes], dtype=float)
+    deaths = np.asarray(
+        [getattr(episode, "natural_death_count", 0) for episode in episodes],
+        dtype=float,
+    )
+    survived = np.asarray([episode.survived for episode in episodes], dtype=float)
+    generation_gain = np.asarray(
+        [
+            getattr(
+                episode,
+                "generation_gain",
+                getattr(episode, "maximum_generation", 0),
+            )
+            for episode in episodes
+        ],
+        dtype=float,
+    )
+    violations = int(
+        np.sum([int(np.asarray(ep.policy_violation_count)) for ep in episodes])
+    )
+    counts = _r4_episode_vector(episodes, "operator_counts")
+    total = float(np.sum(counts))
+    fractions = counts / total if total else np.zeros(6, dtype=float)
+
+    pre_sum = _r4_episode_vector(episodes, "pre_selection_probability_sum")
+    post_sum = _r4_episode_vector(episodes, "post_selection_probability_sum")
+    pre_count = float(
+        np.sum([getattr(ep, "pre_selection_probability_count", 0) for ep in episodes])
+    )
+    post_count = float(
+        np.sum([getattr(ep, "post_selection_probability_count", 0) for ep in episodes])
+    )
+    pre_prob = pre_sum / pre_count if pre_count else np.zeros(6, dtype=float)
+    post_prob = post_sum / post_count if post_count else np.zeros(6, dtype=float)
+
+    success = np.mean(
+        np.stack([np.asarray(ep.operator_success_ema, dtype=float) for ep in episodes]),
+        axis=0,
+    )
+    usage = np.mean(
+        np.stack([np.asarray(ep.operator_usage_ema, dtype=float) for ep in episodes]),
+        axis=0,
+    )
+    evidence = np.mean(
+        np.stack(
+            [np.asarray(ep.operator_evidence_ema, dtype=float) for ep in episodes]
+        ),
+        axis=0,
+    )
+    for name, value in (
+        ("success", success),
+        ("usage", usage),
+        ("evidence", evidence),
+    ):
+        if value.shape != (6,) or not np.all(np.isfinite(value)):
+            raise ValueError(f"r4 operator {name} telemetry is invalid")
+
+    repeat_scores = np.asarray(evaluation.repeat_scores, dtype=float)
+    selected_repeat_index = int(np.asarray(evaluation.selected_repeat_index))
+    if not integrity:
+        repeat_scores = np.full_like(repeat_scores, -2.0, dtype=float)
+    if (
+        repeat_scores.ndim != 1
+        or repeat_scores.size == 0
+        or not 0 <= selected_repeat_index < repeat_scores.size
+        or float(repeat_scores[selected_repeat_index]) != score
+    ):
+        raise ValueError("r4 coherent numerical-repeat selection is invalid")
+
+    public: dict[str, Any] = {
+        "score": score,
+        "sham_auc_delta": _mean_optional(getattr(evaluation, "sham_auc_delta", None)),
+        "survival_rate": float(np.mean(survived)),
+        "mean_births": float(np.mean(births)),
+        "mean_deaths": float(np.mean(deaths)),
+        "mean_generation_gain": float(np.mean(generation_gain)),
+        "operator_fraction": {
+            name: float(fractions[index])
+            for index, name in enumerate(_R4_OPERATOR_NAMES)
+        },
+        "pre_selection_probability": [float(value) for value in pre_prob],
+        "post_selection_probability": [float(value) for value in post_prob],
+        "operator_success_ema": [float(value) for value in success],
+        "operator_usage_ema": [float(value) for value in usage],
+        "operator_evidence_ema": [float(value) for value in evidence],
+    }
+    if regime == "punctuated":
+        public["shock_auc_delta"] = _mean_optional(
+            getattr(evaluation, "shock_auc_delta", None)
+        )
+
+    dominant = _R4_OPERATOR_NAMES[int(np.argmax(fractions))]
+    weakness = (
+        "no births resolved heredity choices"
+        if total == 0
+        else f"dominant action was {dominant} ({float(np.max(fractions)):.2f})"
+    )
+    feedback_parts = [
+        f"paired ancestor delta={score:.4f}",
+        f"sham delta={public['sham_auc_delta']:.4f}",
+    ]
+    if regime == "punctuated":
+        feedback_parts.append(f"shock delta={public['shock_auc_delta']:.4f}")
+    feedback_parts.extend(
+        [
+            f"survival={public['survival_rate']:.2f}",
+            f"mean births={public['mean_births']:.1f}",
+            weakness,
+        ]
+    )
+    return {
+        "combined_score": score,
+        "public": public,
+        "private": {
+            "full_evaluation_performed": True,
+            "integrity_valid": integrity,
+            "policy_violation_count": violations,
+            "numerical_repeats": int(repeat_scores.size),
+            "repeat_scores": [float(value) for value in repeat_scores],
+            "selected_repeat_index": selected_repeat_index,
+        },
+        "text_feedback": "; ".join(feedback_parts) + ".",
+    }
+
+
+def _episode_metrics(
+    evaluation: Any,
+    regime: str = "punctuated",
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+) -> dict[str, Any]:
+    if contract_version == run_spec.R4_CONTRACT:
+        return _episode_metrics_r4(evaluation, regime)
+    return _episode_metrics_legacy(evaluation)
+
+
 def _evaluate_candidate(
     program_path: str | Path,
     regime: str,
@@ -504,16 +859,30 @@ def _evaluate_candidate(
 ) -> dict[str, Any]:
     if regime not in REGIMES:
         raise ValueError("unknown training regime")
-    candidate = _load_candidate(program_path)
     spec, spec_hash, _ = run_spec.load_run_spec(run_spec_path)
     if expected_run_spec_sha256 is not None and not hmac.compare_digest(
         spec_hash, expected_run_spec_sha256
     ):
         raise RuntimeError("selected run specification hash does not match launcher")
+    contract_version = run_spec.candidate_contract_version(spec)
+    initial_path = run_spec.initial_program_path(spec)
+    if run_spec.sha256_file(initial_path) != spec["source_sha256"]["initial"]:
+        raise RuntimeError("initial program does not match the selected run spec")
+    candidate = _load_candidate(program_path, contract_version, initial_path)
     candidate_source_hash = candidate._evo2_source_sha256
     evaluator_source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     output_width = run_spec.candidate_output_width(spec)
-    _smoke_validate_candidate(candidate, output_width)
+    runtime_budget_ms = (
+        float(spec["candidate_contract"]["runtime_budget_ms"])
+        if contract_version == run_spec.R4_CONTRACT
+        else None
+    )
+    _smoke_validate_candidate(
+        candidate,
+        output_width,
+        contract_version=contract_version,
+        runtime_budget_ms=runtime_budget_ms,
+    )
     dependencies = _imports()
     simulator_source_hash = dependencies["simulator_source_sha256"]()
     manifest = _load_bound_manifest(spec, f"training_{regime}", dependencies)
@@ -521,17 +890,47 @@ def _evaluate_candidate(
         raise RuntimeError("training loader returned a non-training manifest")
     config = dependencies["SimulatorConfig"]()
     founder_index_path = _verified_founder_index_path(spec, dependencies)
-    policy = _build_policy(candidate, dependencies["mutate_cppn"])
+    if contract_version == run_spec.R4_CONTRACT:
+        mutate = dependencies["mutate_cppn_r4"]
+        paired_evaluator = dependencies["evaluate_manifest_paired_delta"]
+        if mutate is None or paired_evaluator is None:
+            raise RuntimeError("Microcosmos does not provide the trusted r4 contract")
+    else:
+        mutate = dependencies["mutate_cppn"]
+        paired_evaluator = None
+    policy = _build_policy(candidate, mutate, contract_version=contract_version)
     evaluation_kwargs = {}
     if founder_index_path is not None:
         evaluation_kwargs["founder_index_path"] = founder_index_path
-    evaluation = dependencies["evaluate_manifest"](
-        manifest,
-        config,
-        policy,
-        **evaluation_kwargs,
-    )
-    metrics = _episode_metrics(evaluation)
+    if contract_version == run_spec.R4_CONTRACT:
+        ancestor = _load_candidate(initial_path, contract_version, initial_path)
+        _smoke_validate_candidate(
+            ancestor,
+            output_width,
+            contract_version=contract_version,
+            runtime_budget_ms=runtime_budget_ms,
+        )
+        ancestor_policy = _build_policy(
+            ancestor,
+            mutate,
+            contract_version=contract_version,
+        )
+        evaluation = paired_evaluator(
+            manifest,
+            config,
+            policy,
+            ancestor_policy,
+            regime=regime,
+            **evaluation_kwargs,
+        )
+    else:
+        evaluation = dependencies["evaluate_manifest"](
+            manifest,
+            config,
+            policy,
+            **evaluation_kwargs,
+        )
+    metrics = _episode_metrics(evaluation, regime, contract_version)
     metrics["private"]["candidate_sha256"] = candidate_source_hash
     metrics["private"]["manifest_sha256"] = dependencies["manifest_sha256"](manifest)
     metrics["private"]["simulator_config_sha256"] = dependencies[
@@ -542,6 +941,8 @@ def _evaluate_candidate(
     metrics["private"]["run_spec_sha256"] = spec_hash
     metrics["private"]["run_spec_schema_version"] = run_spec.schema_version(spec)
     metrics["private"]["candidate_output_width"] = output_width
+    metrics["private"]["candidate_contract_version"] = contract_version
+    metrics["private"]["initial_program_sha256"] = spec["source_sha256"]["initial"]
     if founder_index_path is not None:
         metrics["private"]["founder_index_sha256"] = spec["founder_index"]["sha256"]
     metrics["private"]["backend"] = jax.default_backend()
@@ -550,7 +951,7 @@ def _evaluate_candidate(
     metrics["private"]["python_version"] = platform.python_version()
     metrics["private"]["xla_flags"] = os.environ.get("XLA_FLAGS", "")
     final_candidate_hash = hashlib.sha256(
-        _candidate_source(program_path).encode("utf-8")
+        _candidate_source(program_path, contract_version, initial_path).encode("utf-8")
     ).hexdigest()
     final_evaluator_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     final_simulator_hash = dependencies["simulator_source_sha256"]()
@@ -593,6 +994,8 @@ def _failure_metrics(
     spec_hash = ""
     spec_schema_version = None
     output_width = 4
+    contract_version = run_spec.LEGACY_CONTRACT
+    initial_program_hash = ""
     founder_hash = ""
     try:
         spec, spec_hash, _ = run_spec.load_run_spec(run_spec_path)
@@ -604,21 +1007,24 @@ def _failure_metrics(
             )
         spec_schema_version = run_spec.schema_version(spec)
         output_width = run_spec.candidate_output_width(spec)
+        contract_version = run_spec.candidate_contract_version(spec)
+        initial_program_hash = spec["source_sha256"]["initial"]
         dependencies = _imports()
         manifest = _load_bound_manifest(spec, f"training_{regime}", dependencies)
         config = dependencies["SimulatorConfig"]()
         manifest_hash = dependencies["manifest_sha256"](manifest)
         simulator_config_hash = dependencies["simulator_config_sha256"](config)
         simulator_source_hash = dependencies["simulator_source_sha256"]()
-        if spec_schema_version == 2:
+        if spec_schema_version >= 2:
             founder_hash = spec["founder_index"]["sha256"]
     except Exception:
         # The record remains invalid and the freezer will fail closed if trusted
         # infrastructure provenance could not be established.
         pass
+    invalid_score = -2.0 if contract_version == run_spec.R4_CONTRACT else 0.0
     return {
-        "combined_score": 0.0,
-        "public": {"score": 0.0},
+        "combined_score": invalid_score,
+        "public": {"score": invalid_score},
         "private": {
             "error_code": error_code,
             "full_evaluation_performed": False,
@@ -631,6 +1037,8 @@ def _failure_metrics(
             "run_spec_sha256": spec_hash,
             "run_spec_schema_version": spec_schema_version,
             "candidate_output_width": output_width,
+            "candidate_contract_version": contract_version,
+            "initial_program_sha256": initial_program_hash,
             "founder_index_sha256": founder_hash,
             "numerical_repeats": 0,
             "repeat_scores": [],

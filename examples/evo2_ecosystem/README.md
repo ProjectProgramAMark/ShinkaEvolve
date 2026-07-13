@@ -6,6 +6,35 @@ parametric, structural, and mixed TensorNEAT mutation kernels. It never receives
 CPPN graph tensors, raw genomes, simulator state, scenario identity, files, or
 non-training manifests.
 
+## R4 credit-adaptive contract
+
+Schema v3 selects `initial_r4.py` through an authenticated `initial_program`
+binding. The candidate receives four bounded arrays—genome summary `(2,)`,
+parent state `(3,)`, population state `(6,)`, and trusted operator outcomes
+`(3, 6)`—plus an opaque compatibility argument named `rng` that validation
+forbids it from reading. It returns six logits for clone, conservative,
+standard, and exploratory parametric mutation, structural mutation, and mixed
+mutation. Candidate code never samples or mutates; trusted Microcosmos code
+clips logits, owns categorical randomness, and applies the selected TensorNEAT
+operator.
+
+Schema v3 fixes 50 LLM-generated descendants plus the exact initial program,
+two islands, archive capacity 32, and development top-K five. The evaluator
+uses a trusted paired candidate-versus-initial path. Stable-arm feedback
+requires explicit sham-only episode summaries and cannot serialize shock
+outcomes. Development freezing always keeps the unrestricted champion and also
+keeps the best adaptive-eligible finalist when expected (not realized) action
+probabilities satisfy the preregistered rule.
+
+Schema-v3 finalists are stored under `<regime>/unrestricted` and, when one
+qualifies, `<regime>/adaptive`. Export their authenticated parent chains with
+`program_lineage.py --finalist-type unrestricted` or `--finalist-type adaptive`.
+
+The `actuation-cost-r4` profile is intentionally created only after
+Microcosmos qualification has produced immutable founder/manifests and the
+first-passing shock multiplier. Checking in a placeholder profile would forge
+hashes and violate the prospective protocol.
+
 ## Canonical matched run
 
 `run_spec.json` is canonical JSON and `run_spec.sha256` authenticates its exact

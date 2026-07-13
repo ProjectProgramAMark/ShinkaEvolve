@@ -111,7 +111,7 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
     from experiments.evo2_ecosystem.protocol import manifest_sha256  # noqa: PLC0415
 
     source_paths = {
-        "initial": run_spec.sha256_file(TASK_DIR / "initial.py"),
+        "initial": run_spec.sha256_file(run_spec.initial_program_path(spec)),
         "evaluator": run_spec.sha256_file(TASK_DIR / "evaluate.py"),
         "simulator": simulator_source_sha256(),
         "analysis": run_spec.sha256_file(ANALYSIS_PATH),
@@ -121,6 +121,7 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
         "finalist_selector": run_spec.sha256_file(TASK_DIR / "freeze_finalist.py"),
         "lineage_selector": run_spec.sha256_file(TASK_DIR / "program_lineage.py"),
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
+        "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
     }
     expected_sources = spec["source_sha256"]
     actual_sources = {
@@ -134,6 +135,10 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
         )
     if any(actual_sources[name] != expected_sources[name] for name in actual_sources):
         raise RuntimeError("run specification does not match trusted search source")
+    if run_spec.schema_version(spec) >= 3 and (
+        actual_sources["initial"] != spec["initial_program"]["sha256"]
+    ):
+        raise RuntimeError("run specification initial-program bindings disagree")
     if run_spec.schema_version(spec) == 1:
         manifest = load_training_manifest(regime)
     else:
@@ -240,6 +245,7 @@ def _prepare_arm(
     paths.arm_results.mkdir(parents=True, exist_ok=True)
 
     if resume:
+        _authenticate_resume(paths, spec, spec_hash, regime)
         index = 1
         while (paths.arm_results / f"resume_{index:03d}.json").exists():
             index += 1
@@ -268,6 +274,55 @@ def _prepare_arm(
     }
     run_spec.write_once(launch_path, run_spec.canonical_json_bytes(launch))
     return paths
+
+
+def _authenticate_resume(
+    paths: run_spec.RunPaths,
+    spec: dict[str, Any],
+    spec_hash: str,
+    regime: str,
+) -> None:
+    """Permit resumption only inside the same authenticated incomplete arm."""
+    launch_path = paths.arm_results / "launch.json"
+    database = paths.arm_results / "programs.sqlite"
+    if not launch_path.is_file():
+        raise RuntimeError("resume requires the original launch record")
+    launch = json.loads(launch_path.read_text(encoding="utf-8"))
+    expected = {
+        "run_id": spec["run_id"],
+        "regime": regime,
+        "run_spec_sha256": spec_hash,
+    }
+    if any(launch.get(key) != value for key, value in expected.items()):
+        raise RuntimeError("resume launch record does not match this exact run")
+    if run_spec.schema_version(spec) < 3:
+        return
+    if not database.is_file():
+        raise RuntimeError("r4 resume requires the authenticated archive database")
+    for generation_dir in paths.arm_results.glob("gen_*"):
+        source = generation_dir / "main.py"
+        metrics_path = generation_dir / "results" / "metrics.json"
+        correct = generation_dir / "results" / "correct.json"
+        present = (source.is_file(), metrics_path.is_file(), correct.is_file())
+        if not all(present):
+            # The runner owns cleanup/retry of one interrupted generation.
+            continue
+        metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+        private = metrics.get("private", {})
+        protocol_matches = private.get("candidate_sha256") == run_spec.sha256_file(
+            source
+        ) and private.get("manifest_sha256") == run_spec.manifest_hash(
+            spec, f"training_{regime}"
+        )
+        if run_spec.schema_version(spec) >= 2:
+            protocol_matches = protocol_matches and (
+                private.get("run_spec_sha256") == spec_hash
+            )
+        if not protocol_matches:
+            raise RuntimeError(
+                f"completed generation does not authenticate for resume: "
+                f"{generation_dir.name}"
+            )
 
 
 def _require_sibling_isolated(
@@ -346,6 +401,8 @@ def _write_completion(
         "completed_evaluation_count": len(completed),
         "database_sha256": run_spec.sha256_file(database),
     }
+    if run_spec.schema_version(spec) >= 3:
+        marker["llm_generated_descendant_count"] = spec["proposal_budget"]
     run_spec.write_once(
         paths.run_root / f"{regime}.complete.json",
         run_spec.canonical_json_bytes(marker),
@@ -391,7 +448,33 @@ def build_runner(
         num_top_k_inspirations=archive["num_top_k_inspirations"],
     )
     output_width = run_spec.candidate_output_width(spec)
-    task_message = f"""
+    contract_version = run_spec.candidate_contract_version(spec)
+    if contract_version == run_spec.R4_CONTRACT:
+        task_message = f"""
+Improve make_offspring for bounded Evo² r4 heredity scheduling.
+
+The fixed-shape, bounded inputs are:
+- parent_genome_summary: [active_node_fraction, active_connection_fraction]
+- parent_stats: [energy_fraction, intake_ema, age_fraction]
+- population_stats: [alive_fraction, mean_energy_fraction,
+  signed_population_change_ema, birth_rate_ema, death_rate_ema, mean_intake_ema]
+- operator_stats, shape (3, 6): [success_ema, usage_ema, evidence_ema]
+- rng: opaque reserved argument; candidate code must not read it
+
+Return exactly {output_width} finite logits for [clone,
+parametric-conservative, parametric-standard, parametric-exploratory,
+structural, mixed]. Trusted code clips them to [-8, 8], samples the action,
+and performs TensorNEAT mutation. A unique [8, -8, ...] saturation chooses
+that action exactly. Use recent evidence as well as apparent success; 0.5
+success with zero evidence is untested.
+
+Only pure bounded jax.numpy expressions are accepted. No loops, imports, I/O,
+randomness, mutation APIs, simulator state, event/scenario/partition identity,
+seeds, hidden manifests, absolute time, or globals are available. Improve the
+paired candidate-minus-initial score while preserving survival and integrity.
+"""
+    else:
+        task_message = f"""
 Improve make_offspring for Evo² heredity-policy training.
 
 The four inputs are fixed-shape summaries:
@@ -426,7 +509,7 @@ Maximize post-event resource-productivity AUC without integrity violations.
         },
         embedding_model=None,
         llm_dynamic_selection="fixed",
-        init_program_path=str(TASK_DIR / "initial.py"),
+        init_program_path=str(run_spec.initial_program_path(spec)),
         results_dir=str(paths.arm_results),
         max_novelty_attempts=search["max_novelty_attempts"],
         use_text_feedback=True,

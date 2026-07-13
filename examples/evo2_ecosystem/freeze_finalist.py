@@ -19,9 +19,14 @@ from typing import Any
 import numpy as np
 
 if __package__:
-    from examples.evo2_ecosystem import evaluate as task_evaluator, run_spec
+    from examples.evo2_ecosystem import (
+        evaluate as task_evaluator,
+        r4_selection,
+        run_spec,
+    )
 else:  # direct ``python examples/.../freeze_finalist.py``
     import evaluate as task_evaluator
+    import r4_selection
     import run_spec
 
 
@@ -117,17 +122,24 @@ def _audit_arm(
         "simulator_source_sha256": spec["source_sha256"]["simulator"],
         "simulator_config_sha256": spec["simulator_config_sha256"],
     }
-    if run_spec.schema_version(spec) == 2:
+    if run_spec.schema_version(spec) >= 2:
         expected_static.update(
             {
                 "run_spec_sha256": run_spec.sha256_bytes(
                     run_spec.canonical_json_bytes(spec)
                 ),
-                "run_spec_schema_version": 2,
+                "run_spec_schema_version": run_spec.schema_version(spec),
                 "candidate_output_width": run_spec.candidate_output_width(spec),
                 "founder_index_sha256": spec["founder_index"]["sha256"],
             }
         )
+        if run_spec.schema_version(spec) >= 3:
+            expected_static["candidate_contract_version"] = (
+                run_spec.candidate_contract_version(spec)
+            )
+            expected_static["initial_program_sha256"] = spec["initial_program"][
+                "sha256"
+            ]
     completed: list[int] = []
     correct_count = 0
     full_evaluation_count = 0
@@ -230,8 +242,16 @@ def _audit_arm(
     }
     if any(completion.get(key) != value for key, value in expected_completion.items()):
         raise RuntimeError(f"completion marker does not match {regime} artifacts")
+    if (
+        run_spec.schema_version(spec) >= 3
+        and completion.get("llm_generated_descendant_count") != spec["proposal_budget"]
+    ):
+        raise RuntimeError("completion marker has the wrong r4 proposal count")
     return {
         "generation_budget": spec["generations"],
+        "llm_generated_descendant_count": (
+            spec["proposal_budget"] if run_spec.schema_version(spec) >= 3 else None
+        ),
         "completed_evaluation_count": len(completed),
         "correct_evaluation_count": correct_count,
         "full_evaluation_count": full_evaluation_count,
@@ -376,6 +396,15 @@ def _dependencies() -> dict[str, Any]:
     from experiments.evo2_ecosystem.protocol import manifest_sha256  # noqa: PLC0415
     from microcosmos.heredity import mutate_cppn  # noqa: PLC0415
 
+    try:
+        from microcosmos.heredity import mutate_cppn_r4  # noqa: PLC0415
+        from experiments.evo2_ecosystem.episode import (  # noqa: PLC0415
+            evaluate_manifest_paired_delta,
+        )
+    except ImportError:
+        mutate_cppn_r4 = None
+        evaluate_manifest_paired_delta = None
+
     return {
         "SimulatorConfig": SimulatorConfig,
         "evaluate_manifest": evaluate_manifest,
@@ -385,6 +414,8 @@ def _dependencies() -> dict[str, Any]:
         "founder_index_sha256": founder_index_sha256,
         "load_founder_index": load_founder_index,
         "mutate_cppn": mutate_cppn,
+        "mutate_cppn_r4": mutate_cppn_r4,
+        "evaluate_manifest_paired_delta": evaluate_manifest_paired_delta,
         "simulator_config_sha256": simulator_config_sha256,
         "simulator_source_sha256": simulator_source_sha256,
     }
@@ -418,7 +449,7 @@ def _verified_founder_index_path(
 
 def _episode_record(world: Any, episode: Any) -> dict[str, Any]:
     event = episode.event_record
-    return {
+    record = {
         "scenario_id": world.scenario_id,
         "pair_id": world.pair_id,
         "scenario_family": world.scenario_family,
@@ -442,6 +473,26 @@ def _episode_record(world: Any, episode: Any) -> dict[str, Any]:
         "policy_violation_count": int(np.asarray(episode.policy_violation_count)),
         "integrity_valid": bool(np.asarray(episode.integrity_valid)),
     }
+    for name in (
+        "generation_gain",
+        "pre_selection_probability_count",
+        "post_selection_probability_count",
+    ):
+        if hasattr(episode, name):
+            record[name] = int(np.asarray(getattr(episode, name)))
+    for name in (
+        "pre_selection_probability_sum",
+        "post_selection_probability_sum",
+        "operator_success_ema",
+        "operator_usage_ema",
+        "operator_evidence_ema",
+    ):
+        if hasattr(episode, name):
+            values = np.asarray(getattr(episode, name), dtype=float)
+            if values.shape != (6,) or not np.all(np.isfinite(values)):
+                raise ValueError(f"invalid r4 episode field: {name}")
+            record[name] = [float(value) for value in values]
+    return record
 
 
 def _development_record(
@@ -474,7 +525,7 @@ def _development_record(
     )
     if not isinstance(training_manifest_hash, str):
         raise ValueError("training metrics do not identify their manifest")
-    return {
+    record = {
         "schema_version": 1,
         "regime": regime,
         "generation": candidate.generation,
@@ -499,6 +550,15 @@ def _development_record(
             )
         ],
     }
+    observations = getattr(evaluation, "adaptive_observations", ())
+    if observations:
+        normalized = []
+        for observation in observations:
+            value = dict(observation)
+            # Validation and bootstrap are centralized in r4_selection.
+            normalized.append(value)
+        record["adaptive_observations"] = normalized
+    return record
 
 
 def reevaluate_candidate(
@@ -512,20 +572,72 @@ def reevaluate_candidate(
     spec_hash: str,
     candidate_output_width: int = 4,
     founder_index_path: Path | None = None,
+    contract_version: str = run_spec.LEGACY_CONTRACT,
+    initial_source_path: Path | None = None,
 ) -> dict[str, Any]:
     """Validate and evaluate one candidate against the development worlds."""
-    module: ModuleType = task_evaluator._load_candidate(candidate.source_path)
-    if candidate_output_width == 4:
-        task_evaluator._smoke_validate_candidate(module)
+    if contract_version == run_spec.LEGACY_CONTRACT:
+        module: ModuleType = task_evaluator._load_candidate(candidate.source_path)
+        if candidate_output_width == 4:
+            task_evaluator._smoke_validate_candidate(module)
+        else:
+            task_evaluator._smoke_validate_candidate(module, candidate_output_width)
     else:
-        task_evaluator._smoke_validate_candidate(module, candidate_output_width)
-    policy = task_evaluator._build_policy(module, dependencies["mutate_cppn"])
+        module = task_evaluator._load_candidate(
+            candidate.source_path,
+            contract_version,
+            initial_source_path,
+        )
+        task_evaluator._smoke_validate_candidate(
+            module,
+            candidate_output_width,
+            contract_version=contract_version,
+        )
+    mutate = (
+        dependencies["mutate_cppn_r4"]
+        if contract_version == run_spec.R4_CONTRACT
+        else dependencies["mutate_cppn"]
+    )
+    if mutate is None:
+        raise RuntimeError("Microcosmos r4 heredity contract is unavailable")
+    policy = (
+        task_evaluator._build_policy(module, mutate)
+        if contract_version == run_spec.LEGACY_CONTRACT
+        else task_evaluator._build_policy(
+            module,
+            mutate,
+            contract_version=contract_version,
+        )
+    )
     evaluation_kwargs = {"numerical_repeats": numerical_repeats}
     if founder_index_path is not None:
         evaluation_kwargs["founder_index_path"] = founder_index_path
-    evaluation = dependencies["evaluate_manifest"](
-        manifest, config, policy, **evaluation_kwargs
-    )
+    if contract_version == run_spec.R4_CONTRACT:
+        paired = dependencies["evaluate_manifest_paired_delta"]
+        if paired is None or initial_source_path is None:
+            raise RuntimeError("Microcosmos paired r4 evaluator is unavailable")
+        ancestor = task_evaluator._load_candidate(
+            initial_source_path,
+            contract_version,
+            initial_source_path,
+        )
+        ancestor_policy = task_evaluator._build_policy(
+            ancestor,
+            mutate,
+            contract_version=contract_version,
+        )
+        evaluation = paired(
+            manifest,
+            config,
+            policy,
+            ancestor_policy,
+            regime=regime,
+            **evaluation_kwargs,
+        )
+    else:
+        evaluation = dependencies["evaluate_manifest"](
+            manifest, config, policy, **evaluation_kwargs
+        )
     record = _development_record(
         regime,
         candidate,
@@ -606,7 +718,7 @@ def _load_development_record(
 
 def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str, Any]:
     all_sources = {
-        "initial": run_spec.sha256_file(TASK_DIR / "initial.py"),
+        "initial": run_spec.sha256_file(run_spec.initial_program_path(spec)),
         "evaluator": run_spec.sha256_file(TASK_DIR / "evaluate.py"),
         "simulator": dependencies["simulator_source_sha256"](),
         "analysis": run_spec.sha256_file(ANALYSIS_PATH),
@@ -617,6 +729,7 @@ def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str,
         "finalist_selector": run_spec.sha256_file(Path(__file__)),
         "lineage_selector": run_spec.sha256_file(TASK_DIR / "program_lineage.py"),
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
+        "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
     }
     actual_sources = {name: all_sources[name] for name in spec["source_sha256"]}
     if actual_sources != spec["source_sha256"]:
@@ -631,7 +744,7 @@ def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str,
         raise RuntimeError(
             "sealed manifest must remain unreadable during finalist selection"
         )
-    if run_spec.schema_version(spec) == 2:
+    if run_spec.schema_version(spec) >= 2:
         founder_path = run_spec.founder_index_path(spec)
         assert founder_path is not None
         founder_index = dependencies["load_founder_index"](
@@ -661,7 +774,7 @@ def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str,
         name: run_spec.sha256_file(path)
         for name, path in run_spec.bound_protocol_paths(spec).items()
     }
-    if run_spec.schema_version(spec) == 2:
+    if run_spec.schema_version(spec) >= 2:
         for name, digest in protocol_hashes.items():
             if digest != spec[name]["sha256"]:
                 raise RuntimeError(f"{name} no longer matches the run spec")
@@ -741,15 +854,22 @@ def select_and_freeze(
         "numerical_repeats": spec["numerical_repeats"],
         "full_evaluation_performed": True,
     }
-    if run_spec.schema_version(spec) == 2:
+    if run_spec.schema_version(spec) >= 2:
         expected_private.update(
             {
                 "run_spec_sha256": spec_hash,
-                "run_spec_schema_version": 2,
+                "run_spec_schema_version": run_spec.schema_version(spec),
                 "candidate_output_width": run_spec.candidate_output_width(spec),
                 "founder_index_sha256": spec["founder_index"]["sha256"],
             }
         )
+        if run_spec.schema_version(spec) >= 3:
+            expected_private["candidate_contract_version"] = (
+                run_spec.candidate_contract_version(spec)
+            )
+            expected_private["initial_program_sha256"] = spec["initial_program"][
+                "sha256"
+            ]
     candidates = discover_candidates(paths.arm_results, expected_private)[
         : spec["top_k"]
     ]
@@ -796,12 +916,28 @@ def select_and_freeze(
                 spec_hash=spec_hash,
                 candidate_output_width=run_spec.candidate_output_width(spec),
                 founder_index_path=founder_index_path,
+                contract_version=run_spec.candidate_contract_version(spec),
+                initial_source_path=run_spec.initial_program_path(spec),
             )
             _write_atomic(path, _json_bytes(record))
         evaluations.append(record)
 
     if not any(item["development_integrity_valid"] for item in evaluations):
         raise RuntimeError("no development candidate passed integrity checks")
+    if run_spec.schema_version(spec) >= 3:
+        for item in evaluations:
+            try:
+                eligibility = r4_selection.classify_adaptive(
+                    item.get("adaptive_observations", ()),
+                    bootstrap_replicates=spec["bootstrap"]["replicates"],
+                    bootstrap_seed=spec["bootstrap"]["seed"],
+                )
+                item["adaptive_eligibility"] = asdict(eligibility)
+            except ValueError as error:
+                item["adaptive_eligibility"] = {
+                    "eligible": False,
+                    "reason": str(error),
+                }
     evaluations.sort(
         key=lambda item: (
             not item["development_integrity_valid"],
@@ -885,12 +1021,48 @@ def select_and_freeze(
                 "numerical_repeats": item["numerical_repeats"],
                 "repeat_scores": item["repeat_scores"],
                 "selected_repeat_index": item["selected_repeat_index"],
+                "adaptive_eligibility": item.get("adaptive_eligibility"),
             }
             for item in evaluations
         ],
     }
-    _freeze(paths.frozen, winner, freeze_record, archive_bytes)
-    return freeze_record
+    if run_spec.schema_version(spec) < 3:
+        _freeze(paths.frozen, winner, freeze_record, archive_bytes)
+        return freeze_record
+
+    freeze_record["finalist_type"] = "unrestricted"
+    freeze_record["adaptive_eligibility"] = winner_record.get("adaptive_eligibility")
+    _freeze(paths.frozen / "unrestricted", winner, freeze_record, archive_bytes)
+    finalists = r4_selection.select_finalists(evaluations)
+    result: dict[str, Any] = {"unrestricted": freeze_record}
+    adaptive = finalists.get("adaptive")
+    if adaptive is not None:
+        adaptive_winner = candidate_by_hash[adaptive["candidate_source_sha256"]]
+        adaptive_record = {
+            **freeze_record,
+            "finalist_type": "adaptive",
+            "selected_generation": adaptive_winner.generation,
+            "candidate_source_sha256": adaptive_winner.source_sha256,
+            "training_score": adaptive_winner.training_score,
+            "training_manifest_sha256": adaptive["training_manifest_sha256"],
+            "development_score": adaptive["development_score"],
+            "development_integrity_valid": adaptive["development_integrity_valid"],
+            "repeat_scores": adaptive["repeat_scores"],
+            "selected_repeat_index": adaptive["selected_repeat_index"],
+            "adaptive_eligibility": adaptive["adaptive_eligibility"],
+            "development_evaluation_record": (
+                f"gen_{adaptive_winner.generation}_"
+                f"{adaptive_winner.source_sha256[:12]}.json"
+            ),
+        }
+        _freeze(
+            paths.frozen / "adaptive",
+            adaptive_winner,
+            adaptive_record,
+            archive_bytes,
+        )
+        result["adaptive"] = adaptive_record
+    return result
 
 
 def _parse_args() -> argparse.Namespace:

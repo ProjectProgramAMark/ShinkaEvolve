@@ -324,6 +324,11 @@ def export_champion_lineage(
     chain = [
         _program_record(program, ordinal) for ordinal, program in enumerate(programs)
     ]
+    if (
+        run_spec.schema_version(spec) >= 3
+        and chain[0]["candidate_source_sha256"] != spec["initial_program"]["sha256"]
+    ):
+        raise ValueError("r4 program lineage does not start at its frozen ancestor")
     distinct_sources = _deduplicate_sources(chain, champion.id)
     selected = _select_representatives(distinct_sources, chain)
     record = {
@@ -370,6 +375,7 @@ def export_for_regime(
     *,
     selected_run_spec_path: str | Path | None = None,
     profile: str | None = None,
+    finalist_type: str = "unrestricted",
 ) -> dict[str, Any]:
     """Export one canonical lineage using only run-spec-derived paths."""
     spec, _, _ = run_spec.load_run_spec(
@@ -377,20 +383,30 @@ def export_for_regime(
         profile=profile,
     )
     paths = run_spec.paths_for(spec, regime)
+    if finalist_type not in {"unrestricted", "adaptive"}:
+        raise ValueError("unknown finalist type")
+    if run_spec.schema_version(spec) >= 3:
+        finalist_root = paths.frozen / finalist_type
+        output_name = f"program_lineage_selection_{finalist_type}.json"
+    else:
+        if finalist_type != "unrestricted":
+            raise ValueError("legacy runs have only one unrestricted finalist")
+        finalist_root = paths.frozen
+        output_name = "program_lineage_selection.json"
     generation = _load_json_object(
-        paths.frozen / "freeze_record.json",
+        finalist_root / "freeze_record.json",
         "freeze record",
     ).get("selected_generation")
     if not isinstance(generation, int) or isinstance(generation, bool):
         raise ValueError("freeze record has an invalid selected generation")
     return export_champion_lineage(
         database_path=paths.arm_results / "programs.sqlite",
-        freeze_record_path=paths.frozen / "freeze_record.json",
-        frozen_source_path=paths.frozen / "main.py",
+        freeze_record_path=finalist_root / "freeze_record.json",
+        frozen_source_path=finalist_root / "main.py",
         generation_source_path=paths.arm_results / f"gen_{generation}" / "main.py",
         run_spec_path=paths.run_root / "run_spec.json",
         sealed_manifest_path=run_spec.manifest_path(spec, "sealed"),
-        output_path=paths.selection / "program_lineage_selection.json",
+        output_path=paths.selection / output_name,
     )
 
 
@@ -400,6 +416,11 @@ def _parse_args() -> argparse.Namespace:
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--run-spec", type=Path)
     selection.add_argument("--profile")
+    parser.add_argument(
+        "--finalist-type",
+        choices=("unrestricted", "adaptive"),
+        default="unrestricted",
+    )
     return parser.parse_args()
 
 
@@ -409,6 +430,7 @@ def main() -> None:
         arguments.regime,
         selected_run_spec_path=arguments.run_spec,
         profile=arguments.profile,
+        finalist_type=arguments.finalist_type,
     )
     print(
         f"Frozen {len(record['selected_representatives'])} distinct "

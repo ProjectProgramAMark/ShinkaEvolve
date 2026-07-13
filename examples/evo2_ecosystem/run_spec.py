@@ -66,6 +66,10 @@ _V2_SOURCE_KEYS = {
     "lineage_selector",
     "run_spec_module",
 }
+_V3_SOURCE_KEYS = _V2_SOURCE_KEYS | {"adaptive_selector"}
+
+LEGACY_CONTRACT = "evo2-heredity-r3-v1"
+R4_CONTRACT = "evo2-heredity-r4-v1"
 
 
 @dataclass(frozen=True)
@@ -124,7 +128,7 @@ def _validate_shared(spec: dict[str, Any]) -> None:
         or not re.fullmatch(r"[a-z0-9][a-z0-9-]{2,63}", spec["run_id"])
         or spec["generations"] < 1
         or spec["outer_seed"] < 0
-        or spec["top_k"] != 3
+        or spec["top_k"] not in {3, 5}
         or spec["numerical_repeats"] != 3
         or not isinstance(spec["model"], str)
         or not spec["model"].startswith("headless/")
@@ -151,6 +155,8 @@ def _validate_v1(spec: dict[str, Any]) -> None:
         "stress_responsive",
     ]:
         raise ValueError("run specification has the wrong baseline set")
+    if spec["top_k"] != 3:
+        raise ValueError("legacy run specification must freeze top_k=3")
     if set(spec["manifest_sha256"]) != _MANIFEST_ROLES:
         raise ValueError("run specification has incomplete manifest hashes")
     if set(spec["source_sha256"]) != _V1_SOURCE_KEYS:
@@ -175,6 +181,8 @@ def _validate_v2(spec: dict[str, Any]) -> None:
     }
     if set(spec) != required:
         raise ValueError("run specification has the wrong schema")
+    if spec["top_k"] != 3:
+        raise ValueError("schema-v2 run specification must freeze top_k=3")
     if set(spec["manifests"]) != _MANIFEST_ROLES:
         raise ValueError("run specification has incomplete manifest bindings")
     for role, binding in spec["manifests"].items():
@@ -196,6 +204,71 @@ def _validate_v2(spec: dict[str, Any]) -> None:
         _validate_relative_path(value, f"{name} artifact root")
 
 
+def _validate_v3(spec: dict[str, Any]) -> None:
+    required = _COMMON_KEYS | {
+        "manifests",
+        "founder_index",
+        "candidate_output_width",
+        "candidate_contract",
+        "initial_program",
+        "proposal_budget",
+        "preregistration",
+        "implementation_plan",
+        "artifact_roots",
+    }
+    if set(spec) != required:
+        raise ValueError("run specification has the wrong schema")
+    # Reuse the immutable artifact validation from schema 2.
+    v2_view = {
+        key: value
+        for key, value in spec.items()
+        if key not in {"candidate_contract", "initial_program", "proposal_budget"}
+    }
+    v2_view["schema_version"] = 2
+    v2_view["top_k"] = 3
+    v2_view["source_sha256"] = {
+        name: spec["source_sha256"][name] for name in _V2_SOURCE_KEYS
+    }
+    _validate_v2(v2_view)
+    if spec["candidate_output_width"] != 6:
+        raise ValueError("the r4 candidate output width must be six")
+    _validate_binding(spec["initial_program"], "initial program")
+    contract = spec["candidate_contract"]
+    expected_contract = {
+        "version": R4_CONTRACT,
+        "argument_names": [
+            "parent_genome_summary",
+            "parent_stats",
+            "population_stats",
+            "operator_stats",
+            "rng",
+        ],
+        "input_shapes": [[2], [3], [6], [3, 6]],
+        "output_shape": [6],
+        "logit_clip": [-8.0, 8.0],
+        "rng_readable": False,
+        "runtime_budget_ms": 100.0,
+    }
+    if contract != expected_contract:
+        raise ValueError("run specification has the wrong r4 candidate contract")
+    if (
+        not isinstance(spec["proposal_budget"], int)
+        or isinstance(spec["proposal_budget"], bool)
+        or spec["proposal_budget"] != 50
+        or spec["generations"] != spec["proposal_budget"] + 1
+        or spec["top_k"] != 5
+        or spec["archive"].get("num_islands") != 2
+        or spec["archive"].get("archive_size") != 32
+    ):
+        raise ValueError("run specification has the wrong fixed r4 search budget")
+    if set(spec["source_sha256"]) != _V3_SOURCE_KEYS or any(
+        not _is_sha256(value) for value in spec["source_sha256"].values()
+    ):
+        raise ValueError("run specification has incomplete r4 source hashes")
+    if spec["source_sha256"]["initial"] != spec["initial_program"]["sha256"]:
+        raise ValueError("initial source bindings disagree")
+
+
 def _validate(spec: dict[str, Any]) -> None:
     if not isinstance(spec.get("schema_version"), int):
         raise ValueError("run specification has the wrong schema")
@@ -203,6 +276,8 @@ def _validate(spec: dict[str, Any]) -> None:
         _validate_v1(spec)
     elif spec["schema_version"] == 2:
         _validate_v2(spec)
+    elif spec["schema_version"] == 3:
+        _validate_v3(spec)
     else:
         raise ValueError("run specification has the wrong schema")
     _validate_shared(spec)
@@ -260,9 +335,22 @@ def candidate_output_width(spec: dict[str, Any]) -> int:
     return int(spec.get("candidate_output_width", 4))
 
 
+def candidate_contract_version(spec: dict[str, Any]) -> str:
+    """Return the statically selected candidate ABI."""
+    if schema_version(spec) < 3:
+        return LEGACY_CONTRACT
+    return str(spec["candidate_contract"]["version"])
+
+
 def artifact_path(binding: dict[str, str]) -> Path:
     """Resolve a schema-v2 project-relative immutable artifact binding."""
     return (PROJECT_ROOT / binding["path"]).resolve()
+
+
+def initial_program_path(spec: dict[str, Any]) -> Path:
+    if schema_version(spec) < 3:
+        return TASK_DIR / "initial.py"
+    return artifact_path(spec["initial_program"])
 
 
 def manifest_path(spec: dict[str, Any], role: str) -> Path:

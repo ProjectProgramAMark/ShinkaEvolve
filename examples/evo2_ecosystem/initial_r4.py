@@ -1,0 +1,19 @@
+import jax.numpy as jnp
+
+
+# EVOLVE-BLOCK-START
+def make_offspring(
+    parent_genome_summary,
+    parent_stats,
+    population_stats,
+    operator_stats,
+    rng,
+):
+    """Return logits for the six trusted r4 heredity operators."""
+    return jnp.array(
+        [-8.0, -8.0, 8.0, -8.0, -8.0, -8.0],
+        dtype=jnp.float32,
+    )
+
+
+# EVOLVE-BLOCK-END
