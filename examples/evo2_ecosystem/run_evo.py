@@ -36,6 +36,7 @@ HOLDOUT_PATHS = (
 HEADLESS_COMMAND_ENV = "SHINKA_HEADLESS_COMMAND"
 ANALYSIS_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "analysis.py"
 BASELINE_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "run_baselines.py"
+R4_TOOL_ROOT = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
 
 
 def _require_holdouts_locked(spec: dict[str, Any] | None = None) -> None:
@@ -122,6 +123,10 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
         "lineage_selector": run_spec.sha256_file(TASK_DIR / "program_lineage.py"),
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
         "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
+        "r4_final_analysis": run_spec.sha256_file(R4_TOOL_ROOT / "analysis.py"),
+        "r4_manifest_generator": run_spec.sha256_file(R4_TOOL_ROOT / "manifest_generator.py"),
+        "r4_qualification": run_spec.sha256_file(R4_TOOL_ROOT / "qualification.py"),
+        "r4_opportunity": run_spec.sha256_file(R4_TOOL_ROOT / "opportunity.py"),
     }
     expected_sources = spec["source_sha256"]
     actual_sources = {

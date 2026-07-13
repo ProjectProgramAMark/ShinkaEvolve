@@ -66,7 +66,13 @@ _V2_SOURCE_KEYS = {
     "lineage_selector",
     "run_spec_module",
 }
-_V3_SOURCE_KEYS = _V2_SOURCE_KEYS | {"adaptive_selector"}
+_V3_SOURCE_KEYS = _V2_SOURCE_KEYS | {
+    "adaptive_selector",
+    "r4_final_analysis",
+    "r4_manifest_generator",
+    "r4_qualification",
+    "r4_opportunity",
+}
 
 LEGACY_CONTRACT = "evo2-heredity-r3-v1"
 R4_CONTRACT = "evo2-heredity-r4-v1"

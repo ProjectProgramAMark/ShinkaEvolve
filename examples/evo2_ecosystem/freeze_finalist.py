@@ -38,6 +38,7 @@ SEALED_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_sealed" / "final.json"
 SEALED_HASH_PATH = SEALED_PATH.with_suffix(".sha256")
 SEALED_WORKFLOW_PATH = SEALED_PATH.with_name("workflow.py")
 HEREDITY_PATH = MICROCOSMOS_ROOT / "src" / "microcosmos" / "heredity.py"
+R4_TOOL_ROOT = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
 _GENERATION = re.compile(r"gen_(\d+)")
 
 
@@ -730,6 +731,10 @@ def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str,
         "lineage_selector": run_spec.sha256_file(TASK_DIR / "program_lineage.py"),
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
         "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
+        "r4_final_analysis": run_spec.sha256_file(R4_TOOL_ROOT / "analysis.py"),
+        "r4_manifest_generator": run_spec.sha256_file(R4_TOOL_ROOT / "manifest_generator.py"),
+        "r4_qualification": run_spec.sha256_file(R4_TOOL_ROOT / "qualification.py"),
+        "r4_opportunity": run_spec.sha256_file(R4_TOOL_ROOT / "opportunity.py"),
     }
     actual_sources = {name: all_sources[name] for name in spec["source_sha256"]}
     if actual_sources != spec["source_sha256"]:
