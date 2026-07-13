@@ -398,12 +398,12 @@ def _dependencies() -> dict[str, Any]:
     from microcosmos.heredity import mutate_cppn  # noqa: PLC0415
 
     try:
-        from microcosmos.heredity import mutate_cppn_r4  # noqa: PLC0415
+        from microcosmos.heredity import make_r4_offspring_policy  # noqa: PLC0415
         from experiments.evo2_ecosystem.episode import (  # noqa: PLC0415
             evaluate_manifest_paired_delta,
         )
     except ImportError:
-        mutate_cppn_r4 = None
+        make_r4_offspring_policy = None
         evaluate_manifest_paired_delta = None
 
     return {
@@ -415,7 +415,7 @@ def _dependencies() -> dict[str, Any]:
         "founder_index_sha256": founder_index_sha256,
         "load_founder_index": load_founder_index,
         "mutate_cppn": mutate_cppn,
-        "mutate_cppn_r4": mutate_cppn_r4,
+        "make_r4_offspring_policy": make_r4_offspring_policy,
         "evaluate_manifest_paired_delta": evaluate_manifest_paired_delta,
         "simulator_config_sha256": simulator_config_sha256,
         "simulator_source_sha256": simulator_source_sha256,
@@ -595,7 +595,7 @@ def reevaluate_candidate(
             contract_version=contract_version,
         )
     mutate = (
-        dependencies["mutate_cppn_r4"]
+        dependencies["make_r4_offspring_policy"]
         if contract_version == run_spec.R4_CONTRACT
         else dependencies["mutate_cppn"]
     )

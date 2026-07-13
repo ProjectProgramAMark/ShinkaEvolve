@@ -151,7 +151,7 @@ def test_r4_candidate_has_five_arrays_six_logits_and_opaque_rng(tmp_path: Path) 
         evaluator._load_candidate(bad, run_spec.R4_CONTRACT, initial)
 
 
-def test_r4_policy_exposes_only_preregistered_bounded_arrays(tmp_path: Path) -> None:
+def test_r4_policy_delegates_public_abi_to_trusted_microcosmos_adapter(tmp_path: Path) -> None:
     evaluator = _evaluator()
     initial = (
         Path(__file__).resolve().parents[1] / "examples/evo2_ecosystem/initial_r4.py"
@@ -166,33 +166,22 @@ def test_r4_policy_exposes_only_preregistered_bounded_arrays(tmp_path: Path) -> 
     module = evaluator._load_candidate(candidate, run_spec.R4_CONTRACT, initial)
     captured = {}
 
-    def trusted(parent, logits, context):
-        captured["logits"] = np.asarray(logits)
-        return parent, context
+    def trusted(logit_policy):
+        captured["logit_policy"] = logit_policy
+        return "trusted-policy"
 
     policy = evaluator._build_policy(
         module, trusted, contract_version=run_spec.R4_CONTRACT
     )
-    parent = SimpleNamespace(
-        node_fraction=jnp.array(0.4),
-        connection_fraction=jnp.array(0.3),
-        energy_fraction=jnp.array(0.8),
-        intake_ema=jnp.array(0.7),
-        age_fraction=jnp.array(0.6),
+    assert policy == "trusted-policy"
+    logits = captured["logit_policy"](
+        jnp.asarray([0.4, 0.3], dtype=jnp.float32),
+        jnp.asarray([0.8, 0.7, 0.6], dtype=jnp.float32),
+        jnp.asarray([0.5, 0.4, -1.0, 0.2, 0.3, 0.1], dtype=jnp.float32),
+        jnp.arange(18, dtype=jnp.float32).reshape(3, 6) / 10,
+        jnp.asarray(0.0, dtype=jnp.float32),
     )
-    population = SimpleNamespace(
-        alive_fraction=jnp.array(0.5),
-        mean_energy_fraction=jnp.array(0.4),
-        population_change_ema=jnp.array(-2.0),
-        birth_rate_ema=jnp.array(0.2),
-        death_rate_ema=jnp.array(0.3),
-        mean_intake_ema=jnp.array(0.1),
-        operator_success_ema=jnp.arange(6, dtype=jnp.float32) / 10,
-        operator_usage_ema=jnp.zeros(6),
-        operator_evidence_ema=jnp.ones(6),
-    )
-    policy("parent", parent, population, "context")
-    assert np.allclose(captured["logits"], [0.4, 0.6, -1.0, 0.3, -8.0, 8.0])
+    assert np.allclose(logits, [0.4, 0.6, -1.0, 0.3, -8.0, 8.0])
 
 
 def _r4_episode() -> SimpleNamespace:

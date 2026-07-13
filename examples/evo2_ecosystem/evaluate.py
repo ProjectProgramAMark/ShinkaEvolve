@@ -454,9 +454,9 @@ def _imports() -> dict[str, Any]:
     from microcosmos.heredity import mutate_cppn  # noqa: PLC0415
 
     try:
-        from microcosmos.heredity import mutate_cppn_r4  # noqa: PLC0415
+        from microcosmos.heredity import make_r4_offspring_policy  # noqa: PLC0415
     except ImportError:
-        mutate_cppn_r4 = None
+        make_r4_offspring_policy = None
     try:
         from experiments.evo2_ecosystem.episode import (  # noqa: PLC0415
             evaluate_manifest_paired_delta,
@@ -473,7 +473,7 @@ def _imports() -> dict[str, Any]:
         "founder_index_sha256": founder_index_sha256,
         "load_founder_index": load_founder_index,
         "mutate_cppn": mutate_cppn,
-        "mutate_cppn_r4": mutate_cppn_r4,
+        "make_r4_offspring_policy": make_r4_offspring_policy,
         "evaluate_manifest_paired_delta": evaluate_manifest_paired_delta,
         "simulator_config_sha256": simulator_config_sha256,
         "simulator_source_sha256": simulator_source_sha256,
@@ -553,69 +553,9 @@ def _build_policy(
     if contract_version != run_spec.R4_CONTRACT:
         raise CandidateValidationError("unknown candidate contract")
 
-    def policy(parent_genome, parent_stats, population_stats, mutation_context):
-        safe_genome = jnp.clip(
-            jnp.stack([parent_stats.node_fraction, parent_stats.connection_fraction]),
-            0.0,
-            1.0,
-        )
-        safe_parent = jnp.clip(
-            jnp.stack(
-                [
-                    parent_stats.energy_fraction,
-                    parent_stats.intake_ema,
-                    parent_stats.age_fraction,
-                ]
-            ),
-            0.0,
-            1.0,
-        )
-        safe_population = jnp.stack(
-            [
-                population_stats.alive_fraction,
-                population_stats.mean_energy_fraction,
-                population_stats.population_change_ema,
-                population_stats.birth_rate_ema,
-                population_stats.death_rate_ema,
-                population_stats.mean_intake_ema,
-            ]
-        )
-        safe_population = safe_population.at[0].set(
-            jnp.clip(safe_population[0], 0.0, 1.0)
-        )
-        safe_population = safe_population.at[1].set(
-            jnp.clip(safe_population[1], 0.0, 1.0)
-        )
-        safe_population = safe_population.at[2].set(
-            jnp.clip(safe_population[2], -1.0, 1.0)
-        )
-        safe_population = safe_population.at[3:].set(
-            jnp.clip(safe_population[3:], 0.0, 1.0)
-        )
-        safe_operator = jnp.clip(
-            jnp.stack(
-                [
-                    population_stats.operator_success_ema,
-                    population_stats.operator_usage_ema,
-                    population_stats.operator_evidence_ema,
-                ]
-            ),
-            0.0,
-            1.0,
-        )
-        logits = jnp.asarray(
-            function(
-                safe_genome,
-                safe_parent,
-                safe_population,
-                safe_operator,
-                jnp.array(0.0, dtype=jnp.float32),
-            ),
-            dtype=jnp.float32,
-        )
-        return mutate_cppn(parent_genome, logits, mutation_context)
-
-    return policy
+    if mutate_cppn is None:
+        raise RuntimeError("Microcosmos does not provide the trusted r4 adapter")
+    return mutate_cppn(function)
 
 
 def _episode_metrics_legacy(evaluation) -> dict[str, Any]:
@@ -891,7 +831,7 @@ def _evaluate_candidate(
     config = dependencies["SimulatorConfig"]()
     founder_index_path = _verified_founder_index_path(spec, dependencies)
     if contract_version == run_spec.R4_CONTRACT:
-        mutate = dependencies["mutate_cppn_r4"]
+        mutate = dependencies["make_r4_offspring_policy"]
         paired_evaluator = dependencies["evaluate_manifest_paired_delta"]
         if mutate is None or paired_evaluator is None:
             raise RuntimeError("Microcosmos does not provide the trusted r4 contract")
