@@ -56,6 +56,7 @@ def evaluate_program(
     manifest_path: str | Path,
     founder_index_path: str | Path,
     *,
+    ancestor_program_path: str | Path | None = None,
     regime: str,
     numerical_repeats: int,
 ) -> dict[str, object]:
@@ -70,8 +71,9 @@ def evaluate_program(
         run_spec.R4_CONTRACT,
         initial,
     )
+    ancestor_path = initial if ancestor_program_path is None else ancestor_program_path
     ancestor = evaluate._load_candidate(
-        initial,
+        ancestor_path,
         run_spec.R4_CONTRACT,
         initial,
     )
@@ -151,6 +153,7 @@ def evaluate_program(
     metrics["private"].update(
         {
             "backend": jax.default_backend(),
+            "ancestor_sha256": ancestor._evo2_source_sha256,
             "candidate_sha256": candidate._evo2_source_sha256,
             "exploratory": True,
             "founder_index_sha256": hashlib.sha256(
@@ -168,6 +171,7 @@ def main() -> None:
     parser.add_argument("--results_dir", required=True)
     parser.add_argument("--manifest_path", required=True)
     parser.add_argument("--founder_index_path", required=True)
+    parser.add_argument("--ancestor_program_path")
     parser.add_argument("--regime", choices=evaluate.REGIMES, required=True)
     parser.add_argument("--numerical_repeats", type=int, default=1)
     arguments = parser.parse_args()
@@ -178,6 +182,7 @@ def main() -> None:
             arguments.program_path,
             arguments.manifest_path,
             arguments.founder_index_path,
+            ancestor_program_path=arguments.ancestor_program_path,
             regime=arguments.regime,
             numerical_repeats=arguments.numerical_repeats,
         )
