@@ -10,11 +10,16 @@ import sys
 import jax
 from shinka.core.wrap_eval import save_json_results
 
-from examples.evo2_ecosystem import evaluate
-from examples.evo2_ecosystem import run_spec
-
 
 TASK_DIR = Path(__file__).resolve().parent
+SHINKA_ROOT = TASK_DIR.parents[1]
+if str(SHINKA_ROOT) not in sys.path:
+    sys.path.insert(0, str(SHINKA_ROOT))
+
+from examples.evo2_ecosystem import evaluate  # noqa: E402
+from examples.evo2_ecosystem import run_spec  # noqa: E402
+
+
 PROJECT_ROOT = TASK_DIR.parents[2]
 MICROCOSMOS_ROOT = PROJECT_ROOT / "microcosmos"
 
