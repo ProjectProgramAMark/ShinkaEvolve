@@ -117,16 +117,21 @@ def evaluate_program(
     score = raw_score if valid else -2.0
     public = metrics["public"]
     public["score"] = score
+    public["ancestor_survival_rate"] = sum(
+        float(episode.survived) for episode in evaluation.ancestor_episodes
+    ) / len(evaluation.ancestor_episodes)
     metrics["combined_score"] = score
     metrics["private"].update(
         {
             "integrity_valid": valid,
             "physical_integrity_valid": physical_integrity,
+            "pair_deltas": [float(value) for value in evaluation.pair_deltas.tolist()],
             "repeat_scores": [
                 float(value) for value in evaluation.repeat_scores.tolist()
             ],
             "selected_repeat_index": int(evaluation.selected_repeat_index),
             "survival_is_diagnostic": True,
+            "adaptive_observations": list(evaluation.adaptive_observations),
         }
     )
     feedback = [
