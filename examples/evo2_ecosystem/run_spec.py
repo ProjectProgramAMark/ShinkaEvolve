@@ -208,6 +208,7 @@ R6_FOUNDER_INDEX_PATH = f"{R6_ARTIFACT_ROOT}/founders/index.json"
 R6_BASELINE_SOURCE_PATH = R5_BASELINE_SOURCE_PATH
 R6_ARTIFACT_ROOTS = dict(R5_ARTIFACT_ROOTS)
 R6_BASELINES = list(R5_BASELINES)
+R6_SEARCH = {**R5_SEARCH, "evaluation_timeout": "00:20:00"}
 R6_PROTOCOL_SOURCE_PATHS = {
     "plan": R6_PROTOCOL_DOCUMENT_PATH,
     "protocol": f"{R6_PROTOCOL_ROOT}/protocol.py",
@@ -687,7 +688,7 @@ def _validate_v5(spec: dict[str, Any]) -> None:
         or spec["model"] != R5_MODEL
         or spec["headless_command"] != R5_HEADLESS_COMMAND
         or spec["bootstrap"] != R5_BOOTSTRAP
-        or spec["search"] != R5_SEARCH
+        or spec["search"] != R6_SEARCH
         or spec["baselines"] != R6_BASELINES
         or spec["artifact_roots"] != R6_ARTIFACT_ROOTS
     ):
@@ -1188,7 +1189,7 @@ def build_r6_run_spec(
         },
         "bootstrap": dict(R5_BOOTSTRAP),
         "baselines": list(R6_BASELINES),
-        "search": dict(R5_SEARCH),
+        "search": dict(R6_SEARCH),
         "manifests": {
             role: {"path": R6_MANIFEST_PATHS[role], "sha256": manifests[role]}
             for role in sorted(_MANIFEST_ROLES)

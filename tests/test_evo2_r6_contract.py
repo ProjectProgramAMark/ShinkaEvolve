@@ -96,6 +96,8 @@ def test_schema_v5_builder_binds_exact_r6_protocol(
     assert loaded["run_id"] == run_spec.R6_RUN_ID
     assert loaded["proposal_budget"] == 50
     assert loaded["generations"] == 51
+    assert loaded["search"]["evaluation_timeout"] == "00:20:00"
+    assert run_spec.R5_SEARCH["evaluation_timeout"] == "00:10:00"
     assert loaded["candidate_output_width"] == 6
     assert run_spec.baseline_source_path(loaded) == (
         tmp_path / run_spec.R6_BASELINE_SOURCE_PATH
