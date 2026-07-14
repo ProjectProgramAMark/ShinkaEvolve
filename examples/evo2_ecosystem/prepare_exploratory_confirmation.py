@@ -53,9 +53,8 @@ def make_offspring(
     population_stats,
     operator_stats,
     rng,
-):
+): 
     """Always select the frozen {OPERATOR_NAMES[index]} operator."""
-    del parent_genome_summary, parent_stats, population_stats, operator_stats, rng
     return jnp.array([{values}], dtype=jnp.float32)
 
 
