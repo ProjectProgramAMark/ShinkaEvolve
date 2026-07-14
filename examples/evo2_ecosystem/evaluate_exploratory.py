@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import math
 from pathlib import Path
 import sys
 
@@ -106,6 +107,42 @@ def evaluate_program(
         capture_finalists=False,
     )
     metrics = evaluate._episode_metrics_r4(evaluation, regime)
+    violations = int(metrics["private"]["policy_violation_count"])
+    physical_integrity = all(
+        bool(getattr(episode, "integrity_valid", True))
+        for episode in (*evaluation.episodes, *evaluation.ancestor_episodes)
+    )
+    raw_score = float(evaluation.candidate_score)
+    valid = physical_integrity and violations == 0 and math.isfinite(raw_score)
+    score = raw_score if valid else -2.0
+    public = metrics["public"]
+    public["score"] = score
+    metrics["combined_score"] = score
+    metrics["private"].update(
+        {
+            "integrity_valid": valid,
+            "physical_integrity_valid": physical_integrity,
+            "repeat_scores": [
+                float(value) for value in evaluation.repeat_scores.tolist()
+            ],
+            "selected_repeat_index": int(evaluation.selected_repeat_index),
+            "survival_is_diagnostic": True,
+        }
+    )
+    feedback = [
+        f"paired ancestor delta={score:.4f}",
+        f"sham delta={public['sham_auc_delta']:.4f}",
+    ]
+    if regime == "punctuated":
+        feedback.append(f"shock delta={public['shock_auc_delta']:.4f}")
+    feedback.extend(
+        [
+            f"survival={public['survival_rate']:.2f}",
+            f"mean births={public['mean_births']:.1f}",
+            "survival is scored, not a validity gate",
+        ]
+    )
+    metrics["text_feedback"] = "; ".join(feedback) + "."
     metrics["private"].update(
         {
             "backend": jax.default_backend(),
