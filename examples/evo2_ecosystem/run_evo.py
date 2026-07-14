@@ -39,7 +39,9 @@ HOLDOUT_PATHS = (
 HEADLESS_COMMAND_ENV = "SHINKA_HEADLESS_COMMAND"
 ANALYSIS_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "analysis.py"
 BASELINE_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "run_baselines.py"
-R4_TOOL_ROOT = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
+R4_TOOL_ROOT = (
+    MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
+)
 
 
 def _git_output(repository: Path, *arguments: str) -> bytes:
@@ -78,14 +80,35 @@ def _allowed_generated_path(
     relative: Path,
     spec: dict[str, Any],
 ) -> bool:
+    descriptor = run_spec.protocol_descriptor(spec)
+    if descriptor is None:
+        return False
     if repository_name == "microcosmos":
-        artifact_root = Path(run_spec.R5_ARTIFACT_ROOT).relative_to("microcosmos")
-        stop_report = Path(run_spec.R5_STOP_REPORT_PATH).relative_to("microcosmos")
-        return _path_is_within(relative, artifact_root) or relative == stop_report
+        artifact_root = Path(descriptor.artifact_root).relative_to("microcosmos")
+        stop_path = (
+            run_spec.R5_STOP_REPORT_PATH
+            if descriptor.schema_version == 4
+            else "microcosmos/docs/evo2/evo2-r6-resource-relocation-stop-report.md"
+        )
+        stop_report = Path(stop_path).relative_to("microcosmos")
+        final_report = Path("docs/evo2/evo2-r6-resource-relocation-final-report.md")
+        return (
+            _path_is_within(relative, artifact_root)
+            or relative == stop_report
+            or (descriptor.schema_version == 5 and relative == final_report)
+        )
 
+    profile_path = (
+        run_spec.R5_PROFILE_PATH
+        if descriptor.schema_version == 4
+        else (
+            "ShinkaEvolve/examples/evo2_ecosystem/run_specs/"
+            "evo2-r6-resource-relocation.json"
+        )
+    )
     exact_profiles = {
-        Path(run_spec.R5_PROFILE_PATH).relative_to("ShinkaEvolve"),
-        Path(run_spec.R5_PROFILE_HASH_PATH).relative_to("ShinkaEvolve"),
+        Path(profile_path).relative_to("ShinkaEvolve"),
+        Path(profile_path).with_suffix(".sha256").relative_to("ShinkaEvolve"),
     }
     artifact_roots = {
         Path(value).relative_to("ShinkaEvolve")
@@ -98,7 +121,7 @@ def _allowed_generated_path(
 
 def _verify_repository_state(spec: dict[str, Any]) -> None:
     """Bind an r5 launch to clean source commits plus declared outputs."""
-    if run_spec.schema_version(spec) != 4:
+    if run_spec.schema_version(spec) not in {4, 5}:
         return
     project_root = run_spec.PROJECT_ROOT.resolve()
     repositories = {
@@ -155,9 +178,7 @@ def _import_protocol_module(path: Path, source_hash: str) -> ModuleType:
     """Import one authenticated experiment-local protocol module."""
     relative = path.relative_to(MICROCOSMOS_ROOT)
     package_name = ".".join(relative.parent.parts)
-    module_name = (
-        f"{package_name}.__shinka_bound_{path.stem}_{source_hash[:16]}"
-    )
+    module_name = f"{package_name}.__shinka_bound_{path.stem}_{source_hash[:16]}"
     module_spec = importlib.util.spec_from_file_location(module_name, path)
     if module_spec is None or module_spec.loader is None:
         raise RuntimeError(f"cannot import bound protocol tool: {path}")
@@ -173,7 +194,8 @@ def _import_protocol_module(path: Path, source_hash: str) -> ModuleType:
 
 def _resolve_protocol_tools(spec: dict[str, Any]) -> dict[str, Callable[..., Any]]:
     """Import the exact schema-v4 role-to-callable bindings, failing closed."""
-    if run_spec.schema_version(spec) != 4:
+    descriptor = run_spec.protocol_descriptor(spec)
+    if descriptor is None:
         return {}
     try:
         paths = run_spec.protocol_tool_paths(spec)
@@ -181,7 +203,7 @@ def _resolve_protocol_tools(spec: dict[str, Any]) -> dict[str, Callable[..., Any
         raise RuntimeError("r5 protocol-tool authentication failed") from error
     modules: dict[Path, ModuleType] = {}
     resolved: dict[str, Callable[..., Any]] = {}
-    for role, callable_name in run_spec.R5_PROTOCOL_TOOL_CALLABLES.items():
+    for role, callable_name in descriptor.protocol_tool_callables.items():
         path = paths[role]
         binding = spec["protocol_tools"][role]
         module = modules.get(path)
@@ -204,7 +226,7 @@ def _verify_prerequisite_artifacts(
     protocol_tools: Mapping[str, Callable[..., Any]],
 ) -> dict[str, dict[str, Any]]:
     """Authenticate canonical prerequisite evidence before either search arm."""
-    if run_spec.schema_version(spec) != 4:
+    if run_spec.schema_version(spec) not in {4, 5}:
         return {}
     try:
         paths = run_spec.prerequisite_artifact_paths(spec)
@@ -236,9 +258,7 @@ def _verify_prerequisite_artifacts(
             or payload.get("passed") is not True
             or binding["passed"] is not True
         ):
-            raise RuntimeError(
-                f"{role} prerequisite is not canonical passing evidence"
-            )
+            raise RuntimeError(f"{role} prerequisite is not canonical passing evidence")
         evidence[role] = payload
 
     validator = protocol_tools.get("world_qualification")
@@ -328,11 +348,9 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
     )
     from experiments.evo2_ecosystem.protocol import manifest_sha256  # noqa: PLC0415
 
-    if run_spec.schema_version(spec) == 4:
+    if run_spec.schema_version(spec) in {4, 5}:
         analysis_path = run_spec.protocol_tool_paths(spec)["final_analysis"]
-        baseline_path = (
-            run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
-        ).resolve()
+        baseline_path = run_spec.baseline_source_path(spec)
     else:
         analysis_path = ANALYSIS_PATH
         baseline_path = BASELINE_PATH
@@ -349,7 +367,9 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
         "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
         "r4_final_analysis": run_spec.sha256_file(R4_TOOL_ROOT / "analysis.py"),
-        "r4_manifest_generator": run_spec.sha256_file(R4_TOOL_ROOT / "manifest_generator.py"),
+        "r4_manifest_generator": run_spec.sha256_file(
+            R4_TOOL_ROOT / "manifest_generator.py"
+        ),
         "r4_qualification": run_spec.sha256_file(R4_TOOL_ROOT / "qualification.py"),
         "r4_opportunity": run_spec.sha256_file(R4_TOOL_ROOT / "opportunity.py"),
     }
@@ -394,6 +414,11 @@ def _verify_search_inputs(spec: dict[str, Any], regime: str) -> None:
                 raise RuntimeError(
                     f"run specification does not match {label.replace('_', ' ')}"
                 )
+        if run_spec.schema_version(spec) == 5:
+            for label, binding in spec["protocol_sources"].items():
+                path = run_spec.artifact_path(binding)
+                if run_spec.sha256_file(path) != binding["sha256"]:
+                    raise RuntimeError(f"R6 protocol source changed: {label}")
     if manifest_sha256(manifest) != run_spec.manifest_hash(spec, f"training_{regime}"):
         raise RuntimeError("run specification does not match the training manifest")
     if simulator_config_sha256(SimulatorConfig()) != spec["simulator_config_sha256"]:

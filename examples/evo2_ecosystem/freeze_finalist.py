@@ -41,7 +41,9 @@ SEALED_PATH = MICROCOSMOS_ROOT / "experiments" / "evo2_sealed" / "final.json"
 SEALED_HASH_PATH = SEALED_PATH.with_suffix(".sha256")
 SEALED_WORKFLOW_PATH = SEALED_PATH.with_name("workflow.py")
 HEREDITY_PATH = MICROCOSMOS_ROOT / "src" / "microcosmos" / "heredity.py"
-R4_TOOL_ROOT = MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
+R4_TOOL_ROOT = (
+    MICROCOSMOS_ROOT / "experiments" / "evo2_ecosystem" / "heredity_adaptation_v4"
+)
 _GENERATION = re.compile(r"gen_(\d+)")
 
 
@@ -68,8 +70,7 @@ def _require_stored_run_spec(
         not stored_spec.is_file()
         or stored_spec.read_bytes() != spec_raw
         or not stored_hash.is_file()
-        or stored_hash.read_text(encoding="utf-8")
-        != f"{spec_hash}  run_spec.json\n"
+        or stored_hash.read_text(encoding="utf-8") != f"{spec_hash}  run_spec.json\n"
     ):
         raise RuntimeError("stored run specification does not match the canonical spec")
     return stored_spec
@@ -79,9 +80,7 @@ def _load_r5_baselines(spec: dict[str, Any]) -> ModuleType:
     """Load the source-bound Microcosmos r5 baseline module."""
     if run_spec.schema_version(spec) != 4:
         raise ValueError("r5 baselines require a schema-v4 run specification")
-    expected_path = (
-        run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
-    ).resolve()
+    expected_path = (run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH).resolve()
     if (
         not expected_path.is_file()
         or run_spec.sha256_file(expected_path) != spec["source_sha256"]["baseline"]
@@ -106,6 +105,26 @@ def _load_r5_baselines(spec: dict[str, Any]) -> ModuleType:
     return module
 
 
+def _load_bound_baselines(spec: dict[str, Any]) -> ModuleType:
+    """Preserve R5 loading and route schema 5 to its exact bound source."""
+    if run_spec.schema_version(spec) == 4:
+        return _load_r5_baselines(spec)
+    if run_spec.schema_version(spec) != 5:
+        raise ValueError("bound baselines require schema 4 or 5")
+    expected_path = run_spec.baseline_source_path(spec)
+    root = str(MICROCOSMOS_ROOT)
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    module = importlib.import_module("experiments.evo2_ecosystem.r5.baselines")
+    module_path = Path(module.__file__).resolve()
+    if (
+        module_path != expected_path
+        or run_spec.sha256_file(module_path) != spec["source_sha256"]["baseline"]
+    ):
+        raise RuntimeError("loaded schema-v5 baseline is not the bound source")
+    return module
+
+
 def _verify_structured_training_inputs(spec: dict[str, Any]) -> None:
     """Apply the same schema-v4 source, prerequisite, and holdout preflight."""
     if __package__:
@@ -120,6 +139,8 @@ def _verify_structured_training_inputs(spec: dict[str, Any]) -> None:
 def discover_candidates(
     results_dir: Path,
     expected_private: dict[str, Any] | None = None,
+    *,
+    minimum_generation: int = 0,
 ) -> list[Candidate]:
     """Return unique correct candidates, highest training score first."""
     candidates: list[Candidate] = []
@@ -154,9 +175,12 @@ def discover_candidates(
             for key, value in expected_private.items()
         ):
             raise ValueError(f"candidate protocol mismatch in {generation_dir.name}")
+        generation = int(match.group(1))
+        if generation < minimum_generation:
+            continue
         candidates.append(
             Candidate(
-                generation=int(match.group(1)),
+                generation=generation,
                 source_path=source_path,
                 source_sha256=source_hash,
                 training_score=score,
@@ -792,7 +816,7 @@ def _structured_expected_private(
         "simulator_source_sha256": spec["source_sha256"]["simulator"],
         "simulator_config_sha256": spec["simulator_config_sha256"],
         "run_spec_sha256": spec_hash,
-        "run_spec_schema_version": 4,
+        "run_spec_schema_version": run_spec.schema_version(spec),
         "candidate_output_width": run_spec.candidate_output_width(spec),
         "candidate_contract_version": run_spec.candidate_contract_version(spec),
         "initial_program_sha256": spec["initial_program"]["sha256"],
@@ -822,9 +846,7 @@ def _structured_terminal_records(
         if not all(
             path.is_file() for path in (source_path, metrics_path, correct_path)
         ):
-            raise RuntimeError(
-                f"structured-random slot {generation} is not terminal"
-            )
+            raise RuntimeError(f"structured-random slot {generation} is not terminal")
         source = source_path.read_bytes()
         if (
             source != source_record.source.encode("utf-8")
@@ -857,9 +879,7 @@ def _structured_terminal_records(
                 if key != "full_evaluation_performed"
             )
         ):
-            raise RuntimeError(
-                f"structured-random slot {generation} protocol mismatch"
-            )
+            raise RuntimeError(f"structured-random slot {generation} protocol mismatch")
         was_evaluated = private.get("full_evaluation_performed") is True
         is_correct = correct.get("correct") is True
         if is_correct != (private.get("integrity_valid") is True) or (
@@ -874,9 +894,7 @@ def _structured_terminal_records(
             or not isinstance(score, (int, float))
             or not math.isfinite(float(score))
         ):
-            raise RuntimeError(
-                f"structured-random slot {generation} has invalid score"
-            )
+            raise RuntimeError(f"structured-random slot {generation} has invalid score")
         if was_evaluated:
             repeat_scores = private.get("repeat_scores")
             selected_repeat = private.get("selected_repeat_index")
@@ -946,9 +964,7 @@ def _structured_completion(
         spec=spec,
         spec_hash=spec_hash,
     )
-    unique_valid = {
-        record["source_sha256"] for record in records if record["correct"]
-    }
+    unique_valid = {record["source_sha256"] for record in records if record["correct"]}
     return {
         "schema_version": 1,
         "run_id": spec["run_id"],
@@ -1056,12 +1072,12 @@ def run_structured_random_training(
     spec_raw: bytes,
 ) -> dict[str, Any]:
     """Evaluate the prospectively frozen 50-source control exactly once each."""
-    if run_spec.schema_version(spec) != 4 or spec["top_k"] != 5:
-        raise ValueError("structured-random training requires the frozen r5 protocol")
+    if run_spec.schema_version(spec) not in {4, 5} or spec["top_k"] != 5:
+        raise ValueError("structured-random training requires schema 4 or 5")
     paths = run_spec.structured_random_paths(spec)
     stored_spec = _require_stored_run_spec(paths.run_root, spec_raw, spec_hash)
     _verify_structured_training_inputs(spec)
-    baselines = _load_r5_baselines(spec)
+    baselines = _load_bound_baselines(spec)
     baselines.publish_structured_random_roster(paths.roster)
     roster = tuple(baselines.load_structured_random_roster(paths.roster))
     if len(roster) != 50:
@@ -1117,9 +1133,7 @@ def run_structured_random_training(
             "reason": "fewer_than_five_unique_valid_candidates",
             "run_spec_sha256": spec_hash,
             "completion_sha256": run_spec.sha256_file(completion_path),
-            "unique_valid_candidate_count": completion[
-                "unique_valid_candidate_count"
-            ],
+            "unique_valid_candidate_count": completion["unique_valid_candidate_count"],
             "passed": False,
         }
         _write_atomic(paths.control_root / "search_failure.json", _json_bytes(failure))
@@ -1165,11 +1179,9 @@ def _load_development_record(
 def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str, Any]:
     analysis_path = ANALYSIS_PATH
     baseline_path = BASELINE_PATH
-    if run_spec.schema_version(spec) == 4:
+    if run_spec.schema_version(spec) in {4, 5}:
         analysis_path = run_spec.protocol_tool_paths(spec)["final_analysis"]
-        baseline_path = (
-            run_spec.PROJECT_ROOT / run_spec.R5_BASELINE_SOURCE_PATH
-        ).resolve()
+        baseline_path = run_spec.baseline_source_path(spec)
     all_sources = {
         "initial": run_spec.sha256_file(run_spec.initial_program_path(spec)),
         "evaluator": run_spec.sha256_file(TASK_DIR / "evaluate.py"),
@@ -1183,24 +1195,18 @@ def _provenance(spec: dict[str, Any], dependencies: dict[str, Any]) -> dict[str,
         "run_spec_module": run_spec.sha256_file(TASK_DIR / "run_spec.py"),
         "adaptive_selector": run_spec.sha256_file(TASK_DIR / "r4_selection.py"),
     }
-    if run_spec.schema_version(spec) != 4:
+    if run_spec.schema_version(spec) not in {4, 5}:
         all_sources.update(
             {
-                "preregistration": run_spec.sha256_file(
-                    run_spec.PREREGISTRATION_PATH
-                ),
-                "r4_final_analysis": run_spec.sha256_file(
-                    R4_TOOL_ROOT / "analysis.py"
-                ),
+                "preregistration": run_spec.sha256_file(run_spec.PREREGISTRATION_PATH),
+                "r4_final_analysis": run_spec.sha256_file(R4_TOOL_ROOT / "analysis.py"),
                 "r4_manifest_generator": run_spec.sha256_file(
                     R4_TOOL_ROOT / "manifest_generator.py"
                 ),
                 "r4_qualification": run_spec.sha256_file(
                     R4_TOOL_ROOT / "qualification.py"
                 ),
-                "r4_opportunity": run_spec.sha256_file(
-                    R4_TOOL_ROOT / "opportunity.py"
-                ),
+                "r4_opportunity": run_spec.sha256_file(R4_TOOL_ROOT / "opportunity.py"),
             }
         )
     actual_sources = {name: all_sources[name] for name in spec["source_sha256"]}
@@ -1303,7 +1309,7 @@ def _protocol_freeze_fields(
 ) -> dict[str, Any]:
     """Preserve legacy records while using r5's single protocol document."""
     version = run_spec.schema_version(spec)
-    if version == 4:
+    if version in {4, 5}:
         return {
             "protocol_document_sha256": spec["protocol_document"]["sha256"],
             "protocol_document_complete": True,
@@ -1385,7 +1391,9 @@ def _load_development_completion(
     try:
         completion = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        raise RuntimeError(f"development evaluation is incomplete for {label}") from error
+        raise RuntimeError(
+            f"development evaluation is incomplete for {label}"
+        ) from error
     expected = {
         "schema_version": 1,
         "complete": True,
@@ -1403,8 +1411,7 @@ def _load_development_completion(
     records = completion.get("records")
     if (
         not archive.is_file()
-        or run_spec.sha256_file(archive)
-        != completion.get("archive_lineage_sha256")
+        or run_spec.sha256_file(archive) != completion.get("archive_lineage_sha256")
         or not isinstance(records, list)
         or len(records) != spec["top_k"]
     ):
@@ -1433,9 +1440,7 @@ def _load_development_completion(
     return completion
 
 
-def _require_all_development_evaluations(
-    spec: dict[str, Any], spec_hash: str
-) -> None:
+def _require_all_development_evaluations(spec: dict[str, Any], spec_hash: str) -> None:
     """Prevent any r5 freeze until all 15 development records authenticate."""
     for label in (*run_spec.REGIMES, "structured_random"):
         _load_development_completion(spec, spec_hash, label)
@@ -1453,10 +1458,10 @@ def select_and_freeze(
     version = run_spec.schema_version(spec)
     if _phase not in {None, "evaluate", "freeze"}:
         raise ValueError("unknown development phase")
-    if version == 4 and _phase is None:
-        raise RuntimeError("schema-v4 development requires an explicit phase")
-    if version != 4 and _phase is not None:
-        raise ValueError("split development phases require schema v4")
+    if version in {4, 5} and _phase is None:
+        raise RuntimeError("bounded development requires an explicit phase")
+    if version not in {4, 5} and _phase is not None:
+        raise ValueError("split development phases require schema 4 or 5")
     if _phase == "freeze":
         _require_all_development_evaluations(spec, spec_hash)
     paths = run_spec.paths_for(spec, regime)
@@ -1488,9 +1493,11 @@ def select_and_freeze(
             expected_private["initial_program_sha256"] = spec["initial_program"][
                 "sha256"
             ]
-    candidates = discover_candidates(paths.arm_results, expected_private)[
-        : spec["top_k"]
-    ]
+    candidates = discover_candidates(
+        paths.arm_results,
+        expected_private,
+        minimum_generation=1 if version == 5 else 0,
+    )[: spec["top_k"]]
     if len(candidates) != spec["top_k"]:
         raise RuntimeError("arm does not contain the required unique correct top-K")
     archive_record = export_archive_lineage(
@@ -1541,7 +1548,7 @@ def select_and_freeze(
                 contract_version=run_spec.candidate_contract_version(spec),
                 initial_source_path=run_spec.initial_program_path(spec),
             )
-            if version == 4:
+            if version in {4, 5}:
                 try:
                     eligibility = r4_selection.classify_adaptive(
                         record.get("adaptive_observations", ()),
@@ -1555,7 +1562,7 @@ def select_and_freeze(
                         "reason": str(error),
                     }
             _write_atomic(path, _json_bytes(record))
-        elif version == 4 and "adaptive_eligibility" not in record:
+        elif version in {4, 5} and "adaptive_eligibility" not in record:
             raise RuntimeError(
                 f"r5 development record lacks frozen adaptive eligibility: {path}"
             )
@@ -1746,15 +1753,15 @@ def select_and_freeze_structured_random(
     _phase: str,
 ) -> dict[str, Any]:
     """Development-rank the fixed control top five and freeze one champion."""
-    if run_spec.schema_version(spec) != 4 or spec["top_k"] != 5:
-        raise ValueError("structured-random selection requires the frozen r5 protocol")
+    if run_spec.schema_version(spec) not in {4, 5} or spec["top_k"] != 5:
+        raise ValueError("structured-random selection requires schema 4 or 5")
     if _phase not in {"evaluate", "freeze"}:
         raise ValueError("structured-random development requires an explicit phase")
     if _phase == "freeze":
         _require_all_development_evaluations(spec, spec_hash)
     paths = run_spec.structured_random_paths(spec)
     _require_stored_run_spec(paths.run_root, spec_raw, spec_hash)
-    baselines = _load_r5_baselines(spec)
+    baselines = _load_bound_baselines(spec)
     roster = tuple(baselines.load_structured_random_roster(paths.roster))
     completion = _structured_completion(
         paths,
@@ -1763,9 +1770,8 @@ def select_and_freeze_structured_random(
         spec_hash=spec_hash,
     )
     completion_path = paths.control_root / "complete.json"
-    if (
-        not completion_path.is_file()
-        or completion_path.read_bytes() != _json_bytes(completion)
+    if not completion_path.is_file() or completion_path.read_bytes() != _json_bytes(
+        completion
     ):
         raise RuntimeError("structured-random completion marker does not authenticate")
     if not completion["passed"]:
@@ -1850,7 +1856,9 @@ def select_and_freeze_structured_random(
         )
     )
     if not evaluations[0]["development_integrity_valid"]:
-        raise RuntimeError("no structured-random candidate passed development integrity")
+        raise RuntimeError(
+            "no structured-random candidate passed development integrity"
+        )
     if _phase == "evaluate":
         return _publish_development_completion(
             spec,
@@ -1885,15 +1893,11 @@ def select_and_freeze_structured_random(
         "training_score": winner.training_score,
         "training_manifest_sha256": winner_record["training_manifest_sha256"],
         "development_score": winner_record["development_score"],
-        "development_integrity_valid": winner_record[
-            "development_integrity_valid"
-        ],
+        "development_integrity_valid": winner_record["development_integrity_valid"],
         "numerical_repeats": winner_record["numerical_repeats"],
         "repeat_scores": winner_record["repeat_scores"],
         "selected_repeat_index": winner_record["selected_repeat_index"],
-        "development_manifest_sha256": winner_record[
-            "development_manifest_sha256"
-        ],
+        "development_manifest_sha256": winner_record["development_manifest_sha256"],
         "simulator_config_sha256": winner_record["simulator_config_sha256"],
         "simulator_config": asdict(config),
         "sealed_manifest_sha256": run_spec.manifest_hash(spec, "sealed"),
@@ -1902,9 +1906,7 @@ def select_and_freeze_structured_random(
         "founder_index_sha256": spec["founder_index"]["sha256"],
         "candidate_output_width": run_spec.candidate_output_width(spec),
         "matched_run_counts": matched_counts,
-        "structured_random_completion_sha256": run_spec.sha256_file(
-            completion_path
-        ),
+        "structured_random_completion_sha256": run_spec.sha256_file(completion_path),
         "archive_config": spec["archive"],
         "baselines": spec["baselines"],
         "bootstrap_config": spec["bootstrap"],
@@ -1922,9 +1924,7 @@ def select_and_freeze_structured_random(
                 "candidate_source_sha256": item["candidate_source_sha256"],
                 "training_score": item["training_score"],
                 "development_score": item["development_score"],
-                "development_integrity_valid": item[
-                    "development_integrity_valid"
-                ],
+                "development_integrity_valid": item["development_integrity_valid"],
                 "numerical_repeats": item["numerical_repeats"],
                 "repeat_scores": item["repeat_scores"],
                 "selected_repeat_index": item["selected_repeat_index"],
