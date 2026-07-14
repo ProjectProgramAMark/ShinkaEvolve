@@ -90,7 +90,10 @@ def _runner(
     manifest_path: Path,
     founder_index_path: Path,
     *,
+    ancestor_program_path: Path,
+    ancestor_description: str,
     generations: int,
+    init_program_path: Path,
     regime: str,
 ):
     from shinka.core import EvolutionConfig, ShinkaEvolveRunner
@@ -104,6 +107,7 @@ def _runner(
         extra_cmd_args={
             "manifest_path": str(manifest_path.resolve()),
             "founder_index_path": str(founder_index_path.resolve()),
+            "ancestor_program_path": str(ancestor_program_path),
             "regime": regime,
             "numerical_repeats": "1",
         },
@@ -119,14 +123,14 @@ def _runner(
         num_archive_inspirations=1,
         num_top_k_inspirations=1,
     )
-    task = """
+    task = f"""
 Discover a better six-action heredity scheduler for an embodied CPPN ecosystem.
 
 make_offspring receives bounded parent, population, and per-operator success,
 usage, and evidence summaries. Return six finite logits for clone,
 conservative parametric, standard parametric, exploratory parametric,
-structural, and mixed mutation. The ancestor always chooses standard
-parametric mutation. Maximize the paired candidate-minus-ancestor ecological
+structural, and mixed mutation. The paired ancestor for this run is
+{ancestor_description}. Maximize the paired candidate-minus-ancestor ecological
 score across matched resource-refresh and resource-relocation worlds. Use
 operator evidence to adapt choices rather than merely returning the ancestor.
 Only pure bounded jax.numpy expressions are valid.
@@ -148,7 +152,7 @@ Only pure bounded jax.numpy expressions are valid.
         },
         embedding_model=None,
         llm_dynamic_selection="fixed",
-        init_program_path=str(TASK_DIR / "initial_r4.py"),
+        init_program_path=str(init_program_path),
         results_dir=str(arm),
         max_novelty_attempts=1,
         use_text_feedback=True,
@@ -169,9 +173,24 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--generations", type=int, default=8)
     parser.add_argument("--regime", choices=("stable", "punctuated"), default="punctuated")
+    parser.add_argument("--init-program-path")
+    parser.add_argument("--ancestor-program-path")
+    parser.add_argument(
+        "--ancestor-description",
+        default="standard parametric mutation",
+    )
     arguments = parser.parse_args()
     if not 2 <= arguments.generations <= 20:
         raise ValueError("exploratory generations must be in [2, 20]")
+    init_program_path = Path(
+        arguments.init_program_path or TASK_DIR / "initial_r4.py"
+    ).resolve()
+    ancestor_program_path = Path(
+        arguments.ancestor_program_path or TASK_DIR / "initial_r4.py"
+    ).resolve()
+    for path in (init_program_path, ancestor_program_path):
+        if not path.is_file():
+            raise FileNotFoundError(path)
 
     random.seed(17)
     np.random.seed(17)
@@ -183,9 +202,14 @@ def main() -> None:
         "exploratory": True,
         "founder_index_sha256": _sha256(founder_index_path),
         "generations": arguments.generations,
+        "init_program_path": str(init_program_path),
+        "init_program_sha256": _sha256(init_program_path),
         "manifest_sha256": _sha256(manifest_path),
         "microcosmos_commit": _git_commit(MICROCOSMOS_ROOT),
         "model": FROZEN_MODEL,
+        "ancestor_description": arguments.ancestor_description,
+        "ancestor_program_path": str(ancestor_program_path),
+        "ancestor_program_sha256": _sha256(ancestor_program_path),
         "regime": arguments.regime,
         "run_id": arguments.run_id,
         "shinkaevolve_commit": _git_commit(PROJECT_ROOT / "ShinkaEvolve"),
@@ -195,7 +219,10 @@ def main() -> None:
         run_root,
         manifest_path,
         founder_index_path,
+        ancestor_program_path=ancestor_program_path,
+        ancestor_description=arguments.ancestor_description,
         generations=arguments.generations,
+        init_program_path=init_program_path,
         regime=arguments.regime,
     )
     runner.run()
