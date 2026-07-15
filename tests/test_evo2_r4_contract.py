@@ -214,9 +214,11 @@ def test_r4_candidate_allows_pure_jax_reductions_and_indexed_updates(
         tmp_path,
         "def make_offspring(parent_genome_summary, parent_stats, population_stats, "
         "operator_stats, rng):\n"
-        "    evidence = operator_stats[2]\n"
+        "    node, connection = parent_genome_summary\n"
+        "    success, usage, evidence = operator_stats\n"
         "    bootstrap = 1.0 - jnp.max(evidence[1:4])\n"
-        "    logits = jnp.zeros_like(evidence) + bootstrap\n"
+        "    logits = jnp.zeros_like(evidence) + bootstrap + node + connection\n"
+        "    logits = logits + 0.0 * success + 0.0 * usage\n"
         "    logits = logits.at[0].add(-2.0)\n"
         "    logits = logits.at[4].set(jnp.min(evidence))\n"
         "    return logits.astype(jnp.float32)",

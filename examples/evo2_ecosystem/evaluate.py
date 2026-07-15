@@ -271,11 +271,22 @@ def _validate_candidate_source(
     local_names = set(argument_names)
     for node in ast.walk(function):
         if isinstance(node, ast.Assign):
-            if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
-                raise CandidateValidationError("assignments must target one local name")
-            if node.targets[0].id in set(argument_names) | {"jnp"}:
+            if len(node.targets) != 1:
+                raise CandidateValidationError("assignments must have one target")
+            target = node.targets[0]
+            if isinstance(target, ast.Name):
+                target_names = (target.id,)
+            elif isinstance(target, (ast.List, ast.Tuple)) and all(
+                isinstance(item, ast.Name) for item in target.elts
+            ):
+                target_names = tuple(item.id for item in target.elts)
+            else:
+                raise CandidateValidationError(
+                    "assignments must target local names"
+                )
+            if set(target_names) & (set(argument_names) | {"jnp"}):
                 raise CandidateValidationError("task inputs cannot be reassigned")
-            local_names.add(node.targets[0].id)
+            local_names.update(target_names)
         if isinstance(node, ast.Attribute):
             jnp_attribute = (
                 isinstance(node.value, ast.Name)

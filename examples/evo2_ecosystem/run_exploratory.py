@@ -190,6 +190,13 @@ The array ABI is exact:
   use the six-operator order above
 - rng is opaque and must not be read
 
+Index operator_stats exactly as:
+  success = operator_stats[0]
+  usage = operator_stats[1]
+  evidence = operator_stats[2]
+Each resulting vector has six entries. Never use operator_stats[:, 0],
+operator_stats[:, 1], or operator_stats[:, 2]; those transpose the ABI.
+
 Keep the complete source within 60 nonblank lines. Use only the approved
 jax.numpy expression grammar already demonstrated by the parent program.
 Only pure bounded jax.numpy expressions are valid.
