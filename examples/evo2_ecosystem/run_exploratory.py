@@ -111,7 +111,11 @@ def _runner(
             "regime": regime,
             "numerical_repeats": "1",
         },
-        time="00:12:00",
+        # A single paired ecosystem evaluation normally finishes well inside
+        # this limit, but concurrent GPU work can slow it substantially.  Keep
+        # the timeout as a runaway guard without treating host contention as a
+        # candidate failure.
+        time="00:30:00",
         python_executable=sys.executable,
         numeric_threads_per_job=1,
         eval_verbose=False,
