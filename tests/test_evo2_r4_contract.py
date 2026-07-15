@@ -203,6 +203,30 @@ def test_r4_candidate_allows_safe_fixed_array_operations(tmp_path: Path) -> None
     )
 
 
+def test_r4_candidate_allows_pure_jax_reductions_and_indexed_updates(
+    tmp_path: Path,
+) -> None:
+    evaluator = _evaluator()
+    initial = (
+        Path(__file__).resolve().parents[1] / "examples/evo2_ecosystem/initial_r4.py"
+    )
+    candidate = _write_r4_candidate(
+        tmp_path,
+        "def make_offspring(parent_genome_summary, parent_stats, population_stats, "
+        "operator_stats, rng):\n"
+        "    evidence = operator_stats[2]\n"
+        "    bootstrap = 1.0 - jnp.max(evidence[1:4])\n"
+        "    logits = jnp.zeros_like(evidence) + bootstrap\n"
+        "    logits = logits.at[0].add(-2.0)\n"
+        "    logits = logits.at[4].set(jnp.min(evidence))\n"
+        "    return logits.astype(jnp.float32)",
+    )
+    module = evaluator._load_candidate(candidate, run_spec.R4_CONTRACT, initial)
+    evaluator._smoke_validate_candidate(
+        module, 6, contract_version=run_spec.R4_CONTRACT
+    )
+
+
 def _r4_episode() -> SimpleNamespace:
     return SimpleNamespace(
         birth_count=6,

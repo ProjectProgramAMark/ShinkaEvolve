@@ -65,16 +65,24 @@ _JNP_ATTRIBUTES = frozenset(
         "float32",
         "log",
         "maximum",
+        "max",
         "mean",
         "minimum",
+        "min",
+        "ones_like",
         "sqrt",
         "stack",
+        "sum",
         "tanh",
         "where",
+        "zeros_like",
     }
 )
 _JNP_CALLS = _JNP_ATTRIBUTES - {"float32"}
-_ARRAY_METHODS = frozenset({"astype"})
+_ARRAY_ATTRIBUTES = frozenset(
+    {"add", "at", "astype", "max", "min", "multiply", "set"}
+)
+_ARRAY_METHODS = _ARRAY_ATTRIBUTES - {"at"}
 _ALLOWED_NODES = (
     ast.Module,
     ast.Import,
@@ -274,7 +282,7 @@ def _validate_candidate_source(
                 and node.value.id == "jnp"
                 and node.attr in _JNP_ATTRIBUTES
             )
-            array_method = node.attr in _ARRAY_METHODS
+            array_method = node.attr in _ARRAY_ATTRIBUTES
             if not (jnp_attribute or array_method):
                 raise CandidateValidationError(
                     "attribute access is restricted to jnp and approved array methods"
