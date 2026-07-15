@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -62,12 +63,20 @@ def make_offspring(
 '''
 
 
-def _development_manifest(output: Path) -> tuple[Path, Path]:
+def _confirmation_manifest(
+    output: Path,
+    *,
+    partition: str,
+    scenario_family: str,
+) -> tuple[Path, Path]:
     for path in (MICROCOSMOS_ROOT, MICROCOSMOS_ROOT / "src"):
         value = str(path)
         if value not in sys.path:
             sys.path.insert(0, value)
     from experiments.evo2_ecosystem.protocol import (  # noqa: PLC0415
+        ActuatorInjuryParameters,
+        EventKind,
+        NullEventParameters,
         canonical_manifest_bytes,
     )
     from experiments.evo2_ecosystem.r6.protocol import (  # noqa: PLC0415
@@ -87,9 +96,43 @@ def _development_manifest(output: Path) -> tuple[Path, Path]:
         FOUNDER_INDEX_PATH,
         {name: seeds[name] for name in ("training", "development", "sealed")},
     )
-    manifest = output / "inputs" / "development_punctuated.json"
+    selected = {
+        "development": bundle.development,
+        "sealed": bundle.sealed,
+    }[partition]
+    if scenario_family == "head_actuator_injury":
+        worlds = []
+        for item in selected.worlds:
+            if item.scenario_id.endswith("-control"):
+                worlds.append(
+                    replace(
+                        item,
+                        scenario_id=f"{item.pair_id}-sham",
+                        scenario_family="actuator_injury",
+                        event_kind=EventKind.NULL,
+                        event_parameters=NullEventParameters(),
+                    )
+                )
+            elif item.scenario_id.endswith("-shock"):
+                worlds.append(
+                    replace(
+                        item,
+                        scenario_id=f"{item.pair_id}-injured",
+                        scenario_family="actuator_injury",
+                        event_kind=EventKind.ACTUATOR_INJURY,
+                        event_parameters=ActuatorInjuryParameters(
+                            (0.1, 0.1, 1.0, 1.0, 1.0, 1.0)
+                        ),
+                    )
+                )
+            else:
+                raise ValueError("unexpected R6 confirmation scenario role")
+        selected = replace(selected, worlds=tuple(worlds))
+    elif scenario_family != "resource_relocation":
+        raise ValueError("unknown confirmation scenario family")
+    manifest = output / "inputs" / f"{partition}_punctuated.json"
     manifest.parent.mkdir(parents=True)
-    manifest.write_bytes(canonical_manifest_bytes(bundle.development) + b"\n")
+    manifest.write_bytes(canonical_manifest_bytes(selected) + b"\n")
     return manifest, FOUNDER_INDEX_PATH
 
 
@@ -98,6 +141,16 @@ def main() -> None:
     parser.add_argument("--source-run-id", required=True)
     parser.add_argument("--output-run-id", required=True)
     parser.add_argument("--generations", nargs="+", type=int, required=True)
+    parser.add_argument(
+        "--partition",
+        choices=("development", "sealed"),
+        default="development",
+    )
+    parser.add_argument(
+        "--scenario-family",
+        choices=("resource_relocation", "head_actuator_injury"),
+        default="resource_relocation",
+    )
     arguments = parser.parse_args()
 
     source = RESULTS_ROOT / arguments.source_run_id / "punctuated"
@@ -121,13 +174,19 @@ def main() -> None:
             {"name": destination.stem, "sha256": _sha256(destination)}
         )
 
-    manifest, founder_index = _development_manifest(output)
+    manifest, founder_index = _confirmation_manifest(
+        output,
+        partition=arguments.partition,
+        scenario_family=arguments.scenario_family,
+    )
     launch = {
         "founder_index_sha256": _sha256(founder_index),
         "manifest_sha256": _sha256(manifest),
         "microcosmos_commit": _commit(MICROCOSMOS_ROOT),
         "numerical_repeats": 3,
         "programs": program_records,
+        "partition": arguments.partition,
+        "scenario_family": arguments.scenario_family,
         "shinkaevolve_commit": _commit(PROJECT_ROOT / "ShinkaEvolve"),
         "source_run_id": arguments.source_run_id,
     }
