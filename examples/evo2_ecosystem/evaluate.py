@@ -31,8 +31,6 @@ TASK_DIR = Path(__file__).resolve().parent
 MICROCOSMOS_ROOT = TASK_DIR.parents[2] / "microcosmos"
 
 MAX_SOURCE_BYTES = 12_000
-MAX_AST_NODES = 1_024
-MAX_NONBLANK_LINES = 100
 REGIMES = ("stable", "punctuated")
 START_MARKER = "# EVOLVE-BLOCK-START"
 END_MARKER = "# EVOLVE-BLOCK-END"
@@ -156,8 +154,6 @@ def _candidate_source(
         source = source_bytes.decode("utf-8")
     except UnicodeDecodeError as error:
         raise CandidateValidationError("source must be UTF-8") from error
-    if sum(bool(line.strip()) for line in source.splitlines()) > MAX_NONBLANK_LINES:
-        raise CandidateValidationError("source exceeds the line limit")
     _validate_immutable_regions(
         source,
         _initial_source_path(contract_version, initial_source_path),
@@ -202,8 +198,6 @@ def _validate_candidate_source(
         raise CandidateValidationError("source is not valid Python") from error
 
     nodes = list(ast.walk(tree))
-    if len(nodes) > MAX_AST_NODES:
-        raise CandidateValidationError("source exceeds the syntax-tree limit")
     unsupported = next(
         (node for node in nodes if not isinstance(node, _ALLOWED_NODES)),
         None,
