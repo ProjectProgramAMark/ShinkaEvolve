@@ -137,6 +137,18 @@ structural, and mixed mutation. The paired ancestor for this run is
 {ancestor_description}. Maximize the paired candidate-minus-ancestor ecological
 score across matched resource-refresh and resource-relocation worlds. Use
 operator evidence to adapt choices rather than merely returning the ancestor.
+
+The array ABI is exact:
+- parent_genome_summary = [node_fraction, connection_fraction]
+- parent_stats = [energy_fraction, intake_ema, age_fraction]
+- population_stats = [alive_fraction, mean_energy_fraction,
+  population_change_ema, birth_rate_ema, death_rate_ema, mean_intake_ema]
+- operator_stats rows are [success_ema, usage_ema, evidence_ema] and columns
+  use the six-operator order above
+- rng is opaque and must not be read
+
+Keep the complete source within 60 nonblank lines. Use only the approved
+jax.numpy expression grammar already demonstrated by the parent program.
 Only pure bounded jax.numpy expressions are valid.
 """
     evolution = EvolutionConfig(

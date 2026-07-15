@@ -189,6 +189,11 @@ def main() -> None:
         correct = bool(metrics["private"]["integrity_valid"])
         error = None if correct else "ecosystem integrity check failed"
     except Exception as caught:
+        validation_detail = (
+            str(caught)
+            if isinstance(caught, evaluate.CandidateValidationError)
+            else ""
+        )
         metrics = {
             "combined_score": -2.0,
             "public": {"score": -2.0},
@@ -197,11 +202,15 @@ def main() -> None:
                     Path(arguments.program_path).read_bytes()
                 ).hexdigest(),
                 "error_type": type(caught).__name__,
+                "error_message": validation_detail,
                 "exploratory": True,
                 "full_evaluation_performed": False,
                 "integrity_valid": False,
             },
-            "text_feedback": f"Exploratory evaluation failed: {type(caught).__name__}",
+            "text_feedback": (
+                f"Exploratory evaluation failed: {type(caught).__name__}"
+                + (f": {validation_detail}" if validation_detail else "")
+            ),
         }
         correct = False
         error = f"exploratory evaluation failed ({type(caught).__name__})"
