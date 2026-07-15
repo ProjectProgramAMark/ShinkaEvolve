@@ -184,6 +184,25 @@ def test_r4_policy_delegates_public_abi_to_trusted_microcosmos_adapter(tmp_path:
     assert np.allclose(logits, [0.4, 0.6, -1.0, 0.3, -8.0, 8.0])
 
 
+def test_r4_candidate_allows_fixed_array_slices(tmp_path: Path) -> None:
+    evaluator = _evaluator()
+    initial = (
+        Path(__file__).resolve().parents[1] / "examples/evo2_ecosystem/initial_r4.py"
+    )
+    candidate = _write_r4_candidate(
+        tmp_path,
+        "def make_offspring(parent_genome_summary, parent_stats, population_stats, "
+        "operator_stats, rng):\n"
+        "    success = operator_stats[:, 0]\n"
+        "    return jnp.array([success[0], success[1], success[2], "
+        "success[0], success[1], success[2]])",
+    )
+    module = evaluator._load_candidate(candidate, run_spec.R4_CONTRACT, initial)
+    evaluator._smoke_validate_candidate(
+        module, 6, contract_version=run_spec.R4_CONTRACT
+    )
+
+
 def _r4_episode() -> SimpleNamespace:
     return SimpleNamespace(
         birth_count=6,

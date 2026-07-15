@@ -88,6 +88,7 @@ _ALLOWED_NODES = (
     ast.Load,
     ast.Store,
     ast.Subscript,
+    ast.Slice,
     ast.List,
     ast.Tuple,
     ast.Call,

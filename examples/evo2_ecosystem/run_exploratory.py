@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import hashlib
 import json
 import os
@@ -50,7 +51,7 @@ def _git_commit(path: Path) -> str:
     ).stdout.strip()
 
 
-def _prepare_manifest(run_root: Path) -> tuple[Path, Path]:
+def _prepare_manifest(run_root: Path, scenario_family: str) -> tuple[Path, Path]:
     for path in (MICROCOSMOS_ROOT, MICROCOSMOS_ROOT / "src"):
         value = str(path)
         if value not in sys.path:
@@ -67,6 +68,9 @@ def _prepare_manifest(run_root: Path) -> tuple[Path, Path]:
         validate_world_qualification,
     )
     from experiments.evo2_ecosystem.protocol import (  # noqa: PLC0415
+        ActuatorInjuryParameters,
+        EventKind,
+        NullEventParameters,
         canonical_manifest_bytes,
     )
 
@@ -76,9 +80,40 @@ def _prepare_manifest(run_root: Path) -> tuple[Path, Path]:
         FOUNDER_INDEX_PATH,
         {name: seeds[name] for name in ("training", "development", "sealed")},
     )
+    manifest = bundle.training_punctuated
+    if scenario_family == "head_actuator_injury":
+        worlds = []
+        for item in manifest.worlds:
+            if item.scenario_id.endswith("-control"):
+                worlds.append(
+                    replace(
+                        item,
+                        scenario_id=f"{item.pair_id}-sham",
+                        scenario_family="actuator_injury",
+                        event_kind=EventKind.NULL,
+                        event_parameters=NullEventParameters(),
+                    )
+                )
+            elif item.scenario_id.endswith("-shock"):
+                worlds.append(
+                    replace(
+                        item,
+                        scenario_id=f"{item.pair_id}-injured",
+                        scenario_family="actuator_injury",
+                        event_kind=EventKind.ACTUATOR_INJURY,
+                        event_parameters=ActuatorInjuryParameters(
+                            (0.1, 0.1, 1.0, 1.0, 1.0, 1.0)
+                        ),
+                    )
+                )
+            else:
+                raise ValueError("unexpected R6 training scenario role")
+        manifest = replace(manifest, worlds=tuple(worlds))
+    elif scenario_family != "resource_relocation":
+        raise ValueError("unknown exploratory scenario family")
     manifest_path = run_root / "inputs" / "training_punctuated.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    payload = canonical_manifest_bytes(bundle.training_punctuated) + b"\n"
+    payload = canonical_manifest_bytes(manifest) + b"\n"
     if manifest_path.exists() and manifest_path.read_bytes() != payload:
         raise FileExistsError("exploratory manifest changed")
     manifest_path.write_bytes(payload)
@@ -92,6 +127,7 @@ def _runner(
     *,
     ancestor_program_path: Path,
     ancestor_description: str,
+    scenario_family: str,
     generations: int,
     init_program_path: Path,
     regime: str,
@@ -127,6 +163,13 @@ def _runner(
         num_archive_inspirations=1,
         num_top_k_inspirations=1,
     )
+    world_description = {
+        "resource_relocation": "matched resource-refresh and resource-relocation worlds",
+        "head_actuator_injury": (
+            "matched uninjured and persistent head-actuator-injury worlds; "
+            "the first two of six hinge gains fall from 1.0 to 0.1 at the event"
+        ),
+    }[scenario_family]
     task = f"""
 Discover a better six-action heredity scheduler for an embodied CPPN ecosystem.
 
@@ -135,7 +178,7 @@ usage, and evidence summaries. Return six finite logits for clone,
 conservative parametric, standard parametric, exploratory parametric,
 structural, and mixed mutation. The paired ancestor for this run is
 {ancestor_description}. Maximize the paired candidate-minus-ancestor ecological
-score across matched resource-refresh and resource-relocation worlds. Use
+score across {world_description}. Use
 operator evidence to adapt choices rather than merely returning the ancestor.
 
 The array ABI is exact:
@@ -192,6 +235,11 @@ def main() -> None:
     parser.add_argument("--init-program-path")
     parser.add_argument("--ancestor-program-path")
     parser.add_argument(
+        "--scenario-family",
+        choices=("resource_relocation", "head_actuator_injury"),
+        default="resource_relocation",
+    )
+    parser.add_argument(
         "--ancestor-description",
         default="standard parametric mutation",
     )
@@ -213,7 +261,9 @@ def main() -> None:
     os.environ["SHINKA_HEADLESS_COMMAND"] = HEADLESS_COMMAND
     run_root = RESULTS_ROOT / arguments.run_id
     run_root.mkdir(parents=True, exist_ok=False)
-    manifest_path, founder_index_path = _prepare_manifest(run_root)
+    manifest_path, founder_index_path = _prepare_manifest(
+        run_root, arguments.scenario_family
+    )
     launch = {
         "exploratory": True,
         "founder_index_sha256": _sha256(founder_index_path),
@@ -227,6 +277,7 @@ def main() -> None:
         "ancestor_program_path": str(ancestor_program_path),
         "ancestor_program_sha256": _sha256(ancestor_program_path),
         "regime": arguments.regime,
+        "scenario_family": arguments.scenario_family,
         "run_id": arguments.run_id,
         "shinkaevolve_commit": _git_commit(PROJECT_ROOT / "ShinkaEvolve"),
     }
@@ -237,6 +288,7 @@ def main() -> None:
         founder_index_path,
         ancestor_program_path=ancestor_program_path,
         ancestor_description=arguments.ancestor_description,
+        scenario_family=arguments.scenario_family,
         generations=arguments.generations,
         init_program_path=init_program_path,
         regime=arguments.regime,
