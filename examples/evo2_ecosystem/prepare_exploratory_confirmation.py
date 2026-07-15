@@ -68,6 +68,7 @@ def _confirmation_manifest(
     *,
     partition: str,
     scenario_family: str,
+    event_step: int | None,
 ) -> tuple[Path, Path]:
     for path in (MICROCOSMOS_ROOT, MICROCOSMOS_ROOT / "src"):
         value = str(path)
@@ -97,6 +98,7 @@ def _confirmation_manifest(
         {name: seeds[name] for name in ("training", "development", "sealed")},
     )
     selected = {
+        "training": bundle.training_punctuated,
         "development": bundle.development,
         "sealed": bundle.sealed,
     }[partition]
@@ -130,6 +132,19 @@ def _confirmation_manifest(
         selected = replace(selected, worlds=tuple(worlds))
     elif scenario_family != "resource_relocation":
         raise ValueError("unknown confirmation scenario family")
+    if event_step is not None:
+        if (
+            event_step <= 0
+            or event_step >= selected.horizon
+            or event_step % selected.chunk_steps
+        ):
+            raise ValueError(
+                "event_step must be a positive chunk boundary before the horizon"
+            )
+        selected = replace(
+            selected,
+            worlds=tuple(replace(item, event_step=event_step) for item in selected.worlds),
+        )
     manifest = output / "inputs" / f"{partition}_punctuated.json"
     manifest.parent.mkdir(parents=True)
     manifest.write_bytes(canonical_manifest_bytes(selected) + b"\n")
@@ -143,13 +158,18 @@ def main() -> None:
     parser.add_argument("--generations", nargs="+", type=int, required=True)
     parser.add_argument(
         "--partition",
-        choices=("development", "sealed"),
+        choices=("training", "development", "sealed"),
         default="development",
     )
     parser.add_argument(
         "--scenario-family",
         choices=("resource_relocation", "head_actuator_injury"),
         default="resource_relocation",
+    )
+    parser.add_argument(
+        "--event-step",
+        type=int,
+        help="override the paired event time without changing the rollout horizon",
     )
     arguments = parser.parse_args()
 
@@ -178,9 +198,11 @@ def main() -> None:
         output,
         partition=arguments.partition,
         scenario_family=arguments.scenario_family,
+        event_step=arguments.event_step,
     )
     launch = {
         "founder_index_sha256": _sha256(founder_index),
+        "event_step": arguments.event_step,
         "manifest_sha256": _sha256(manifest),
         "microcosmos_commit": _commit(MICROCOSMOS_ROOT),
         "numerical_repeats": 3,

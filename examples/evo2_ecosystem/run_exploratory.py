@@ -51,7 +51,12 @@ def _git_commit(path: Path) -> str:
     ).stdout.strip()
 
 
-def _prepare_manifest(run_root: Path, scenario_family: str) -> tuple[Path, Path]:
+def _prepare_manifest(
+    run_root: Path,
+    scenario_family: str,
+    *,
+    event_step: int | None,
+) -> tuple[Path, Path]:
     for path in (MICROCOSMOS_ROOT, MICROCOSMOS_ROOT / "src"):
         value = str(path)
         if value not in sys.path:
@@ -111,6 +116,19 @@ def _prepare_manifest(run_root: Path, scenario_family: str) -> tuple[Path, Path]
         manifest = replace(manifest, worlds=tuple(worlds))
     elif scenario_family != "resource_relocation":
         raise ValueError("unknown exploratory scenario family")
+    if event_step is not None:
+        if (
+            event_step <= 0
+            or event_step >= manifest.horizon
+            or event_step % manifest.chunk_steps
+        ):
+            raise ValueError(
+                "event_step must be a positive chunk boundary before the horizon"
+            )
+        manifest = replace(
+            manifest,
+            worlds=tuple(replace(item, event_step=event_step) for item in manifest.worlds),
+        )
     manifest_path = run_root / "inputs" / "training_punctuated.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     payload = canonical_manifest_bytes(manifest) + b"\n"
@@ -247,6 +265,11 @@ def main() -> None:
         default="resource_relocation",
     )
     parser.add_argument(
+        "--event-step",
+        type=int,
+        help="override the paired event time without changing the rollout horizon",
+    )
+    parser.add_argument(
         "--ancestor-description",
         default="standard parametric mutation",
     )
@@ -269,10 +292,13 @@ def main() -> None:
     run_root = RESULTS_ROOT / arguments.run_id
     run_root.mkdir(parents=True, exist_ok=False)
     manifest_path, founder_index_path = _prepare_manifest(
-        run_root, arguments.scenario_family
+        run_root,
+        arguments.scenario_family,
+        event_step=arguments.event_step,
     )
     launch = {
         "exploratory": True,
+        "event_step": arguments.event_step,
         "founder_index_sha256": _sha256(founder_index_path),
         "generations": arguments.generations,
         "init_program_path": str(init_program_path),
