@@ -65,6 +65,7 @@ _JNP_ATTRIBUTES = frozenset(
         "float32",
         "log",
         "maximum",
+        "mean",
         "minimum",
         "sqrt",
         "stack",
@@ -73,6 +74,7 @@ _JNP_ATTRIBUTES = frozenset(
     }
 )
 _JNP_CALLS = _JNP_ATTRIBUTES - {"float32"}
+_ARRAY_METHODS = frozenset({"astype"})
 _ALLOWED_NODES = (
     ast.Module,
     ast.Import,
@@ -267,20 +269,31 @@ def _validate_candidate_source(
                 raise CandidateValidationError("task inputs cannot be reassigned")
             local_names.add(node.targets[0].id)
         if isinstance(node, ast.Attribute):
-            if (
-                not isinstance(node.value, ast.Name)
-                or node.value.id != "jnp"
-                or node.attr not in _JNP_ATTRIBUTES
-            ):
-                raise CandidateValidationError("attribute access is restricted to jnp")
+            jnp_attribute = (
+                isinstance(node.value, ast.Name)
+                and node.value.id == "jnp"
+                and node.attr in _JNP_ATTRIBUTES
+            )
+            array_method = node.attr in _ARRAY_METHODS
+            if not (jnp_attribute or array_method):
+                raise CandidateValidationError(
+                    "attribute access is restricted to jnp and approved array methods"
+                )
         if isinstance(node, ast.Call):
-            if (
-                not isinstance(node.func, ast.Attribute)
-                or not isinstance(node.func.value, ast.Name)
-                or node.func.value.id != "jnp"
-                or node.func.attr not in _JNP_CALLS
-            ):
-                raise CandidateValidationError("only approved jnp calls are allowed")
+            jnp_call = (
+                isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "jnp"
+                and node.func.attr in _JNP_CALLS
+            )
+            array_method_call = (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr in _ARRAY_METHODS
+            )
+            if not (jnp_call or array_method_call):
+                raise CandidateValidationError(
+                    "only approved jnp and array-method calls are allowed"
+                )
             if any(keyword.arg is None for keyword in node.keywords):
                 raise CandidateValidationError(
                     "expanded keyword arguments are not allowed"

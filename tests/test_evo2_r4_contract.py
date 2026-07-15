@@ -184,7 +184,7 @@ def test_r4_policy_delegates_public_abi_to_trusted_microcosmos_adapter(tmp_path:
     assert np.allclose(logits, [0.4, 0.6, -1.0, 0.3, -8.0, 8.0])
 
 
-def test_r4_candidate_allows_fixed_array_slices(tmp_path: Path) -> None:
+def test_r4_candidate_allows_safe_fixed_array_operations(tmp_path: Path) -> None:
     evaluator = _evaluator()
     initial = (
         Path(__file__).resolve().parents[1] / "examples/evo2_ecosystem/initial_r4.py"
@@ -193,9 +193,9 @@ def test_r4_candidate_allows_fixed_array_slices(tmp_path: Path) -> None:
         tmp_path,
         "def make_offspring(parent_genome_summary, parent_stats, population_stats, "
         "operator_stats, rng):\n"
-        "    success = operator_stats[:, 0]\n"
+        "    success = jnp.mean(operator_stats[:, 0:3], axis=1)\n"
         "    return jnp.array([success[0], success[1], success[2], "
-        "success[0], success[1], success[2]])",
+        "success[0], success[1], success[2]]).astype(jnp.float32)",
     )
     module = evaluator._load_candidate(candidate, run_spec.R4_CONTRACT, initial)
     evaluator._smoke_validate_candidate(
