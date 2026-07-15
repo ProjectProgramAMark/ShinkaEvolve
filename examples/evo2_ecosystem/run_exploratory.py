@@ -258,6 +258,8 @@ def main() -> None:
     parser.add_argument("--regime", choices=("stable", "punctuated"), default="punctuated")
     parser.add_argument("--init-program-path")
     parser.add_argument("--ancestor-program-path")
+    parser.add_argument("--external-manifest-path")
+    parser.add_argument("--external-founder-index-path")
     parser.add_argument(
         "--scenario-family",
         choices=("resource_relocation", "head_actuator_injury"),
@@ -284,20 +286,41 @@ def main() -> None:
     for path in (init_program_path, ancestor_program_path):
         if not path.is_file():
             raise FileNotFoundError(path)
+    external_inputs = (
+        arguments.external_manifest_path,
+        arguments.external_founder_index_path,
+    )
+    if any(external_inputs) and not all(external_inputs):
+        raise ValueError(
+            "external manifest and founder index must be supplied together"
+        )
+    if all(external_inputs) and arguments.event_step is not None:
+        raise ValueError("event_step is already bound by an external manifest")
 
     random.seed(17)
     np.random.seed(17)
     os.environ["SHINKA_HEADLESS_COMMAND"] = HEADLESS_COMMAND
     run_root = RESULTS_ROOT / arguments.run_id
     run_root.mkdir(parents=True, exist_ok=False)
-    manifest_path, founder_index_path = _prepare_manifest(
-        run_root,
-        arguments.scenario_family,
-        event_step=arguments.event_step,
-    )
+    if all(external_inputs):
+        source_manifest = Path(arguments.external_manifest_path).resolve()
+        founder_index_path = Path(arguments.external_founder_index_path).resolve()
+        for path in (source_manifest, founder_index_path):
+            if not path.is_file():
+                raise FileNotFoundError(path)
+        manifest_path = run_root / "inputs" / "training_punctuated.json"
+        manifest_path.parent.mkdir(parents=True)
+        manifest_path.write_bytes(source_manifest.read_bytes())
+    else:
+        manifest_path, founder_index_path = _prepare_manifest(
+            run_root,
+            arguments.scenario_family,
+            event_step=arguments.event_step,
+        )
     launch = {
         "exploratory": True,
         "event_step": arguments.event_step,
+        "external_inputs": bool(all(external_inputs)),
         "founder_index_sha256": _sha256(founder_index_path),
         "generations": arguments.generations,
         "init_program_path": str(init_program_path),
