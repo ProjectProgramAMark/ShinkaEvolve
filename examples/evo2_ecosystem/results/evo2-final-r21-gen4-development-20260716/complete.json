@@ -1,0 +1,15 @@
+{
+  "candidate_program_sha256": "d6b0c7ea19b0ad69c3b4c5e3aa3035ffd2d208d02a620ec07fcb7ffcba4e0db9",
+  "completed_utc": "2026-07-16T21:08:35Z",
+  "correct_record_sha256": "8cdce45f08a0cfc41be160afe77bca7cb407284b8a32e0c737a89a2f36287bd0",
+  "development_passed": false,
+  "integrity_valid": true,
+  "metrics_sha256": "0309c045f2f5294077b0daa9da0fce6cf5d8ab153e4cc530e500f182b68d8e4d",
+  "repeat_scores": [
+    -0.010516779497265816,
+    -0.006196683272719383,
+    -0.0077119083143770695
+  ],
+  "r21_sealed_opened": false,
+  "sealed_evaluation_permitted": false
+}
