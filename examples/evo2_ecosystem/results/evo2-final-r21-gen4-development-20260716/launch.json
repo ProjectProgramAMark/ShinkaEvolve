@@ -1,0 +1,24 @@
+{
+  "ancestor_program_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/programs/fixed_clone.py",
+  "ancestor_program_sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3",
+  "candidate_program_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_4/main.py",
+  "candidate_program_sha256": "d6b0c7ea19b0ad69c3b4c5e3aa3035ffd2d208d02a620ec07fcb7ffcba4e0db9",
+  "development_founder_index_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r21_artifacts/founders/index.json",
+  "development_founder_index_sha256": "2f859dadf096cfb9dd5d3bb3a251a9dfaf91ff2546364ba14f2eafc48e11dd23",
+  "development_manifest_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r21_artifacts/manifests/development_early_injury.json",
+  "development_manifest_sha256": "127a5138e240d11b5643ee8d64063283c3a15c9fcb4f301d3a686b2a673c5d80",
+  "microcosmos_commit": "433327bd80f96fff79e46efc6d34bb1e724f5dad",
+  "numerical_repeats": 3,
+  "preregistration_sha256": "64a9782e1dabe2bd3f88218ea5ead3ab9a0fef4a4bf8a9445984e2cdc427de79",
+  "promotion_training_repeat_scores": [
+    0.009664639830589294,
+    0.005382193252444267,
+    0.002813815139234066
+  ],
+  "regime": "punctuated",
+  "r21_sealed_opened": false,
+  "scenario_family": "head_actuator_injury",
+  "shinkaevolve_commit": "e3281d4f6f98c1fb3244e50b9379590f4968bd67",
+  "source_generation": 4,
+  "source_run_id": "evo2-final-r21-cross-founder-20260716"
+}
