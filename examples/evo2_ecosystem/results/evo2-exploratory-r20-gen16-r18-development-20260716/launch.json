@@ -1,0 +1,43 @@
+{
+  "event_step": 4000,
+  "founder_index_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/founders/index.json",
+  "founder_index_sha256": "cef784562c8f8bf045f161ed01c708c778902f2d6b98a8dcf270d5985c561c72",
+  "manifest_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/manifests/development_early_injury.json",
+  "manifest_sha256": "e4d4c1482d65563e3adec4060d26a0579182c1b8669d1b0df23d0e4050581c07",
+  "microcosmos_commit": "73188f9a76590aa532f75c3f6f404d427b1b5e14",
+  "numerical_repeats": 3,
+  "partition": "development",
+  "programs": [
+    {
+      "name": "shinka_gen_16",
+      "sha256": "715f6407a4deb24658e6f05eaf3472329376ce8645d6fa1f3239cbc9ce2a6490"
+    },
+    {
+      "name": "fixed_clone",
+      "sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3"
+    },
+    {
+      "name": "fixed_parametric_conservative",
+      "sha256": "278b1c815e61ddf8c918adb305e612827598e1f659b2095136ba300fd4066cab"
+    },
+    {
+      "name": "fixed_parametric_standard",
+      "sha256": "af32758d72dfeabc621141387343bcb45a4eab0a13f3126d6d9946cb7b47d219"
+    },
+    {
+      "name": "fixed_parametric_exploratory",
+      "sha256": "d0ae459df5784ee14bd2c03129709a9c32b1a2240992c6d31e734d8695ba3480"
+    },
+    {
+      "name": "fixed_structural",
+      "sha256": "fabbf1618ed62fd4b2f7bf6f96e1d7982d2e91614fa1cdb97e3b9c335cd1863f"
+    },
+    {
+      "name": "fixed_mixed",
+      "sha256": "fe269e5edf1553b332d70740e2aeb11098ed6161174a67158bd84f6fab496b35"
+    }
+  ],
+  "scenario_family": "head_actuator_injury",
+  "shinkaevolve_commit": "c769176fcb97e347e3a5cce84c9bb9d266c6c9c8",
+  "source_run_id": "evo2-exploratory-r20-compact-stress-20260716"
+}

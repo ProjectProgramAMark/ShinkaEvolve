@@ -1,0 +1,15 @@
+{
+  "generation": 16,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "readiness_tiered_rescue",
+  "patch_description": "This uses a tiered ecological triage policy instead of a homeostatic bandit budget. Clone remains dominant in stable/high-resource conditions, but observable contraction, deaths, low intake, and reproductive slowdown open discrete readiness-gated mutation tiers. Standard parametric mutation becomes the primary rescue operator because prior evidence shows conservative mutation and clone collapse into the ancestor behavior, while exploratory/structural/mixed are only allowed under stronger decline and compact genomes. Operator evidence still reshapes the portfolio: proven operators are amplified, overused or poorly evidenced operators are damped, and unevidenced standard mutation receives a bounded probe only when the ecology is worsening.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T12:36:22.835998",
+  "llm_cost": 0.196315,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-compact-stress-20260716/punctuated/gen_16/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}
