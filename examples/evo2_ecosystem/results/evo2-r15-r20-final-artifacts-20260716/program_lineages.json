@@ -1,0 +1,206 @@
+{
+  "R15": [
+    {
+      "generation": 0,
+      "score": -0.021454814821481705,
+      "valid": true
+    },
+    {
+      "generation": 1,
+      "score": -0.002827604068443179,
+      "valid": true
+    },
+    {
+      "generation": 2,
+      "score": -0.01444987766444683,
+      "valid": true
+    },
+    {
+      "generation": 3,
+      "score": -2.0,
+      "valid": false
+    },
+    {
+      "generation": 4,
+      "score": -0.009554612450301647,
+      "valid": true
+    },
+    {
+      "generation": 5,
+      "score": -0.01821700856089592,
+      "valid": true
+    },
+    {
+      "generation": 6,
+      "score": -0.021447276696562767,
+      "valid": true
+    },
+    {
+      "generation": 7,
+      "score": -0.006568536162376404,
+      "valid": true
+    },
+    {
+      "generation": 8,
+      "score": -0.019471976906061172,
+      "valid": true
+    },
+    {
+      "generation": 9,
+      "score": -0.001749855582602322,
+      "valid": true
+    },
+    {
+      "generation": 10,
+      "score": -0.002217959612607956,
+      "valid": true
+    },
+    {
+      "generation": 11,
+      "score": -0.010446292348206043,
+      "valid": true
+    },
+    {
+      "generation": 12,
+      "score": 0.009561016224324703,
+      "valid": true
+    },
+    {
+      "generation": 13,
+      "score": -0.007662694901227951,
+      "valid": true
+    },
+    {
+      "generation": 14,
+      "score": -0.04457689821720123,
+      "valid": true
+    },
+    {
+      "generation": 15,
+      "score": 0.0010781571036204696,
+      "valid": true
+    },
+    {
+      "generation": 16,
+      "score": -0.021059297025203705,
+      "valid": true
+    },
+    {
+      "generation": 17,
+      "score": -2.0,
+      "valid": false
+    },
+    {
+      "generation": 18,
+      "score": 0.0002150148939108476,
+      "valid": true
+    },
+    {
+      "generation": 19,
+      "score": -2.0,
+      "valid": false
+    }
+  ],
+  "R20": [
+    {
+      "generation": 0,
+      "score": -0.003359813243150711,
+      "valid": true
+    },
+    {
+      "generation": 1,
+      "score": -0.0008994793170131743,
+      "valid": true
+    },
+    {
+      "generation": 2,
+      "score": -0.0006676967022940516,
+      "valid": true
+    },
+    {
+      "generation": 3,
+      "score": -0.0010835459688678384,
+      "valid": true
+    },
+    {
+      "generation": 4,
+      "score": -0.0005362795200198889,
+      "valid": true
+    },
+    {
+      "generation": 5,
+      "score": -0.00025752923102118075,
+      "valid": true
+    },
+    {
+      "generation": 6,
+      "score": -0.0031644394621253014,
+      "valid": true
+    },
+    {
+      "generation": 7,
+      "score": -0.00012370964395813644,
+      "valid": true
+    },
+    {
+      "generation": 8,
+      "score": -0.00037450078525580466,
+      "valid": true
+    },
+    {
+      "generation": 9,
+      "score": -0.00014346071111503989,
+      "valid": true
+    },
+    {
+      "generation": 10,
+      "score": -0.0009065877529792488,
+      "valid": true
+    },
+    {
+      "generation": 11,
+      "score": -0.0033735039178282022,
+      "valid": true
+    },
+    {
+      "generation": 12,
+      "score": -0.00023820303613319993,
+      "valid": true
+    },
+    {
+      "generation": 13,
+      "score": -0.0007807697984389961,
+      "valid": true
+    },
+    {
+      "generation": 14,
+      "score": -0.002191330539062619,
+      "valid": true
+    },
+    {
+      "generation": 15,
+      "score": -8.512483327649534e-05,
+      "valid": true
+    },
+    {
+      "generation": 16,
+      "score": 9.488765499554574e-05,
+      "valid": true
+    },
+    {
+      "generation": 17,
+      "score": -0.02022024430334568,
+      "valid": true
+    },
+    {
+      "generation": 18,
+      "score": -4.641771738533862e-05,
+      "valid": true
+    },
+    {
+      "generation": 19,
+      "score": -0.0002872688928619027,
+      "valid": true
+    }
+  ]
+}
