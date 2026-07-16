@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "trusted_relative_rescue",
+  "patch_description": "Shift the scheduler from raw stress-triggered mutation toward relative ecology plus trusted operator evidence. The edit keeps clone dominant in calm, low-evidence states, but gives conservative and standard parametric mutation more probability when the parent is healthier than the local ecology and when operator evidence supports mutation. Exploratory, structural, and mixed remain bounded and only rise under normalized rescue pressure with compact genomes and trusted non-clone evidence, reducing founder-specific over-triggering from raw population stress alone.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T18:52:05.273080",
+  "llm_cost": 0.15997,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_1/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}
