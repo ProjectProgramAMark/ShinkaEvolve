@@ -1,0 +1,15 @@
+{
+  "generation": 2,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "normalized_trust_gate",
+  "patch_description": "Use ecology-normalized stress with a reproductive deficit gate and require parent advantage plus trusted mutation evidence before opening mutation logits. This keeps a real ecology-conditioned scheduler, but reduces founder-specific over-triggering by making mutation pressure depend on normalized population need and actual trusted operator evidence rather than raw stress alone.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T19:16:22.959597",
+  "llm_cost": 0.084155,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_2/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}
