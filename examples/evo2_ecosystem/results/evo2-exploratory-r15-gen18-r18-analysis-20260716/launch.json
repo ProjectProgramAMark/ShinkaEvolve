@@ -1,0 +1,24 @@
+{
+  "ancestor_program_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/programs/fixed_clone.py",
+  "ancestor_sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3",
+  "experiments": [
+    {
+      "name": "matched_sparse_constant",
+      "program_sha256": "ed184e3637944574137b8208be40123c59c7f96382ebbbc107cc1648b474fed8",
+      "question": "Does R15 generation 18 outperform a constant mixture matched to its development operator-use rate?"
+    },
+    {
+      "name": "ablation_no_crisis_signal",
+      "program_sha256": "c0d6982d039980d919647570c9fcc07b02b25de77adf5714ae304b3e7f55ed93",
+      "question": "Does removing only the explicit pressure and rescue terms reduce the development-panel effect?"
+    }
+  ],
+  "founder_index_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/founders/index.json",
+  "founder_index_sha256": "cef784562c8f8bf045f161ed01c708c778902f2d6b98a8dcf270d5985c561c72",
+  "manifest_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/manifests/development_early_injury.json",
+  "manifest_sha256": "e4d4c1482d65563e3adec4060d26a0579182c1b8669d1b0df23d0e4050581c07",
+  "numerical_repeats": 3,
+  "partition": "development",
+  "post_sealed_status": "exploratory_nonsealed_only",
+  "schema_version": 1
+}
