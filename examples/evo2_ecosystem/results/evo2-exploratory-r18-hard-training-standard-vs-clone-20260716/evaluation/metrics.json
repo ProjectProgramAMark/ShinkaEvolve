@@ -1,0 +1,268 @@
+{
+    "combined_score": -0.02764590084552765,
+    "public": {
+        "score": -0.02764590084552765,
+        "sham_auc_delta": -0.0164335984736681,
+        "survival_rate": 0.5625,
+        "mean_births": 20.0625,
+        "mean_deaths": 16.1875,
+        "mean_generation_gain": 2.8125,
+        "operator_fraction": {
+            "clone": 0.0,
+            "parametric_conservative": 0.0,
+            "parametric_standard": 1.0,
+            "parametric_exploratory": 0.0,
+            "structural": 0.0,
+            "mixed": 0.0
+        },
+        "pre_selection_probability": [
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "post_selection_probability": [
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "operator_success_ema": [
+            0.5,
+            0.5,
+            0.32399019529111683,
+            0.5,
+            0.5,
+            0.5
+        ],
+        "operator_usage_ema": [
+            0.0,
+            0.0,
+            0.4416104834526777,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "operator_evidence_ema": [
+            0.0,
+            0.0,
+            0.47721307072788477,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "shock_auc_delta": 0.010889140889048576,
+        "ancestor_survival_rate": 0.75
+    },
+    "private": {
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "policy_violation_count": 0,
+        "numerical_repeats": 1,
+        "repeat_scores": [
+            -0.02764590084552765
+        ],
+        "selected_repeat_index": 0,
+        "physical_integrity_valid": true,
+        "pair_deltas": [
+            -0.00010539114009588957,
+            -0.12436606734991074,
+            -0.06143195554614067,
+            -0.04849858582019806,
+            0.008350582793354988,
+            0.04384741932153702,
+            0.25451764464378357,
+            -0.005077098496258259
+        ],
+        "survival_is_diagnostic": true,
+        "adaptive_observations": [
+            {
+                "founder_id": "train-00",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 0,
+                "post_count": 1
+            },
+            {
+                "founder_id": "train-01",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 2,
+                "post_count": 0
+            },
+            {
+                "founder_id": "train-02",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 1,
+                "post_count": 2
+            },
+            {
+                "founder_id": "train-03",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 2,
+                "post_count": 2
+            },
+            {
+                "founder_id": "train-04",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 2,
+                "post_count": 2
+            },
+            {
+                "founder_id": "train-05",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 5,
+                "post_count": 6
+            },
+            {
+                "founder_id": "train-06",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 12,
+                "post_count": 54
+            },
+            {
+                "founder_id": "train-07",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 4,
+                "post_count": 10
+            }
+        ],
+        "backend": "gpu",
+        "ancestor_sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3",
+        "candidate_sha256": "af32758d72dfeabc621141387343bcb45a4eab0a13f3126d6d9946cb7b47d219",
+        "exploratory": true,
+        "founder_index_sha256": "e16a0a5ae7f815f19c3fbe98f8b27cd0196466ca94bbb0ebd06a13b36532f67b",
+        "manifest_sha256": "73c36fadb89b21bd8b59d294f62a42b0fd513fd37dfaa2d34e13c5c341a76329"
+    },
+    "text_feedback": "paired ancestor delta=-0.0276; sham delta=-0.0164; shock delta=0.0109; survival=0.56; mean births=20.1; survival is scored, not a validity gate."
+}
