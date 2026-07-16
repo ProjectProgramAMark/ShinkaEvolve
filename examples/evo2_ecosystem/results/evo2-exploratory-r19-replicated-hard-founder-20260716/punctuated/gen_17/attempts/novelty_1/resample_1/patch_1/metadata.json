@@ -1,0 +1,15 @@
+{
+  "generation": 17,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "conservative_rescue_ladder",
+  "patch_description": "Shift the scheduler from broad standard-parametric exploration back toward an evidence-ratcheted repair ladder. The current program pays stable-world cost by giving standard mutation a high base logit, while observed evidence still only supports conservative mutation. This edit lowers the standard baseline, restores conservative mutation as the first injury/stress response, and keeps standard mutation available mainly through existing injury-gated repair/probe terms when clone performance is poor. Exploratory, structural, and mixed remain rare and stress-gated to avoid founder tails.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T07:59:45.986945",
+  "llm_cost": 0.20192,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_17/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

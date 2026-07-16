@@ -1,0 +1,53 @@
+<NAME>
+conservative_evidence_rescue
+</NAME>
+<DESCRIPTION>
+Shift the scheduler away from unproven standard mutation, which the latest run sampled enough to erase both sham and shock gains, and back toward a conservative repair channel conditioned on observed clone weakness, conservative evidence, and injury stress. Standard mutation remains available during real stress, but its baseline is quarantined until ecological injury and accumulated evidence justify it. This should reduce stable-world cost while preserving a small injury-responsive mutation path.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    anchor = jnp.array([4.10, -1.18, -3.35, -6.40, -6.65, -6.25], dtype=jnp.float32)
+    stable_policy = jnp.array([1.22, 0.16, -2.10, -2.35, -2.45, -2.20], dtype=jnp.float32)
+    renewal_policy = jnp.array([-0.18, 0.92, -0.10, -0.54, -0.58, -0.42], dtype=jnp.float32)
+    stress_policy = jnp.array([-3.16, -0.22, 1.20, 0.30, 0.16, 0.46], dtype=jnp.float32)
+    rescue_policy = jnp.array([-1.78, 0.04, 2.34, 0.24, 0.08, 0.52], dtype=jnp.float32)
+    utility_policy = jnp.array([0.08, 0.72, 1.12, 0.24, 0.18, 0.32], dtype=jnp.float32)
+    pulse = jnp.array(
+        [
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.82 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.58 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            3.08 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.46 * standard_trial_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+            0.38 * exploratory_gate,
+            0.24 * structural_gate,
+            0.74 * mixed_gate,
+        ],
+        dtype=jnp.float32,
+    )
+    growth_trim = jnp.array(
+        [0.16 * growth, 0.00 * growth, -0.34 * growth, -0.24 * growth, -0.20 * growth, 0.04 * growth],
+        dtype=jnp.float32,
+    )
+=======
+    anchor = jnp.array([4.18, -0.92, -4.72, -6.78, -6.92, -6.64], dtype=jnp.float32)
+    stable_policy = jnp.array([1.34, -0.06, -2.62, -2.60, -2.68, -2.42], dtype=jnp.float32)
+    renewal_policy = jnp.array([-0.12, 1.10, -0.34, -0.58, -0.62, -0.48], dtype=jnp.float32)
+    stress_policy = jnp.array([-2.44, 0.82, -0.22, -0.08, -0.10, 0.04], dtype=jnp.float32)
+    rescue_policy = jnp.array([-1.42, 1.14, 0.28, 0.02, -0.02, 0.10], dtype=jnp.float32)
+    utility_policy = jnp.array([-0.04, 0.88, 0.20, 0.06, 0.04, 0.10], dtype=jnp.float32)
+    pulse = jnp.array(
+        [
+            -1.30 * local_repair - 0.40 * trial_repair - 0.20 * rescue_param - 0.22 * stable_escape + 0.48 * fragile_lock + 1.06 * stable_mutation_debt,
+            2.24 * conservative_repair_gate + 1.02 * local_repair + 0.24 * stable_escape + 0.12 * injury_rescue - 1.16 * stable_mutation_debt - 0.64 * conservative_fatigue,
+            1.02 * standard_repair_gate + 0.34 * trial_repair + 0.10 * rescue_param - 0.28 * quiet_bias - 0.92 * stable_lock - 0.66 * fragile_lock,
+            0.12 * rare_repair_gate,
+            0.06 * rare_repair_gate,
+            0.34 * mixed_repair_gate,
+        ],
+        dtype=jnp.float32,
+    )
+    growth_trim = jnp.array(
+        [0.16 * growth, -0.04 * growth, -0.38 * growth, -0.24 * growth, -0.20 * growth, 0.02 * growth],
+        dtype=jnp.float32,
+    )
+>>>>>>> REPLACE
+</DIFF>

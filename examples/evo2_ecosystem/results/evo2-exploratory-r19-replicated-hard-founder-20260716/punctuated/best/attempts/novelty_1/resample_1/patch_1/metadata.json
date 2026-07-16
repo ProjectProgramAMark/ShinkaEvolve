@@ -1,0 +1,15 @@
+{
+  "generation": 14,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "stress_weighted_repair",
+  "patch_description": "Shift the small mutation budget away from quiet conditions and toward observable population stress. The current scheduler already finds the conservative band, but pays stable-world cost while giving too little stress-only repair. This edit raises conservative repair only when ecological stress and clone underperformance are visible, adds a bounded standard trial path when clone evidence is poor, and strengthens the stable lock so quiet worlds stay closer to clone behavior.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T07:19:10.250391",
+  "llm_cost": 0.14927,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_14/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

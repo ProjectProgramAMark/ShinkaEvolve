@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "00ce815cbf58bea2cecc34c98ff21f63b83ac52cdb4e436e26ba7543a69ac29f",
+        "error_type": "CandidateValidationError",
+        "error_message": "unknown name: local_repair",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: CandidateValidationError: unknown name: local_repair"
+}

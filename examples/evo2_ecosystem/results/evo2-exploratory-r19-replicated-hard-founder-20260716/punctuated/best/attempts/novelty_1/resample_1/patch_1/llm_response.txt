@@ -1,0 +1,116 @@
+<NAME>
+stress_weighted_repair
+</NAME>
+<DESCRIPTION>
+Shift the small mutation budget away from quiet conditions and toward observable population stress. The current scheduler already finds the conservative band, but pays stable-world cost while giving too little stress-only repair. This edit raises conservative repair only when ecological stress and clone underperformance are visible, adds a bounded standard trial path when clone evidence is poor, and strengthens the stable lock so quiet worlds stay closer to clone behavior.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    conservative_proof = jnp.clip(
+        (learned[1] - learned[0] + 0.05) * evidence_gate[1]
+        + 0.38 * clone_bad
+        + 0.16 * evidence_margin[1],
+        0.0,
+        1.0,
+    )
+    standard_proof = jnp.clip(
+        0.34 * standard_edge
+        + 0.16 * evidence_margin[2]
+        + 0.06 * unused[2] * clone_bad,
+        0.0,
+        1.0,
+    )
+    repair_need = jnp.clip(
+        stress_opportunity
+        * reproduction_ready
+        * (0.46 + 0.54 * stress_core)
+        * (1.0 - 0.82 * stable_world)
+        * (1.0 - 0.52 * fragile_lock),
+        0.0,
+        1.0,
+    )
+    local_repair = jnp.clip(
+        repair_need
+        * (0.28 + 0.72 * conservative_proof)
+        * (1.0 - 0.46 * conservative_fatigue),
+        0.0,
+        1.0,
+    )
+    trial_repair = jnp.clip(
+        repair_need
+        * unused[2]
+        * (0.16 + 0.84 * clone_bad)
+        * (0.28 + 0.72 * conservative_edge)
+        * (1.0 - 0.78 * low_alive),
+        0.0,
+        1.0,
+    )
+    quiet_bias = jnp.clip(stable_world * (1.0 - injury_rescue) * (1.0 - 0.55 * clone_bad), 0.0, 1.0)
+=======
+    conservative_proof = jnp.clip(
+        (learned[1] - learned[0] + 0.04) * evidence_gate[1]
+        + 0.44 * clone_bad
+        + 0.18 * evidence_margin[1],
+        0.0,
+        1.0,
+    )
+    standard_proof = jnp.clip(
+        0.42 * standard_edge
+        + 0.18 * evidence_margin[2]
+        + 0.10 * unused[2] * clone_bad * stress_core,
+        0.0,
+        1.0,
+    )
+    repair_need = jnp.clip(
+        stress_opportunity
+        * reproduction_ready
+        * (0.40 + 0.60 * stress_core)
+        * (0.30 + 0.70 * injury_rescue)
+        * (1.0 - 0.90 * stable_world)
+        * (1.0 - 0.50 * fragile_lock),
+        0.0,
+        1.0,
+    )
+    local_repair = jnp.clip(
+        repair_need
+        * (0.34 + 0.66 * conservative_proof)
+        * (1.0 - 0.42 * conservative_fatigue),
+        0.0,
+        1.0,
+    )
+    trial_repair = jnp.clip(
+        repair_need
+        * unused[2]
+        * (0.24 + 0.76 * clone_bad)
+        * (0.22 + 0.78 * standard_proof)
+        * (1.0 - 0.82 * low_alive),
+        0.0,
+        1.0,
+    )
+    quiet_bias = jnp.clip(stable_world * (1.0 - injury_rescue) * (1.0 - 0.70 * clone_bad), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    anchor = jnp.array([4.18, -0.86, -4.88, -6.85, -6.95, -6.72], dtype=jnp.float32)
+    stable_policy = jnp.array([1.34, -0.10, -2.72, -2.66, -2.72, -2.46], dtype=jnp.float32)
+    renewal_policy = jnp.array([-0.10, 1.08, -0.38, -0.58, -0.62, -0.48], dtype=jnp.float32)
+    stress_policy = jnp.array([-2.36, 0.74, -0.28, -0.10, -0.12, 0.02], dtype=jnp.float32)
+    rescue_policy = jnp.array([-1.34, 1.06, 0.34, 0.02, -0.02, 0.08], dtype=jnp.float32)
+    utility_policy = jnp.array([-0.04, 0.86, 0.22, 0.06, 0.04, 0.10], dtype=jnp.float32)
+=======
+    anchor = jnp.array([4.22, -0.94, -4.62, -6.88, -6.98, -6.76], dtype=jnp.float32)
+    stable_policy = jnp.array([1.42, -0.18, -2.86, -2.70, -2.76, -2.52], dtype=jnp.float32)
+    renewal_policy = jnp.array([-0.08, 1.00, -0.24, -0.58, -0.62, -0.48], dtype=jnp.float32)
+    stress_policy = jnp.array([-2.62, 0.82, 0.06, -0.10, -0.12, 0.02], dtype=jnp.float32)
+    rescue_policy = jnp.array([-1.48, 1.18, 0.58, 0.02, -0.02, 0.08], dtype=jnp.float32)
+    utility_policy = jnp.array([-0.02, 0.82, 0.34, 0.06, 0.04, 0.10], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.30 * local_repair - 0.48 * trial_repair - 0.22 * rescue_param - 0.18 * stable_escape - 0.34 * standard_probe + 0.48 * fragile_lock + 1.08 * stable_mutation_debt,
+            2.38 * conservative_repair_gate + 1.06 * local_repair + 0.20 * stable_escape + 0.10 * injury_rescue - 1.18 * stable_mutation_debt - 0.66 * conservative_fatigue,
+            1.42 * standard_repair_gate + 0.62 * trial_repair + 0.12 * rescue_param + 0.96 * standard_probe - 0.24 * quiet_bias - 0.88 * stable_lock - 0.64 * fragile_lock,
+=======
+            -1.42 * local_repair - 0.62 * trial_repair - 0.24 * rescue_param - 0.16 * stable_escape - 0.40 * standard_probe + 0.52 * fragile_lock + 1.18 * stable_mutation_debt,
+            2.18 * conservative_repair_gate + 1.18 * local_repair + 0.16 * stable_escape + 0.08 * injury_rescue - 1.32 * stable_mutation_debt - 0.72 * conservative_fatigue,
+            1.58 * standard_repair_gate + 0.86 * trial_repair + 0.18 * rescue_param + 1.16 * standard_probe - 0.34 * quiet_bias - 0.98 * stable_lock - 0.66 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

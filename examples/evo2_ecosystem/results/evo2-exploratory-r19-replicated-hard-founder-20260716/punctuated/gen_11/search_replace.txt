@@ -1,0 +1,53 @@
+<NAME>
+stress_evidence_probe
+</NAME>
+<DESCRIPTION>
+Adds a small standard-parametric repair probe that only rises under observable injury/stress, reproductive readiness, low stable-world signal, clone underperformance, and conservative evidence. It also slightly lowers clone pressure and raises standard pressure only through that probe, aiming to recover injury benefit while keeping ordinary-world mutation cost low.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    rare_repair_gate = jnp.clip(
+        repair_need
+        * unused[3]
+        * unused[4]
+        * compact
+        * injury_rescue
+        * (1.0 - 0.84 * stable_lock),
+        0.0,
+        1.0,
+    )
+    anchor = jnp.array([4.18, -0.86, -4.88, -6.85, -6.95, -6.72], dtype=jnp.float32)
+=======
+    rare_repair_gate = jnp.clip(
+        repair_need
+        * unused[3]
+        * unused[4]
+        * compact
+        * injury_rescue
+        * (1.0 - 0.84 * stable_lock),
+        0.0,
+        1.0,
+    )
+    standard_probe = jnp.clip(
+        repair_need
+        * unused[2]
+        * reproduction_ready
+        * (0.18 + 0.82 * clone_bad)
+        * (0.34 + 0.66 * conservative_proof)
+        * (1.0 - 0.88 * stable_world)
+        * (1.0 - 0.74 * low_alive),
+        0.0,
+        1.0,
+    )
+    anchor = jnp.array([4.18, -0.86, -4.88, -6.85, -6.95, -6.72], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.30 * local_repair - 0.48 * trial_repair - 0.22 * rescue_param - 0.18 * stable_escape + 0.48 * fragile_lock + 1.08 * stable_mutation_debt,
+            2.38 * conservative_repair_gate + 1.06 * local_repair + 0.20 * stable_escape + 0.10 * injury_rescue - 1.18 * stable_mutation_debt - 0.66 * conservative_fatigue,
+            1.42 * standard_repair_gate + 0.62 * trial_repair + 0.12 * rescue_param - 0.24 * quiet_bias - 0.88 * stable_lock - 0.64 * fragile_lock,
+=======
+            -1.30 * local_repair - 0.48 * trial_repair - 0.22 * rescue_param - 0.18 * stable_escape - 0.34 * standard_probe + 0.48 * fragile_lock + 1.08 * stable_mutation_debt,
+            2.38 * conservative_repair_gate + 1.06 * local_repair + 0.20 * stable_escape + 0.10 * injury_rescue - 1.18 * stable_mutation_debt - 0.66 * conservative_fatigue,
+            1.42 * standard_repair_gate + 0.62 * trial_repair + 0.12 * rescue_param + 0.96 * standard_probe - 0.24 * quiet_bias - 0.88 * stable_lock - 0.64 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

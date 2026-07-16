@@ -1,0 +1,15 @@
+{
+  "generation": 4,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "evidence_backed_conservative_repair",
+  "patch_description": "Shift the scheduler back toward the only operator with demonstrated accumulated evidence: conservative parametric mutation. The current edit lets unevidenced standard mutation reach realized behavior and loses both sham and shock score. This change keeps stable-world clone protection, makes conservative mutation the primary repair path when clone evidence looks weak or injury stress is observable, and demotes standard/mixed/rare probes unless their gates become genuinely supported. It preserves observable stress response without turning realized behavior into constant exploratory noise.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T05:30:45.023238",
+  "llm_cost": 0.185875,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_4/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

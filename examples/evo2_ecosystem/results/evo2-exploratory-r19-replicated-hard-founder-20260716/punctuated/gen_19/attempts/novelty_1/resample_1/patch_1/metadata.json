@@ -1,0 +1,15 @@
+{
+  "generation": 19,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "conservative_injury_memory",
+  "patch_description": "Add a small evidence-weighted conservative rescue credit that activates only when observable stress/injury is present and conservative mutation has accumulated a success margin over cloning. This shifts injury-world choices toward the already-beneficial conservative operator without raising exploratory or structural tails, while the stable lock suppresses the credit in uninjured worlds.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T08:26:26.632070",
+  "llm_cost": 0.194235,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_19/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

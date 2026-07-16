@@ -1,0 +1,40 @@
+<NAME>
+conservative_injury_memory
+</NAME>
+<DESCRIPTION>
+Add a small evidence-weighted conservative rescue credit that activates only when observable stress/injury is present and conservative mutation has accumulated a success margin over cloning. This shifts injury-world choices toward the already-beneficial conservative operator without raising exploratory or structural tails, while the stable lock suppresses the credit in uninjured worlds.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    conservative_fatigue = jnp.clip(evidence[1] * usage[1] * (0.42 - success[1]), 0.0, 1.0)
+    stable_mutation_debt = jnp.clip(stable_world * (1.0 - injury_rescue) * (0.34 + 0.66 * conservative_fatigue), 0.0, 1.0)
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * (0.08 + 0.92 * clone_bad) * (1.0 - 0.88 * stable_world) * (0.28 + 0.72 * stress_core), 0.0, 1.0)
+=======
+    conservative_fatigue = jnp.clip(evidence[1] * usage[1] * (0.42 - success[1]), 0.0, 1.0)
+    conservative_rescue_memory = jnp.clip(
+        reproduction_ready
+        * (0.50 * injury_rescue + 0.30 * decline + 0.20 * death)
+        * (0.28 + 0.72 * conservative_edge)
+        * (0.24 + 0.76 * jnp.clip(success[1] - success[0] + 0.06, 0.0, 1.0))
+        * (0.22 + 0.78 * evidence_gate[1])
+        * (1.0 - 0.86 * stable_world)
+        * (1.0 - 0.44 * low_alive),
+        0.0,
+        1.0,
+    )
+    stable_mutation_debt = jnp.clip(stable_world * (1.0 - injury_rescue) * (0.34 + 0.66 * conservative_fatigue), 0.0, 1.0)
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * (0.08 + 0.92 * clone_bad) * (1.0 - 0.88 * stable_world) * (0.28 + 0.72 * stress_core), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    conservative_gate = jnp.clip((0.42 * renewal_param + 0.08 * injury_rescue * conservative_edge + 0.30 * stable_escape + 0.06 * fragile_lock * conservative_edge) * (1.0 - 0.66 * stable_mutation_debt), 0.0, 1.0)
+=======
+    conservative_gate = jnp.clip((0.38 * renewal_param + 0.42 * conservative_rescue_memory + 0.06 * injury_rescue * conservative_edge + 0.26 * stable_escape + 0.06 * fragile_lock * conservative_edge) * (1.0 - 0.66 * stable_mutation_debt), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.82 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.58 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+=======
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.38 * renewal_param - 0.34 * conservative_rescue_memory - 1.08 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.82 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.52 * conservative_gate + 0.36 * conservative_rescue_memory + 0.03 * injury_rescue + 0.08 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+>>>>>>> REPLACE
+</DIFF>

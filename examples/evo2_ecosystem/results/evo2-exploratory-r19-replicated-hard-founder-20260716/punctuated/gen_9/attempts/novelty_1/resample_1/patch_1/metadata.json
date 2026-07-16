@@ -1,0 +1,15 @@
+{
+  "generation": 9,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_probe_credit",
+  "patch_description": "Add a bounded injury-only probe credit for standard parametric mutation when population decline/death and intake or energy gaps are visible, while suppressing it in stable worlds. This gives the scheduler a small route to gather standard-mutation evidence after injury even when prior evidence is absent, without raising stable-world mutation pressure.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T06:25:06.008754",
+  "llm_cost": 0.18466,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_9/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

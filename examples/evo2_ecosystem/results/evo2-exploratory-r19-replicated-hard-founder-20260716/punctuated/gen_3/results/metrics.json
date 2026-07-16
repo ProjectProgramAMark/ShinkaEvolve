@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "fa62f407e0c50349717f390371d42bee4065bb5608f36aa41731ebe0afdc7149",
+        "error_type": "CandidateValidationError",
+        "error_message": "unknown name: rare_repair_gate",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: CandidateValidationError: unknown name: rare_repair_gate"
+}

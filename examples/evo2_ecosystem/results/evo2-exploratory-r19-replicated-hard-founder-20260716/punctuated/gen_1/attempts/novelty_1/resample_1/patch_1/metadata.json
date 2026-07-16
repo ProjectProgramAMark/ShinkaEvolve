@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "injury_weighted_conservative_repair",
+  "patch_description": "Shift the policy head away from low-evidence standard mutation and toward conservative repair when observable stress, clone underperformance, and accumulated conservative success agree. The edit keeps stable conditions clone-heavy, but lets proven conservative mutations expand under injury pressure. Standard, exploratory, structural, and mixed choices remain tightly bounded and require stress plus operator evidence or unused-trial pressure, reducing stable-world cost and tail risk.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T05:15:55.396327",
+  "llm_cost": 0.263335,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_1/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

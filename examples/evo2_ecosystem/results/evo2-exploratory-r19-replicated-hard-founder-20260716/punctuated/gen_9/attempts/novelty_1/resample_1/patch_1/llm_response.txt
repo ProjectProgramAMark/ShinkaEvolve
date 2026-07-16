@@ -1,0 +1,45 @@
+<NAME>
+injury_probe_credit
+</NAME>
+<DESCRIPTION>
+Add a bounded injury-only probe credit for standard parametric mutation when population decline/death and intake or energy gaps are visible, while suppressing it in stable worlds. This gives the scheduler a small route to gather standard-mutation evidence after injury even when prior evidence is absent, without raising stable-world mutation pressure.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * (0.08 + 0.92 * clone_bad) * (1.0 - 0.88 * stable_world) * (0.28 + 0.72 * stress_core), 0.0, 1.0)
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]), 0.0, 1.0)
+=======
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * (0.08 + 0.92 * clone_bad) * (1.0 - 0.88 * stable_world) * (0.28 + 0.72 * stress_core), 0.0, 1.0)
+    injury_probe_credit = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * (0.42 * decline + 0.34 * death + 0.24 * jnp.clip(intake_gap + energy_gap, 0.0, 1.0))
+        * (0.30 + 0.70 * stress_core)
+        * (0.18 + 0.82 * jnp.clip(success[2] - success[0] + 0.08, 0.0, 1.0))
+        * (1.0 - 0.90 * stable_world)
+        * (1.0 - 0.60 * low_alive),
+        0.0,
+        1.0,
+    )
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_gate = jnp.clip(
+        (0.18 * probe_world * (0.30 + 0.48 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit + 0.24 * stress_probe_credit + 0.68 * stress_probe_gate + 1.18 * standard_trial_gate)
+        * (0.35 + 0.65 * reproduction_ready)
+=======
+    standard_gate = jnp.clip(
+        (0.16 * probe_world * (0.30 + 0.48 * utility[2]) + 0.58 * rescue_param + 0.22 * standard_rescue_credit + 0.20 * stress_probe_credit + 0.86 * injury_probe_credit + 0.60 * stress_probe_gate + 1.08 * standard_trial_gate)
+        * (0.35 + 0.65 * reproduction_ready)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.82 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+=======
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.32 * stress_probe_credit - 0.50 * injury_probe_credit - 0.52 * stress_probe_gate - 0.78 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.08 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.46 * standard_trial_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+=======
+            2.96 * standard_gate + 0.86 * rescue_param + 0.34 * standard_rescue_credit + 0.92 * stress_probe_credit + 1.18 * injury_probe_credit + 0.82 * stress_probe_gate + 1.34 * standard_trial_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

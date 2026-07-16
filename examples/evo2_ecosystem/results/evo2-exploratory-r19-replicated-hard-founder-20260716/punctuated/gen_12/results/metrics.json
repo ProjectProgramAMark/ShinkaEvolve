@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "a9c075f6abaa306c8c2a5e4fb93d59650cc037169b1dfe67c0a12ad524b32ef5",
+        "error_type": "CandidateValidationError",
+        "error_message": "unknown name: quiet_bias",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: CandidateValidationError: unknown name: quiet_bias"
+}

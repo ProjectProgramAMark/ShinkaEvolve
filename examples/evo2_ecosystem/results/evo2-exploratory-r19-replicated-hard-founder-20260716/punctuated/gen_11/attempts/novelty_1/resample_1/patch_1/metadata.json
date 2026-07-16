@@ -1,0 +1,15 @@
+{
+  "generation": 11,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "stress_evidence_probe",
+  "patch_description": "Adds a small standard-parametric repair probe that only rises under observable injury/stress, reproductive readiness, low stable-world signal, clone underperformance, and conservative evidence. It also slightly lowers clone pressure and raises standard pressure only through that probe, aiming to recover injury benefit while keeping ordinary-world mutation cost low.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T06:51:38.476503",
+  "llm_cost": 0.18947,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_11/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

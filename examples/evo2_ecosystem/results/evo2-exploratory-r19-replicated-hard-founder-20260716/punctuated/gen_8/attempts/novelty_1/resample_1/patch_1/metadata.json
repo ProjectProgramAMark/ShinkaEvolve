@@ -1,0 +1,15 @@
+{
+  "generation": 8,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "injury_standard_rescue_probe",
+  "patch_description": "Add a narrow injury-only standard probe driven by observable intake/energy stress, clone underperformance, and lack of standard evidence. This should raise standard parametric trials after ecological injury even when population death/decline lag the injury signal, while staying suppressed in stable worlds. The probe also trims clone logits only in that same injured context, so uninjured sham cost should remain limited and standard evidence can accumulate instead of leaving behavior almost frozen.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T06:11:38.866327",
+  "llm_cost": 0.15883,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_8/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

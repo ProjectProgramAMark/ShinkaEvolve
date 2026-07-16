@@ -1,0 +1,57 @@
+<NAME>
+injury_conservative_patch
+</NAME>
+<DESCRIPTION>
+Add a narrow evidence-weighted conservative repair pulse that only activates under observable decline/death/intake stress, and mostly shuts off in stable worlds. This keeps the current low-cost conservative behavior that produced strong sham gain, but gives the scheduler a clearer post-injury response using the one operator with real accumulated success evidence. The standard/exploratory/structural tails stay suppressed, reducing founder-tail risk.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    rare_repair_gate = jnp.clip(
+        repair_need
+        * unused[3]
+        * unused[4]
+        * compact
+        * injury_rescue
+        * (1.0 - 0.84 * stable_lock),
+        0.0,
+        1.0,
+    )
+    anchor = jnp.array([4.18, -0.86, -4.88, -6.85, -6.95, -6.72], dtype=jnp.float32)
+=======
+    rare_repair_gate = jnp.clip(
+        repair_need
+        * unused[3]
+        * unused[4]
+        * compact
+        * injury_rescue
+        * (1.0 - 0.84 * stable_lock),
+        0.0,
+        1.0,
+    )
+    injury_conservative_patch = jnp.clip(
+        injury_rescue
+        * reproduction_ready
+        * (0.36 + 0.64 * stress_core)
+        * (0.32 + 0.68 * conservative_proof)
+        * (0.40 + 0.60 * evidence_gate[1])
+        * (1.0 - 0.88 * stable_world)
+        * (1.0 - 0.56 * low_alive),
+        0.0,
+        1.0,
+    )
+    anchor = jnp.array([4.18, -0.86, -4.88, -6.85, -6.95, -6.72], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    pulse = jnp.array(
+        [
+            -1.30 * local_repair - 0.48 * trial_repair - 0.22 * rescue_param - 0.18 * stable_escape + 0.48 * fragile_lock + 1.08 * stable_mutation_debt,
+            2.38 * conservative_repair_gate + 1.06 * local_repair + 0.20 * stable_escape + 0.10 * injury_rescue - 1.18 * stable_mutation_debt - 0.66 * conservative_fatigue,
+            1.42 * standard_repair_gate + 0.62 * trial_repair + 0.12 * rescue_param - 0.24 * quiet_bias - 0.88 * stable_lock - 0.64 * fragile_lock,
+=======
+    pulse = jnp.array(
+        [
+            -1.30 * local_repair - 0.48 * trial_repair - 0.22 * rescue_param - 0.18 * stable_escape - 0.30 * injury_conservative_patch + 0.48 * fragile_lock + 1.08 * stable_mutation_debt,
+            2.38 * conservative_repair_gate + 1.06 * local_repair + 0.20 * stable_escape + 0.10 * injury_rescue + 0.78 * injury_conservative_patch - 1.18 * stable_mutation_debt - 0.66 * conservative_fatigue,
+            1.42 * standard_repair_gate + 0.62 * trial_repair + 0.12 * rescue_param - 0.24 * quiet_bias - 0.88 * stable_lock - 0.64 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

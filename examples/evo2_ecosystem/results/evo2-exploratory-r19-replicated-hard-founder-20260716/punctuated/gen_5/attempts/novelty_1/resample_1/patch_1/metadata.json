@@ -1,0 +1,15 @@
+{
+  "generation": 5,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "evidence_bridge_conservative_rescue",
+  "patch_description": "Use the observed evidence pattern more conservatively: clone has substantial evidence and mediocre success, conservative has low but better success, while standard has essentially no evidence. The edit shifts injury/stress rescue pressure first into conservative parametric mutation and makes standard mutation earn its way in through either accumulated evidence or clear conservative fatigue. This should preserve the small non-clone benefit after injury while reducing stable-world and founder-tail cost from premature standard trials.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T05:31:35.492155",
+  "llm_cost": 0.194135,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_5/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

@@ -1,0 +1,52 @@
+<NAME>
+injury_conservative_rescue
+</NAME>
+<DESCRIPTION>
+Shift the injury response toward the only non-clone operator with observed evidence and realized benefit: conservative parametric mutation. The current program opens a standard-mutation window despite zero standard evidence/usage, which improves sham slightly but worsens shock. This edit keeps stable-world mutation suppressed, strengthens conservative credit under observed decline/death/intake stress, and trims unproven standard injury probing so post-injury adaptation follows accumulated operator success/evidence instead of speculative exploration.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    conservative_rescue_credit = jnp.clip(
+        reproduction_ready
+        * (0.46 * injury_rescue + 0.24 * decline + 0.18 * death + 0.12 * jnp.clip(intake_gap + energy_gap, 0.0, 1.0))
+        * (0.24 + 0.76 * conservative_edge)
+        * (0.28 + 0.72 * evidence_gate[1])
+        * (0.32 + 0.68 * jnp.clip(success[1] - success[0] + 0.08, 0.0, 1.0))
+        * (1.0 - 0.84 * stable_world)
+        * (1.0 - 0.48 * low_alive),
+        0.0,
+        1.0,
+    )
+=======
+    conservative_rescue_credit = jnp.clip(
+        reproduction_ready
+        * (0.54 * injury_rescue + 0.28 * decline + 0.22 * death + 0.18 * jnp.clip(intake_gap + energy_gap, 0.0, 1.0))
+        * (0.20 + 0.80 * conservative_edge)
+        * (0.24 + 0.76 * evidence_gate[1])
+        * (0.24 + 0.76 * jnp.clip(success[1] - success[0] + 0.08, 0.0, 1.0))
+        * (1.0 - 0.90 * stable_world)
+        * (1.0 - 0.42 * low_alive),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]) + 0.42 * injury_standard_window, 0.0, 1.0)
+=======
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.18 * unused[2] + 0.82 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]) + 0.18 * injury_standard_window, 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    conservative_gate = jnp.clip((0.40 * renewal_param + 0.34 * conservative_rescue_credit + 0.06 * injury_rescue * conservative_edge + 0.26 * stable_escape + 0.06 * fragile_lock * conservative_edge) * (1.0 - 0.66 * stable_mutation_debt), 0.0, 1.0)
+=======
+    conservative_gate = jnp.clip((0.38 * renewal_param + 0.54 * conservative_rescue_credit + 0.10 * injury_rescue * conservative_edge + 0.24 * stable_escape + 0.06 * fragile_lock * conservative_edge) * (1.0 - 0.70 * stable_mutation_debt), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.02 * standard_gate - 0.46 * mixed_gate - 0.38 * renewal_param - 0.92 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.22 * stress_probe_credit - 0.22 * injury_probe_credit - 0.42 * stress_probe_gate - 0.62 * standard_trial_gate - 0.86 * injury_standard_window - 0.72 * conservative_rescue_credit + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.62 * conservative_gate + 0.18 * conservative_rescue_credit + 0.03 * injury_rescue + 0.08 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            2.74 * standard_gate + 0.74 * rescue_param + 0.28 * standard_rescue_credit + 0.64 * stress_probe_credit + 0.50 * injury_probe_credit + 0.66 * stress_probe_gate + 1.06 * standard_trial_gate + 1.58 * injury_standard_window - 0.76 * stable_lock - 0.58 * fragile_lock,
+=======
+            -0.88 * standard_gate - 0.46 * mixed_gate - 0.34 * renewal_param - 0.86 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.18 * stress_probe_credit - 0.16 * injury_probe_credit - 0.32 * stress_probe_gate - 0.48 * standard_trial_gate - 0.30 * injury_standard_window - 0.96 * conservative_rescue_credit + 0.42 * fragile_lock + 1.02 * stable_mutation_debt,
+            1.76 * conservative_gate + 0.42 * conservative_rescue_credit + 0.05 * injury_rescue + 0.08 * stable_escape + 0.18 * fragile_lock - 1.28 * stable_mutation_debt - 0.48 * conservative_fatigue,
+            2.42 * standard_gate + 0.60 * rescue_param + 0.22 * standard_rescue_credit + 0.42 * stress_probe_credit + 0.28 * injury_probe_credit + 0.46 * stress_probe_gate + 0.76 * standard_trial_gate + 0.54 * injury_standard_window - 0.76 * stable_lock - 0.58 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

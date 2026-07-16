@@ -1,0 +1,15 @@
+{
+  "generation": 18,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "injury_conservative_patch",
+  "patch_description": "Add a narrow evidence-weighted conservative repair pulse that only activates under observable decline/death/intake stress, and mostly shuts off in stable worlds. This keeps the current low-cost conservative behavior that produced strong sham gain, but gives the scheduler a clearer post-injury response using the one operator with real accumulated success evidence. The standard/exploratory/structural tails stay suppressed, reducing founder-tail risk.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T08:13:05.121608",
+  "llm_cost": 0.19127,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_18/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

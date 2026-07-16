@@ -1,0 +1,15 @@
+{
+  "generation": 15,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_conservative_rescue",
+  "patch_description": "Shift the injury response toward the only non-clone operator with observed evidence and realized benefit: conservative parametric mutation. The current program opens a standard-mutation window despite zero standard evidence/usage, which improves sham slightly but worsens shock. This edit keeps stable-world mutation suppressed, strengthens conservative credit under observed decline/death/intake stress, and trims unproven standard injury probing so post-injury adaptation follows accumulated operator success/evidence instead of speculative exploration.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T07:32:40.730091",
+  "llm_cost": 0.205535,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_15/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

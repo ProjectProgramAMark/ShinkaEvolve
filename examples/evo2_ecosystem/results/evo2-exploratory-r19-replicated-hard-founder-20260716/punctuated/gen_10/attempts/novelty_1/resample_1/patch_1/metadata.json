@@ -1,0 +1,15 @@
+{
+  "generation": 10,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "injury_conservative_retention",
+  "patch_description": "Shift the injury response toward the only non-clone operator that has accumulated real evidence in these runs: conservative parametric mutation. The current scheduler tries to open standard mutation during injury despite zero standard evidence and realized zero standard offspring, which worsened shock delta. This edit adds an evidence-aware conservative rescue credit from observable decline, death, intake/energy stress, and conservative success over clone, then routes part of injury pressure into conservative logits while trimming the unevidenced standard injury pulse. Stable-world behavior remains guarded by stable_lock and stable_mutation_debt, so the sham world should retain the low mutation cost profile.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T06:38:27.357671",
+  "llm_cost": 0.13192,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_10/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

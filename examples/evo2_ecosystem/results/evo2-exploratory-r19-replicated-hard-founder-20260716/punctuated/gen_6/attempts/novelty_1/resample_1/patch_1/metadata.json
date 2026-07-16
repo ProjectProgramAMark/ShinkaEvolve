@@ -1,0 +1,15 @@
+{
+  "generation": 6,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "stress_limited_standard_probe",
+  "patch_description": "Add a small injury/stress-only standard-parametric trial path that is suppressed in quiet worlds and tied to observed clone weakness plus conservative evidence. The current scheduler gets a useful sham gain from conservative mutation but realizes no standard mutations, so it cannot learn whether broader parametric repair helps after persistent injury. This edit slightly raises standard only when repair_need is high, clone performance is weak, the parent can reproduce, and the world is not stable; it also trims clone probability in that same condition while leaving stable-world conservative behavior mostly intact.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T05:44:50.393297",
+  "llm_cost": 0.19077,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_6/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

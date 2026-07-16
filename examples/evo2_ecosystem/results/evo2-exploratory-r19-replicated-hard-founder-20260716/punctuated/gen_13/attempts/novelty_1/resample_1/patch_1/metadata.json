@@ -1,0 +1,15 @@
+{
+  "generation": 13,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_standard_window",
+  "patch_description": "Add a narrow standard-parametric rescue window that only opens under observable ecological stress, when standard mutation is unused and plausibly better than cloning. This should raise non-clone exploration after injury while keeping stable-world behavior close to the frozen-clone baseline. The change is intentionally bounded and evidence-aware: it uses the correct operator_stats row ABI, boosts standard only when decline/death/intake-energy stress are present, and damps the window in stable or low-alive founder-tail states.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T07:05:36.408295",
+  "llm_cost": 0.192815,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r19-replicated-hard-founder-20260716/punctuated/gen_13/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}
