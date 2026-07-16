@@ -1,0 +1,15 @@
+{
+  "generation": 4,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "stress_only_standard_probe",
+  "patch_description": "Add a narrow, ecology-conditioned standard-mutation probe that activates only under stress with reproduction capacity and low stable-world signal. The current scheduler almost never samples standard mutation, so it cannot recover the known injury upside. This keeps stable-world clone protection intact while giving the system a small path to collect evidence and exploit standard mutation when decline/death/intake stress indicate injury-like conditions.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:35:56.276049",
+  "llm_cost": 0.169865,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_4/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

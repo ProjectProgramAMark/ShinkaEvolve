@@ -1,0 +1,23 @@
+<NAME>
+evidence_escrow_rescue
+</NAME>
+<DESCRIPTION>
+Reduce the zero-evidence standard-mutation prior back toward a cautious rescue-only role, and make stress probing depend on actual clone weakness plus reproductive readiness. The current program gives standard mutation a small stress-probe subsidy even with no standard evidence, but the observed run still selects almost no standard mutation while paying a slightly worse paired delta. This edit keeps the stable-world clone bias, modestly restores the conservative channel as the safer learned alternative, and prevents broad fixed standard exploration unless stress, clone underperformance, and exploitation capacity coincide.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    prior = jnp.array([0.42, 0.44, 0.38, 0.14, 0.12, 0.20], dtype=jnp.float32)
+=======
+    prior = jnp.array([0.42, 0.46, 0.30, 0.14, 0.12, 0.20], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.22 * clone_bad + 0.58 * evidence_margin[2] + 0.18 * unused[2] * stress_opportunity, 0.0, 1.0)
+=======
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.20 * clone_bad + 0.58 * evidence_margin[2] + 0.08 * unused[2] * stress_opportunity * clone_bad, 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * (1.0 - 0.72 * stable_world) * (0.46 + 0.54 * clone_bad), 0.0, 1.0)
+=======
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * clone_bad * (1.0 - 0.82 * stable_world), 0.0, 1.0)
+>>>>>>> REPLACE
+</DIFF>

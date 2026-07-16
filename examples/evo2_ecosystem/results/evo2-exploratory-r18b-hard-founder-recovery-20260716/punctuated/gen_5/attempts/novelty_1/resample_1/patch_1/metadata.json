@@ -1,0 +1,15 @@
+{
+  "generation": 5,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_only_standard_probe",
+  "patch_description": "Add a narrow standard-mutation pulse that only opens when the ecology shows observable injury-like stress: falling population, elevated death, intake or energy deficit, and enough reproductive capacity to absorb mutation. The pulse is explicitly suppressed by stable_world/stable_lock and low_alive, so it should avoid paying the stable-world sham cost that previous broader standard boosts incurred. It also depends on unused standard-operator capacity plus clone underperformance evidence, so it adapts from accumulated operator summaries instead of hard-coding a fixed non-clone rate.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T04:32:20.218973",
+  "llm_cost": 0.193005,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18b-hard-founder-recovery-20260716/punctuated/gen_5/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "stress_readiness_scheduler",
+  "patch_description": "Reduce stable-world mutation cost by making clone the high-confidence default unless stress, parent vigor, and operator evidence align. Conservative mutation is converted from a broad renewal mode into a narrow clone-escape mode, while standard mutation gets the main injury-rescue path only when ecological stress is present and reproduction readiness suggests variation can be exploited.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:11:56.655381",
+  "llm_cost": 0.24715,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_1/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

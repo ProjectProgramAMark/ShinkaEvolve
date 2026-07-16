@@ -1,0 +1,193 @@
+import jax.numpy as jnp
+
+
+# EVOLVE-BLOCK-START
+def make_offspring(
+    parent_genome_summary,
+    parent_stats,
+    population_stats,
+    operator_stats,
+    rng,
+):
+    """Stress-budget bandit scheduler for six heredity actions."""
+    success = operator_stats[0]
+    usage = operator_stats[1]
+    evidence = operator_stats[2]
+    node_fraction = parent_genome_summary[0]
+    connection_fraction = parent_genome_summary[1]
+    energy_fraction = parent_stats[0]
+    intake_ema = parent_stats[1]
+    age_fraction = parent_stats[2]
+    alive_fraction = population_stats[0]
+    mean_energy_fraction = population_stats[1]
+    population_change_ema = population_stats[2]
+    birth_rate_ema = population_stats[3]
+    death_rate_ema = population_stats[4]
+    mean_intake_ema = population_stats[5]
+    decline = jnp.clip(-population_change_ema, 0.0, 1.0)
+    growth = jnp.clip(population_change_ema, 0.0, 1.0)
+    death = jnp.clip(death_rate_ema, 0.0, 1.0)
+    sparse = jnp.clip(1.0 - alive_fraction, 0.0, 1.0)
+    energy_short = jnp.clip(0.55 - mean_energy_fraction, 0.0, 1.0)
+    intake_short = jnp.clip(0.54 - mean_intake_ema, 0.0, 1.0)
+    birth_short = jnp.clip(0.28 - birth_rate_ema, 0.0, 1.0)
+    parent_power = jnp.clip(
+        0.52 * energy_fraction + 0.34 * intake_ema + 0.14 * (1.0 - age_fraction),
+        0.0,
+        1.0,
+    )
+    compact = jnp.clip(1.0 - 0.50 * node_fraction - 0.50 * connection_fraction, 0.0, 1.0)
+    leverage = jnp.clip(
+        parent_power
+        * (0.45 + 0.55 * energy_fraction)
+        * (0.45 + 0.55 * intake_ema)
+        * (0.58 + 0.42 * compact),
+        0.0,
+        1.0,
+    )
+    fast_stress = jnp.clip(0.82 * decline + 0.72 * death + 0.34 * sparse, 0.0, 1.0)
+    resource_stress = jnp.clip(0.44 * intake_short + 0.34 * energy_short + 0.20 * birth_short, 0.0, 1.0)
+    stress = jnp.clip(
+        fast_stress * (0.44 + 0.56 * resource_stress) + 0.16 * sparse * resource_stress,
+        0.0,
+        1.0,
+    )
+    stable = jnp.clip(
+        alive_fraction
+        * (1.0 - decline)
+        * (1.0 - death)
+        * (0.62 + 0.38 * mean_energy_fraction)
+        * (0.62 + 0.38 * mean_intake_ema),
+        0.0,
+        1.0,
+    )
+    no_spend = jnp.clip(stable * (1.0 - 0.88 * stress) * (0.82 + 0.18 * growth), 0.0, 1.0)
+    fragile = jnp.clip(stable * (1.0 - parent_power) * (0.48 + 0.52 * (1.0 - compact)), 0.0, 1.0)
+    prior = jnp.array([0.38, 0.46, 0.33, 0.12, 0.10, 0.18], dtype=jnp.float32)
+    estimate = jnp.clip(evidence * success + (1.0 - evidence) * prior, 0.0, 1.0)
+    trust = jnp.clip(0.10 + 0.90 * evidence, 0.0, 1.0)
+    novelty = jnp.clip((1.0 - usage) * (1.0 - 0.62 * evidence), 0.0, 1.0)
+    clone_failure = jnp.clip(evidence[0] * (0.39 - success[0]) + usage[0] * evidence[0] * 0.10, 0.0, 1.0)
+    conservative_proven = jnp.clip((estimate[1] - estimate[0] + 0.03) * trust[1] + 0.24 * clone_failure, 0.0, 1.0)
+    standard_proven = jnp.clip((estimate[2] - estimate[0] + 0.04) * trust[2] + 0.30 * clone_failure, 0.0, 1.0)
+    mixed_proven = jnp.clip((estimate[5] - estimate[0] + 0.02) * trust[5] + 0.12 * clone_failure, 0.0, 1.0)
+    conservative_fatigue = jnp.clip(usage[1] * evidence[1] * (0.45 - success[1]), 0.0, 1.0)
+    standard_fatigue = jnp.clip(usage[2] * evidence[2] * (0.43 - success[2]), 0.0, 1.0)
+    rescue_budget = jnp.clip(
+        stress
+        * leverage
+        * (0.18 + 0.82 * clone_failure + 0.26 * novelty[2])
+        * (1.0 - 0.78 * no_spend)
+        * (1.0 - 0.55 * fragile),
+        0.0,
+        1.0,
+    )
+    renewal_budget = jnp.clip(
+        stable
+        * leverage
+        * conservative_proven
+        * (0.16 + 0.84 * clone_failure)
+        * (1.0 - 0.86 * stress)
+        * (1.0 - 0.70 * conservative_fatigue)
+        * (1.0 - 0.58 * fragile),
+        0.0,
+        1.0,
+    )
+    probe_budget = jnp.clip(
+        stress
+        * leverage
+        * novelty
+        * (0.35 + 0.65 * clone_failure)
+        * (1.0 - 0.92 * no_spend),
+        0.0,
+        1.0,
+    )
+    mutation_tax = jnp.clip(no_spend * (0.80 + 0.20 * growth) + 0.55 * fragile, 0.0, 1.0)
+    relief_window = jnp.clip(
+        stress
+        * leverage
+        * (0.20 + 0.80 * clone_failure)
+        * (0.40 + 0.60 * novelty[2])
+        * (1.0 - 0.92 * no_spend)
+        * (1.0 - 0.62 * fragile),
+        0.0,
+        1.0,
+    )
+    conservative_bridge = jnp.clip(
+        relief_window
+        * (0.36 + 0.64 * novelty[1])
+        * (0.56 + 0.44 * compact)
+        * (1.0 - 0.60 * conservative_fatigue),
+        0.0,
+        1.0,
+    )
+    standard_bridge = jnp.clip(
+        relief_window
+        * (0.46 + 0.54 * standard_proven)
+        * (0.72 + 0.28 * compact)
+        * (1.0 - 0.70 * standard_fatigue),
+        0.0,
+        1.0,
+    )
+    clone_logit = (
+        4.55
+        + 1.35 * no_spend
+        + 0.72 * fragile
+        + 0.24 * growth
+        - 2.55 * rescue_budget
+        - 0.58 * renewal_budget
+        - 1.55 * relief_window
+        - 0.82 * clone_failure * stress
+    )
+    conservative_logit = (
+        -2.05
+        + 2.25 * renewal_budget
+        + 1.85 * conservative_bridge
+        + 0.38 * stress * conservative_proven
+        + 0.30 * fragile * conservative_proven
+        - 1.70 * mutation_tax
+        - 0.72 * conservative_fatigue
+    )
+    standard_logit = (
+        -4.10
+        + 4.85 * rescue_budget * (0.42 + 0.58 * standard_proven)
+        + 3.25 * standard_bridge
+        + 0.92 * stress * leverage * novelty[2] * clone_failure
+        - 1.95 * no_spend
+        - 1.10 * fragile
+        - 0.68 * standard_fatigue
+    )
+    exploratory_logit = (
+        -6.55
+        + 0.95 * probe_budget[3] * compact
+        + 0.42 * rescue_budget * novelty[3]
+        - 1.20 * no_spend
+        - 0.70 * fragile
+    )
+    structural_logit = (
+        -6.75
+        + 0.70 * probe_budget[4] * compact
+        + 0.24 * rescue_budget * novelty[4]
+        - 1.20 * no_spend
+        - 0.75 * fragile
+    )
+    mixed_logit = (
+        -6.35
+        + 1.25 * rescue_budget * mixed_proven * compact
+        + 0.62 * probe_budget[5] * compact
+        - 1.35 * no_spend
+        - 0.78 * fragile
+    )
+    logits = jnp.array(
+        [
+            clone_logit,
+            conservative_logit,
+            standard_logit,
+            exploratory_logit,
+            structural_logit,
+            mixed_logit,
+        ],
+        dtype=jnp.float32,
+    )
+    return jnp.clip(logits, -7.0, 7.0)
+# EVOLVE-BLOCK-END

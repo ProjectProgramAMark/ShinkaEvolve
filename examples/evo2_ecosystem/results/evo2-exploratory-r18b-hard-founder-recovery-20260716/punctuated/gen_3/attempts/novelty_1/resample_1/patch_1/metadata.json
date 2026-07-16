@@ -1,0 +1,15 @@
+{
+  "generation": 3,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_only_standard_probe",
+  "patch_description": "Add a narrow standard-mutation probe that activates only under observable ecological stress: decline or death with intake/energy scarcity, reproductive readiness, a vigorous parent, low stable-world confidence, and no severe founder-tail collapse. The current scheduler preserves sham performance but almost never samples standard mutation, leaving shock recovery negative. This edit increases standard logits only through this stress-gated path while subtracting clone pressure in the same ecological window, so stable sham worlds remain clone/conservative dominated.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T04:20:14.915707",
+  "llm_cost": 0.159352,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18b-hard-founder-recovery-20260716/punctuated/gen_3/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

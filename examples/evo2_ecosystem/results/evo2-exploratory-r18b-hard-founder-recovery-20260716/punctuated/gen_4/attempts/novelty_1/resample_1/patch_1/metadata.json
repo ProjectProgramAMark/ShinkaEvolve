@@ -1,0 +1,15 @@
+{
+  "generation": 4,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "scarcity_limited_standard_probe",
+  "patch_description": "Keep the shock-recovery idea, but make the added standard-mutation probe much more scarcity-conditioned. The current recovery probe fires from clone weakness plus mild stress and appears to buy shock stability at the cost of sham AUC and survival. This edit requires simultaneous population decline/death, intake or energy shortage, non-collapsed alive fraction, low stable-world confidence, and either little standard evidence or standard evidence that is not worse than clone. It also reduces the direct logit pulse from this probe so standard mutation remains a measured injury response instead of a stable-world tax.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T04:26:21.653666",
+  "llm_cost": 0.195395,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18b-hard-founder-recovery-20260716/punctuated/gen_4/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

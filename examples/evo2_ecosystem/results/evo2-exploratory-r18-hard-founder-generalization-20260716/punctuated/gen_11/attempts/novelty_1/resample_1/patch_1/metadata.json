@@ -1,0 +1,15 @@
+{
+  "generation": 11,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 5,
+  "patch_name": "stable_rescue_split",
+  "patch_description": "Separate genuine injury-rescue opportunity from ordinary stable renewal. The current scheduler still spends about 1.5% on conservative mutation and pays a sham cost while standard mutation is effectively never selected. This edit adds a compact rescue-specific gate that requires stress, injury signal, low stable-world confidence, and reproductive readiness. Stable worlds get a stronger clone lock and less conservative renewal pressure; standard mutation receives a narrow rescue-only pulse so the policy can keep injury upside without broad fixed mutation.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:19:31.470551",
+  "llm_cost": 0.207325,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_11/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

@@ -1,0 +1,8 @@
+{
+  "failed_utc": "2026-07-16T04:00:52Z",
+  "reason": "Persistent service startup failed before runner construction because npx was absent from the noninteractive PATH.",
+  "candidate_proposals": 0,
+  "ecosystem_evaluations": 0,
+  "recovery_run_id": "evo2-exploratory-r18b-hard-founder-recovery-20260716",
+  "schema_version": 1
+}

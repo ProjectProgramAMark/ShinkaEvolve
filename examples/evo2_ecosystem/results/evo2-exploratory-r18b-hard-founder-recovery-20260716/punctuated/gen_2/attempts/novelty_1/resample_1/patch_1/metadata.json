@@ -1,0 +1,15 @@
+{
+  "generation": 2,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_standard_probe",
+  "patch_description": "Add a narrow standard-mutation probe that only opens under observable ecological stress: decline/death pressure, intake or energy shortfall, reproductive readiness, and low stable-world signal. The current scheduler improves sham but still almost never samples standard mutation, so it cannot retain the known injury benefit. This edit gives standard mutation a small evidence-seeking path after injury while adding explicit clone pressure in stable worlds and low-vigor tail states to limit sham cost and founder-tail failures.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T04:14:10.767424",
+  "llm_cost": 0.17536,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18b-hard-founder-recovery-20260716/punctuated/gen_2/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

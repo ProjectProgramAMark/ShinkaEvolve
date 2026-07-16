@@ -1,0 +1,15 @@
+{
+  "generation": 6,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "stress_proven_mutation",
+  "patch_description": "Make conservative mutation pay a larger evidence tax in stable renewal worlds, while preserving stress-triggered standard rescue credit. The current run still spends about 1.5% on conservative mutation with very low conservative evidence, and the observed cost is mostly sham-side. This change separates \"clone is underperforming\" from \"conservative mutation is proven enough to use in stable conditions\": clone weakness can still open injury/stress rescue, but stable-world conservative drift now needs accumulated conservative evidence and success. Standard rescue also regains a narrow stress-probe term so injury worlds can exploit unused standard mutation without raising broad stable mutation.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:47:57.194325",
+  "llm_cost": 0.186735,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_6/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

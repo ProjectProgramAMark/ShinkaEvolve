@@ -1,0 +1,15 @@
+{
+  "generation": 2,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 6,
+  "patch_name": "stress_probe_standard",
+  "patch_description": "Raise only the injury/stress-conditioned path for standard parametric mutation, while leaving stable worlds strongly clone-biased. The current scheduler nearly matches clone and avoids sham cost, but it starves standard mutation of evidence, so it cannot recover the known injury benefit. This edit gives standard mutation a cautious prior and a bounded stress probe that requires injury pressure, reproduction readiness, and non-stable conditions. Clone is reduced only through that same stress opportunity, limiting stable-world mutation cost and founder-tail exposure.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:23:12.814700",
+  "llm_cost": 0.162555,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_2/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

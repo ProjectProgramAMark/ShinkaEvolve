@@ -1,0 +1,15 @@
+{
+  "generation": 7,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "stress_budget_bandit",
+  "patch_description": "This scheduler uses a different budget-based policy: clone is the default reserve, and mutation probability is treated as a scarce ecological \u201cspend\u201d released only when population stress, parent reproductive leverage, and operator evidence agree. Stable worlds accumulate a strong no-spend lock, while post-injury decline can open a narrow standard/conservative rescue channel. Evidence affects both trust and fatigue, so successful underused operators can be tried under stress without broad fixed mutation.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:55:27.046236",
+  "llm_cost": 0.435311,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_7/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

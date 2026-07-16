@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "injury_limited_standard_probe",
+  "patch_description": "Add a narrow standard-mutation trial path that only opens when the observable ecology looks injured rather than merely stable: decline/death stress, noncollapsed alive fraction, viable parent vigor, reproduction readiness, and unused/low-evidence standard operator history. It is explicitly suppressed by stable_world and fragile_lock to avoid sham-world cost and founder-tail failures. The pulse then gives standard mutation a readable rescue boost from this gate while slightly taxing clone only in the same gated injury context.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T04:08:05.182212",
+  "llm_cost": 0.150565,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18b-hard-founder-recovery-20260716/punctuated/gen_1/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

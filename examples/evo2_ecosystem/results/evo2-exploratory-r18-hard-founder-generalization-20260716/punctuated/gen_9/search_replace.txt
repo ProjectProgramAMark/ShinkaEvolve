@@ -1,0 +1,76 @@
+<NAME>
+stress_release_probe
+</NAME>
+<DESCRIPTION>
+Add a narrow stress-release gate that only activates when ecological stress is high, stable-world no-spend pressure is low, the parent has enough reproductive leverage, and clone evidence is accumulating as weak. This keeps sham worlds clone-heavy, but gives standard and conservative parametric mutation a real chance during injury recovery instead of leaving the policy effectively unconditional clone. The release is still bounded by novelty, fatigue, and fragile-parent penalties, so it should avoid broad fixed mutation and founder-tail exposure.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    mutation_tax = jnp.clip(no_spend * (0.80 + 0.20 * growth) + 0.55 * fragile, 0.0, 1.0)
+    clone_logit = (
+        4.55
+        + 1.35 * no_spend
+        + 0.72 * fragile
+        + 0.24 * growth
+        - 2.55 * rescue_budget
+        - 0.58 * renewal_budget
+        - 0.82 * clone_failure * stress
+    )
+    conservative_logit = (
+        -2.05
+        + 2.25 * renewal_budget
+        + 0.38 * stress * conservative_proven
+        + 0.30 * fragile * conservative_proven
+        - 1.95 * mutation_tax
+        - 0.72 * conservative_fatigue
+    )
+    standard_logit = (
+        -4.10
+        + 4.85 * rescue_budget * (0.42 + 0.58 * standard_proven)
+        + 0.92 * stress * leverage * novelty[2] * clone_failure
+        - 2.20 * no_spend
+        - 1.10 * fragile
+        - 0.68 * standard_fatigue
+    )
+=======
+    mutation_tax = jnp.clip(no_spend * (0.80 + 0.20 * growth) + 0.55 * fragile, 0.0, 1.0)
+    stress_release = jnp.clip(
+        stress
+        * leverage
+        * (1.0 - no_spend)
+        * (0.24 + 0.76 * clone_failure)
+        * (0.34 + 0.66 * novelty[2])
+        * (1.0 - 0.62 * fragile),
+        0.0,
+        1.0,
+    )
+    clone_logit = (
+        4.55
+        + 1.35 * no_spend
+        + 0.72 * fragile
+        + 0.24 * growth
+        - 2.55 * rescue_budget
+        - 0.58 * renewal_budget
+        - 2.35 * stress_release
+        - 0.82 * clone_failure * stress
+    )
+    conservative_logit = (
+        -2.05
+        + 2.25 * renewal_budget
+        + 1.35 * stress_release * (0.44 + 0.56 * conservative_proven)
+        + 0.38 * stress * conservative_proven
+        + 0.30 * fragile * conservative_proven
+        - 1.95 * mutation_tax
+        - 0.72 * conservative_fatigue
+    )
+    standard_logit = (
+        -4.10
+        + 4.85 * rescue_budget * (0.42 + 0.58 * standard_proven)
+        + 3.40 * stress_release * (0.46 + 0.54 * standard_proven)
+        + 0.92 * stress * leverage * novelty[2] * clone_failure
+        - 2.20 * no_spend
+        - 1.10 * fragile
+        - 0.68 * standard_fatigue
+    )
+>>>>>>> REPLACE
+</DIFF>

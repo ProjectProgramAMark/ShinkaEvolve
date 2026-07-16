@@ -1,0 +1,15 @@
+{
+  "generation": 9,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "stress_release_probe",
+  "patch_description": "Add a narrow stress-release gate that only activates when ecological stress is high, stable-world no-spend pressure is low, the parent has enough reproductive leverage, and clone evidence is accumulating as weak. This keeps sham worlds clone-heavy, but gives standard and conservative parametric mutation a real chance during injury recovery instead of leaving the policy effectively unconditional clone. The release is still bounded by novelty, fatigue, and fragile-parent penalties, so it should avoid broad fixed mutation and founder-tail exposure.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:07:15.379832",
+  "llm_cost": 0.16942,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_9/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

@@ -1,0 +1,15 @@
+{
+  "generation": 13,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "hard_stress_exploit_gate",
+  "patch_description": "Make the mutation release more event-shaped instead of a broad low-level leak. The current scheduler admits a tiny conservative trickle in otherwise stable conditions, which appears to cost births without producing enough standard mutation to help injury worlds. This change adds a stricter hard-stress gate, a reproduction/exploitation window, and an evidence gate tied to clone underperformance plus operator estimates. It then concentrates release into conservative and standard parametric mutation only when stress, reproductive capacity, and evidence align, while increasing the stable-world clone advantage.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:31:37.713865",
+  "llm_cost": 0.11081,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_13/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

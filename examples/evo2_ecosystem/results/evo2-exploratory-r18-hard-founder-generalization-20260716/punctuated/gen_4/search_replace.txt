@@ -1,0 +1,23 @@
+<NAME>
+stress_only_standard_probe
+</NAME>
+<DESCRIPTION>
+Add a narrow, ecology-conditioned standard-mutation probe that activates only under stress with reproduction capacity and low stable-world signal. The current scheduler almost never samples standard mutation, so it cannot recover the known injury upside. This keeps stable-world clone protection intact while giving the system a small path to collect evidence and exploit standard mutation when decline/death/intake stress indicate injury-like conditions.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * clone_bad * (1.0 - 0.82 * stable_world), 0.0, 1.0)
+=======
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * reproduction_ready * (0.08 + 0.92 * clone_bad) * (1.0 - 0.88 * stable_world) * (0.28 + 0.72 * stress_core), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.66 * stress_probe_credit + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+=======
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.42 * stress_probe_credit + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit + 0.92 * stress_probe_credit - 0.68 * stable_lock - 0.52 * fragile_lock,
+=======
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit + 1.36 * stress_probe_credit - 0.68 * stable_lock - 0.52 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

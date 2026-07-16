@@ -1,0 +1,22 @@
+{
+  "completed_generation_artifacts": [
+    "gen_0",
+    "gen_1",
+    "gen_2",
+    "gen_3",
+    "gen_4",
+    "gen_5",
+    "gen_6",
+    "gen_7",
+    "gen_8",
+    "gen_9",
+    "gen_10",
+    "gen_11",
+    "gen_12",
+    "gen_13"
+  ],
+  "interrupted_utc": "2026-07-16T03:59:57Z",
+  "reason": "The transient process scope ended with its owning Codex turn after generation 13 evaluation artifacts were written and before the outer runner ingested generation 13 or proposed generation 14.",
+  "recovery_run_id": "evo2-exploratory-r18b-hard-founder-recovery-20260716",
+  "schema_version": 1
+}

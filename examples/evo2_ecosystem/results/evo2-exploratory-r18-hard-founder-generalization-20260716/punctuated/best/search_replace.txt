@@ -1,0 +1,43 @@
+<NAME>
+stress_only_standard_probe
+</NAME>
+<DESCRIPTION>
+Add a narrow rescue-only standard mutation pulse that does not depend on prior standard evidence being present. The current scheduler learns conservative mutation, but standard mutation never gets sampled on this panel, so it cannot recover the known injury-side benefit. This edit creates a bounded stress_probe_gate from ecological stress, clone underperformance, unused standard capacity, low stability, and reproduction readiness, then routes it mostly to standard mutation while subtracting from clone. Stable worlds still suppress it through stable_world/stable_lock/fragile_lock, so it should avoid broad fixed mutation and founder-tail damage.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]), 0.0, 1.0)
+=======
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]), 0.0, 1.0)
+    stress_probe_gate = jnp.clip(
+        stress_opportunity
+        * unused[2]
+        * reproduction_ready
+        * (0.16 + 0.84 * clone_bad)
+        * (0.36 + 0.64 * stress_core)
+        * (1.0 - 0.92 * stable_world),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.22 * probe_world * (0.30 + 0.48 * utility[2]) + 0.72 * rescue_param + 0.30 * standard_rescue_credit + 0.34 * stress_probe_credit)
+        * (0.35 + 0.65 * reproduction_ready)
+        * (1.0 - 0.64 * stable_lock)
+        * (1.0 - 0.68 * fragile_lock),
+=======
+        (0.20 * probe_world * (0.30 + 0.48 * utility[2]) + 0.68 * rescue_param + 0.28 * standard_rescue_credit + 0.30 * stress_probe_credit + 0.86 * stress_probe_gate)
+        * (0.35 + 0.65 * reproduction_ready)
+        * (1.0 - 0.68 * stable_lock)
+        * (1.0 - 0.70 * fragile_lock),
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.42 * stress_probe_credit + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+            1.64 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.16 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit + 1.36 * stress_probe_credit - 0.68 * stable_lock - 0.52 * fragile_lock,
+=======
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.42 * stress_probe_credit - 0.72 * stress_probe_gate + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+            1.58 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.16 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit + 1.36 * stress_probe_credit + 1.18 * stress_probe_gate - 0.70 * stable_lock - 0.52 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

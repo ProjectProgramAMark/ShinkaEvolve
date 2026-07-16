@@ -1,0 +1,77 @@
+<NAME>
+injury_only_standard_probe
+</NAME>
+<DESCRIPTION>
+Add a narrow standard-mutation probe that activates only under observable ecological stress: decline or death with intake/energy scarcity, reproductive readiness, a vigorous parent, low stable-world confidence, and no severe founder-tail collapse. The current scheduler preserves sham performance but almost never samples standard mutation, leaving shock recovery negative. This edit increases standard logits only through this stress-gated path while subtracting clone pressure in the same ecological window, so stable sham worlds remain clone/conservative dominated.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    standard_trial_gate = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * parent_vigor
+        * (0.28 + 0.72 * injury_rescue)
+        * (0.34 + 0.66 * stress_core)
+        * (0.22 + 0.78 * jnp.clip(decline + death, 0.0, 1.0))
+        * (1.0 - 0.76 * low_alive)
+        * (1.0 - 0.94 * stable_world),
+        0.0,
+        1.0,
+    )
+=======
+    standard_trial_gate = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * parent_vigor
+        * (0.28 + 0.72 * injury_rescue)
+        * (0.34 + 0.66 * stress_core)
+        * (0.22 + 0.78 * jnp.clip(decline + death, 0.0, 1.0))
+        * (1.0 - 0.76 * low_alive)
+        * (1.0 - 0.94 * stable_world),
+        0.0,
+        1.0,
+    )
+    recovery_probe_gate = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * parent_vigor
+        * (0.30 + 0.70 * jnp.clip(intake_gap + energy_gap, 0.0, 1.0))
+        * (0.26 + 0.74 * jnp.clip(decline + death, 0.0, 1.0))
+        * (0.18 + 0.82 * injury_rescue)
+        * (0.24 + 0.76 * clone_bad)
+        * (1.0 - 0.88 * stable_world)
+        * (1.0 - 0.64 * low_alive),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_gate = jnp.clip(
+        (0.18 * probe_world * (0.30 + 0.48 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit + 0.24 * stress_probe_credit + 0.68 * stress_probe_gate + 1.18 * standard_trial_gate)
+        * (0.35 + 0.65 * reproduction_ready)
+        * (1.0 - 0.68 * stable_lock)
+        * (1.0 - 0.70 * fragile_lock),
+        0.0,
+        1.0,
+    )
+=======
+    standard_gate = jnp.clip(
+        (0.18 * probe_world * (0.30 + 0.48 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit + 0.24 * stress_probe_credit + 0.68 * stress_probe_gate + 1.08 * standard_trial_gate + 0.92 * recovery_probe_gate)
+        * (0.35 + 0.65 * reproduction_ready)
+        * (1.0 - 0.68 * stable_lock)
+        * (1.0 - 0.70 * fragile_lock),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.82 * standard_trial_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+=======
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.76 * standard_trial_gate - 0.62 * recovery_probe_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.08 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.46 * standard_trial_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+=======
+            3.08 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.28 * standard_trial_gate + 1.10 * recovery_probe_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

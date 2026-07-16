@@ -1,0 +1,15 @@
+{
+  "generation": 10,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "injury_locked_evidence_release",
+  "patch_description": "Gate mutation behind a sharper ecological distress window so stable sham worlds return closer to frozen clone, while preserving a small standard/conservative escape path when decline, death, low births, clone underperformance, parent leverage, and operator evidence align. This removes the broad relief push that likely caused the sham cost, makes conservative mutation the first low-risk bridge, and lets standard mutation rise mainly under hard stress with accumulated success/evidence or clone failure.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:13:22.823143",
+  "llm_cost": 0.18815,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_10/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

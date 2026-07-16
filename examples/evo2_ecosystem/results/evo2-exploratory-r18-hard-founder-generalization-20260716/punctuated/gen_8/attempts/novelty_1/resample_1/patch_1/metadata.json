@@ -1,0 +1,15 @@
+{
+  "generation": 8,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "stress_relief_probe",
+  "patch_description": "The current scheduler effectively collapses to clone, so it preserves stable worlds but cannot learn the injury niche. This targeted edit adds a small stress-only relief channel: it opens mutation only when population decline/death/resource stress coincide with observed clone underperformance, viable parent leverage, and low stable-world no-spend pressure. It also gives conservative mutation a modest bridge role before standard mutation has evidence, while keeping exploratory, structural, and mixed actions very suppressed. The clone logit is reduced only inside that same stress-relief window, so stable-world clone behavior should remain dominant.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:01:20.614691",
+  "llm_cost": 0.154395,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_8/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

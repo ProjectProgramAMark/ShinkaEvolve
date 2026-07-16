@@ -1,0 +1,39 @@
+<NAME>
+stress_probe_standard
+</NAME>
+<DESCRIPTION>
+Raise only the injury/stress-conditioned path for standard parametric mutation, while leaving stable worlds strongly clone-biased. The current scheduler nearly matches clone and avoids sham cost, but it starves standard mutation of evidence, so it cannot recover the known injury benefit. This edit gives standard mutation a cautious prior and a bounded stress probe that requires injury pressure, reproduction readiness, and non-stable conditions. Clone is reduced only through that same stress opportunity, limiting stable-world mutation cost and founder-tail exposure.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    prior = jnp.array([0.42, 0.44, 0.30, 0.14, 0.12, 0.20], dtype=jnp.float32)
+=======
+    prior = jnp.array([0.42, 0.44, 0.38, 0.14, 0.12, 0.20], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.22 * clone_bad + 0.58 * evidence_margin[2] + 0.10 * unused[2] * injury_rescue, 0.0, 1.0)
+=======
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.22 * clone_bad + 0.58 * evidence_margin[2] + 0.18 * unused[2] * stress_opportunity, 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.20 * unused[2] + 0.80 * standard_edge) * evidence_gate[2], 0.0, 1.0)
+=======
+    stress_probe_credit = jnp.clip(stress_opportunity * unused[2] * (1.0 - 0.72 * stable_world) * (0.46 + 0.54 * clone_bad), 0.0, 1.0)
+    standard_rescue_credit = jnp.clip(stress_opportunity * (0.24 * unused[2] + 0.76 * standard_edge) * (0.42 + 0.58 * evidence_gate[2]), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.22 * probe_world * (0.30 + 0.48 * utility[2]) + 0.72 * rescue_param + 0.30 * standard_rescue_credit)
+=======
+        (0.22 * probe_world * (0.30 + 0.48 * utility[2]) + 0.72 * rescue_param + 0.30 * standard_rescue_credit + 0.34 * stress_probe_credit)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+=======
+            -1.18 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.66 * stress_probe_credit + 0.40 * fragile_lock + 0.92 * stable_mutation_debt,
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit - 0.68 * stable_lock - 0.52 * fragile_lock,
+=======
+            3.18 * standard_gate + 1.04 * rescue_param + 0.44 * standard_rescue_credit + 0.92 * stress_probe_credit - 0.68 * stable_lock - 0.52 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

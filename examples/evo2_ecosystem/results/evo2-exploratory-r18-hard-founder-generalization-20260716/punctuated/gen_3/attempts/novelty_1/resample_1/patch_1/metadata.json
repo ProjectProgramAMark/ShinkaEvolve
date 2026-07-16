@@ -1,0 +1,15 @@
+{
+  "generation": 3,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "evidence_escrow_rescue",
+  "patch_description": "Reduce the zero-evidence standard-mutation prior back toward a cautious rescue-only role, and make stress probing depend on actual clone weakness plus reproductive readiness. The current program gives standard mutation a small stress-probe subsidy even with no standard evidence, but the observed run still selects almost no standard mutation while paying a slightly worse paired delta. This edit keeps the stable-world clone bias, modestly restores the conservative channel as the safer learned alternative, and prevents broad fixed standard exploration unless stress, clone underperformance, and exploitation capacity coincide.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:30:05.910538",
+  "llm_cost": 0.09889,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_3/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

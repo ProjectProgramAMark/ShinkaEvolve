@@ -1,0 +1,31 @@
+<NAME>
+stress_proven_mutation
+</NAME>
+<DESCRIPTION>
+Make conservative mutation pay a larger evidence tax in stable renewal worlds, while preserving stress-triggered standard rescue credit. The current run still spends about 1.5% on conservative mutation with very low conservative evidence, and the observed cost is mostly sham-side. This change separates "clone is underperforming" from "conservative mutation is proven enough to use in stable conditions": clone weakness can still open injury/stress rescue, but stable-world conservative drift now needs accumulated conservative evidence and success. Standard rescue also regains a narrow stress-probe term so injury worlds can exploit unused standard mutation without raising broad stable mutation.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    conservative_edge = jnp.clip((learned[1] - learned[0]) * (0.22 + 0.78 * evidence[1]) + 0.42 * clone_bad + 0.34 * evidence_margin[1], 0.0, 1.0)
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.22 * clone_bad + 0.58 * evidence_margin[2] + 0.10 * unused[2] * injury_rescue, 0.0, 1.0)
+=======
+    conservative_proof = jnp.clip(evidence[1] * (0.35 + 0.65 * success[1]) * (1.0 - 0.55 * usage[1]), 0.0, 1.0)
+    conservative_edge = jnp.clip((learned[1] - learned[0]) * (0.18 + 0.82 * conservative_proof) + 0.24 * clone_bad * conservative_proof + 0.34 * evidence_margin[1], 0.0, 1.0)
+    standard_edge = jnp.clip((learned[2] - learned[0]) * (0.18 + 0.82 * evidence[2]) + 0.22 * clone_bad + 0.58 * evidence_margin[2] + 0.10 * unused[2] * injury_rescue, 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    renewal_param = jnp.clip(renewal_world * conservative_edge * reproduction_ready * (0.16 + 0.84 * clone_bad) * (1.0 - 0.78 * injury_rescue) * (1.0 - 0.42 * fragile_lock) * (1.0 - 0.78 * conservative_fatigue), 0.0, 1.0)
+=======
+    renewal_param = jnp.clip(renewal_world * conservative_edge * reproduction_ready * (0.08 + 0.92 * clone_bad) * (0.30 + 0.70 * conservative_proof) * (1.0 - 0.82 * injury_rescue) * (1.0 - 0.42 * fragile_lock) * (1.0 - 0.78 * conservative_fatigue), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    conservative_gate = jnp.clip((0.42 * renewal_param + 0.08 * injury_rescue * conservative_edge + 0.30 * stable_escape + 0.06 * fragile_lock * conservative_edge) * (1.0 - 0.66 * stable_mutation_debt), 0.0, 1.0)
+=======
+    conservative_gate = jnp.clip((0.32 * renewal_param + 0.10 * injury_rescue * conservative_edge + 0.18 * stable_escape * conservative_proof + 0.04 * fragile_lock * conservative_edge * conservative_proof) * (1.0 - 0.72 * stable_mutation_debt), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.22 * probe_world * (0.30 + 0.48 * utility[2]) + 0.72 * rescue_param + 0.30 * standard_rescue_credit)
+=======
+        (0.22 * probe_world * (0.30 + 0.48 * utility[2]) + 0.72 * rescue_param + 0.30 * standard_rescue_credit + 0.20 * stress_probe_credit)
+>>>>>>> REPLACE
+</DIFF>

@@ -1,0 +1,15 @@
+{
+  "generation": 12,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "stress_only_standard_probe",
+  "patch_description": "Add a narrow rescue-only standard mutation pulse that does not depend on prior standard evidence being present. The current scheduler learns conservative mutation, but standard mutation never gets sampled on this panel, so it cannot recover the known injury-side benefit. This edit creates a bounded stress_probe_gate from ecological stress, clone underperformance, unused standard capacity, low stability, and reproduction readiness, then routes it mostly to standard mutation while subtracting from clone. Stable worlds still suppress it through stable_world/stable_lock/fragile_lock, so it should avoid broad fixed mutation and founder-tail damage.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T03:25:33.095757",
+  "llm_cost": 0.184255,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_12/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

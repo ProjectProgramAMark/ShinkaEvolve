@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "883f6a0616b901ec06d831457fe4c773cecb3218145d4efb2aa7da86adc2482b",
+        "error_type": "CandidateValidationError",
+        "error_message": "candidate is not JAX-compatible",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: CandidateValidationError: candidate is not JAX-compatible"
+}

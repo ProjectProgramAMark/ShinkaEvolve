@@ -1,0 +1,15 @@
+{
+  "generation": 5,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "stress_probe_recovery",
+  "patch_description": "Add back a narrow standard-mutation rescue pulse, but keep it gated by ecological stress, reproduction readiness, unused/evidence opportunity, and anti-stable-world pressure. The current program almost never selects standard mutation, so it loses the injury benefit while still paying a small stable-world mutation cost through conservative mutation. This change gives standard mutation a chance only when the ecology is deteriorating and clone evidence looks weak, while leaving stable worlds clone-heavy.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:41:49.471542",
+  "llm_cost": 0.1776,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r18-hard-founder-generalization-20260716/punctuated/gen_5/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

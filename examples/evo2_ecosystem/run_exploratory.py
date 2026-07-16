@@ -148,6 +148,7 @@ def _runner(
     scenario_family: str,
     generations: int,
     init_program_path: Path,
+    numerical_repeats: int,
     regime: str,
 ):
     from shinka.core import EvolutionConfig, ShinkaEvolveRunner
@@ -163,7 +164,7 @@ def _runner(
             "founder_index_path": str(founder_index_path.resolve()),
             "ancestor_program_path": str(ancestor_program_path),
             "regime": regime,
-            "numerical_repeats": "1",
+            "numerical_repeats": str(numerical_repeats),
         },
         # A single paired ecosystem evaluation normally finishes well inside
         # this limit, but concurrent GPU work can slow it substantially.  Keep
@@ -255,6 +256,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--generations", type=int, default=8)
+    parser.add_argument("--numerical-repeats", type=int, default=1)
     parser.add_argument("--regime", choices=("stable", "punctuated"), default="punctuated")
     parser.add_argument("--init-program-path")
     parser.add_argument("--ancestor-program-path")
@@ -277,6 +279,8 @@ def main() -> None:
     arguments = parser.parse_args()
     if not 2 <= arguments.generations <= 20:
         raise ValueError("exploratory generations must be in [2, 20]")
+    if arguments.numerical_repeats < 1 or arguments.numerical_repeats % 2 == 0:
+        raise ValueError("numerical_repeats must be a positive odd integer")
     init_program_path = Path(
         arguments.init_program_path or TASK_DIR / "initial_r4.py"
     ).resolve()
@@ -328,6 +332,7 @@ def main() -> None:
         "manifest_sha256": _sha256(manifest_path),
         "microcosmos_commit": _git_commit(MICROCOSMOS_ROOT),
         "model": FROZEN_MODEL,
+        "numerical_repeats": arguments.numerical_repeats,
         "ancestor_description": arguments.ancestor_description,
         "ancestor_program_path": str(ancestor_program_path),
         "ancestor_program_sha256": _sha256(ancestor_program_path),
@@ -346,6 +351,7 @@ def main() -> None:
         scenario_family=arguments.scenario_family,
         generations=arguments.generations,
         init_program_path=init_program_path,
+        numerical_repeats=arguments.numerical_repeats,
         regime=arguments.regime,
     )
     runner.run()

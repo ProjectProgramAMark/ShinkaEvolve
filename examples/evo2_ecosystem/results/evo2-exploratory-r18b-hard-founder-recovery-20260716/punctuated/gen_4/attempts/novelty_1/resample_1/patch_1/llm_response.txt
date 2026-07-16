@@ -1,0 +1,54 @@
+<NAME>
+scarcity_limited_standard_probe
+</NAME>
+<DESCRIPTION>
+Keep the shock-recovery idea, but make the added standard-mutation probe much more scarcity-conditioned. The current recovery probe fires from clone weakness plus mild stress and appears to buy shock stability at the cost of sham AUC and survival. This edit requires simultaneous population decline/death, intake or energy shortage, non-collapsed alive fraction, low stable-world confidence, and either little standard evidence or standard evidence that is not worse than clone. It also reduces the direct logit pulse from this probe so standard mutation remains a measured injury response instead of a stable-world tax.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    recovery_probe_gate = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * parent_vigor
+        * (0.30 + 0.70 * jnp.clip(intake_gap + energy_gap, 0.0, 1.0))
+        * (0.26 + 0.74 * jnp.clip(decline + death, 0.0, 1.0))
+        * (0.18 + 0.82 * injury_rescue)
+        * (0.24 + 0.76 * clone_bad)
+        * (1.0 - 0.88 * stable_world)
+        * (1.0 - 0.64 * low_alive),
+        0.0,
+        1.0,
+    )
+=======
+    standard_ok = jnp.clip(0.18 + 0.82 * jnp.clip(success[2] - success[0] + 0.04, 0.0, 1.0) + 0.28 * (1.0 - evidence[2]), 0.0, 1.0)
+    shortage_signal = jnp.clip(0.62 * intake_gap + 0.38 * energy_gap + 0.22 * birth_gap, 0.0, 1.0)
+    recovery_probe_gate = jnp.clip(
+        unused[2]
+        * reproduction_ready
+        * parent_vigor
+        * shortage_signal
+        * jnp.clip(decline + death, 0.0, 1.0)
+        * injury_rescue
+        * standard_ok
+        * (0.16 + 0.84 * stress_core)
+        * (1.0 - 0.94 * stable_world)
+        * (1.0 - 0.70 * low_alive),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.18 * probe_world * (0.30 + 0.48 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit + 0.24 * stress_probe_credit + 0.68 * stress_probe_gate + 1.08 * standard_trial_gate + 0.92 * recovery_probe_gate)
+=======
+        (0.18 * probe_world * (0.30 + 0.48 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit + 0.24 * stress_probe_credit + 0.68 * stress_probe_gate + 1.04 * standard_trial_gate + 0.54 * recovery_probe_gate)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.10 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.76 * standard_trial_gate - 0.62 * recovery_probe_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.58 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            3.08 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.28 * standard_trial_gate + 1.10 * recovery_probe_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+=======
+            -1.08 * standard_gate - 0.46 * mixed_gate - 0.42 * renewal_param - 1.18 * clone_bad * injury_rescue - 0.20 * stable_world * clone_bad - 0.36 * stress_probe_credit - 0.58 * stress_probe_gate - 0.72 * standard_trial_gate - 0.36 * recovery_probe_gate + 0.42 * fragile_lock + 0.96 * stable_mutation_debt,
+            1.58 * conservative_gate + 0.04 * injury_rescue + 0.10 * stable_escape + 0.18 * fragile_lock - 1.22 * stable_mutation_debt - 0.52 * conservative_fatigue,
+            3.04 * standard_gate + 0.94 * rescue_param + 0.36 * standard_rescue_credit + 1.08 * stress_probe_credit + 0.92 * stress_probe_gate + 1.22 * standard_trial_gate + 0.64 * recovery_probe_gate - 0.76 * stable_lock - 0.58 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>
