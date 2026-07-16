@@ -1,0 +1,622 @@
+{
+    "combined_score": -0.08753631263971329,
+    "public": {
+        "score": -0.08753631263971329,
+        "sham_auc_delta": -0.044942378997802734,
+        "survival_rate": 1.0,
+        "mean_births": 62.8125,
+        "mean_deaths": 40.25,
+        "mean_generation_gain": 5.625,
+        "operator_fraction": {
+            "clone": 0.0,
+            "parametric_conservative": 1.0,
+            "parametric_standard": 0.0,
+            "parametric_exploratory": 0.0,
+            "structural": 0.0,
+            "mixed": 0.0
+        },
+        "pre_selection_probability": [
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "post_selection_probability": [
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "operator_success_ema": [
+            0.5,
+            0.10088056745007634,
+            0.5,
+            0.5,
+            0.5,
+            0.5
+        ],
+        "operator_usage_ema": [
+            0.0,
+            0.9475926905870438,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "operator_evidence_ema": [
+            0.0,
+            0.9528195783495903,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "shock_auc_delta": -0.08618178963661194,
+        "ancestor_survival_rate": 1.0
+    },
+    "private": {
+        "full_evaluation_performed": true,
+        "integrity_valid": true,
+        "policy_violation_count": 0,
+        "numerical_repeats": 3,
+        "repeat_scores": [
+            -0.08753631263971329,
+            -0.09367779642343521,
+            -0.07510621845722198
+        ],
+        "selected_repeat_index": 0,
+        "physical_integrity_valid": true,
+        "pair_deltas": [
+            0.025466201826930046,
+            -0.1303030401468277,
+            -0.016323775053024292,
+            -0.04950176551938057,
+            0.027900921180844307,
+            -0.17468740046024323,
+            0.06953614950180054,
+            -0.3593509793281555
+        ],
+        "survival_is_diagnostic": true,
+        "adaptive_observations": [
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 51
+            },
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 12,
+                "post_count": 45
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 20,
+                "post_count": 50
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 13,
+                "post_count": 57
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 52
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 14,
+                "post_count": 31
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 22,
+                "post_count": 49
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 0,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 5,
+                "post_count": 25
+            },
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 51
+            },
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 12,
+                "post_count": 48
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 20,
+                "post_count": 50
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 13,
+                "post_count": 57
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 52
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 14,
+                "post_count": 34
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 22,
+                "post_count": 49
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 1,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 5,
+                "post_count": 25
+            },
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 51
+            },
+            {
+                "founder_id": "dev-00",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 12,
+                "post_count": 45
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 20,
+                "post_count": 50
+            },
+            {
+                "founder_id": "dev-01",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 13,
+                "post_count": 57
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 18,
+                "post_count": 52
+            },
+            {
+                "founder_id": "dev-02",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 14,
+                "post_count": 38
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 22,
+                "post_count": 49
+            },
+            {
+                "founder_id": "dev-03",
+                "repeat_index": 2,
+                "pre_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "post_probability": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "pre_count": 5,
+                "post_count": 25
+            }
+        ],
+        "backend": "gpu",
+        "ancestor_sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3",
+        "candidate_sha256": "278b1c815e61ddf8c918adb305e612827598e1f659b2095136ba300fd4066cab",
+        "exploratory": true,
+        "founder_index_sha256": "cef784562c8f8bf045f161ed01c708c778902f2d6b98a8dcf270d5985c561c72",
+        "manifest_sha256": "26a54aa914f42601532cbd46c517ae305c369cfda9dc1242d4b018501f6c8a5e"
+    },
+    "text_feedback": "paired ancestor delta=-0.0875; sham delta=-0.0449; shock delta=-0.0862; survival=1.00; mean births=62.8; survival is scored, not a validity gate."
+}
