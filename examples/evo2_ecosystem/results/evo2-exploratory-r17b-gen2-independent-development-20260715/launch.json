@@ -1,0 +1,16 @@
+{
+  "candidate_generation": 2,
+  "candidate_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_2/main.py",
+  "candidate_sha256": "9b5db8652945ea82705b8a652b80bdcb6d210018cbb58f57d73fd89fb0757ba5",
+  "clone_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r16b-gen11-sealed-20260715/programs/fixed_clone.py",
+  "clone_sha256": "a1c8014508aaebcb355f41b374f1d258a837f4a09ea0ad07b0c6d2df46a4ffe3",
+  "created_at_utc": "2026-07-15T22:07:27.293775+00:00",
+  "founder_index_file_sha256": "b120bdd61b2a6aa10e5726ce4a92eeb9e5bca4427e410c907a270d8ae254a025",
+  "manifest_sha256": "d75f91175bc5ba648e39ed45ddb3f274875715d3ad0a36393012bc69e2f6ab69",
+  "microcosmos_commit": "8839b0493d525392dddc6d5372f7fc32c673eb3f",
+  "numerical_repeats": 3,
+  "partition": "independent_development",
+  "sealed_opened": false,
+  "shinkaevolve_commit": "335a603b58a8e604f16754be3d9d7ccacdeccb9c",
+  "source_run_id": "evo2-exploratory-r17b-crosspanel-founder-generalization-20260715"
+}
