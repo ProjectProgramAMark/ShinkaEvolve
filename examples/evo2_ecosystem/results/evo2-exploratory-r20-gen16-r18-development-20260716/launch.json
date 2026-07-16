@@ -1,5 +1,10 @@
 {
   "event_step": 4000,
+  "failed_attempt": {
+    "error": "development founder artifacts remained permission-locked",
+    "full_evaluation_performed": false,
+    "preserved_directory": "evaluation_startup_failed_locked_development"
+  },
   "founder_index_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/founders/index.json",
   "founder_index_sha256": "cef784562c8f8bf045f161ed01c708c778902f2d6b98a8dcf270d5985c561c72",
   "manifest_path": "/home/mmmoussa/Programming/sakana/origins-of-life/microcosmos/experiments/evo2_ecosystem/r18_artifacts/manifests/development_early_injury.json",

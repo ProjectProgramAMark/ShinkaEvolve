@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "715f6407a4deb24658e6f05eaf3472329376ce8645d6fa1f3239cbc9ce2a6490",
+        "error_type": "ValueError",
+        "error_message": "",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: ValueError"
+}
