@@ -1,0 +1,15 @@
+{
+  "generation": 12,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "stable_fatigue_rescue",
+  "patch_description": "Adds an evidence-based brake for over-used conservative mutation in stable regimes, while giving standard mutation a narrow rescue credit only when ecological injury stress is present and standard has either unused capacity or learned edge. The current run over-selected conservative mutation and paid a sham penalty; this keeps the injury benefit path but reduces stable-world mutation debt using accumulated success, usage, and evidence rather than a fixed clone fallback.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T00:46:38.423255",
+  "llm_cost": 0.157752,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_12/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

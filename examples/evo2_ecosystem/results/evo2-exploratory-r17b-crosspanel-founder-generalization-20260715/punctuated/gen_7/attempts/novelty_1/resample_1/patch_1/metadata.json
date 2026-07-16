@@ -1,0 +1,15 @@
+{
+  "generation": 7,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "risk_budget_lcb_scheduler",
+  "patch_description": "Uses a robust lower-confidence bandit policy with an ecological mutation budget. Instead of blending fixed regime policies, it estimates each operator's conservative value from success, evidence, and usage, then spends mutation probability only when population stress, parent vigor, and operator evidence justify it. Stable or fragile regimes collapse toward clone/conservative, while injury-like stress opens a bounded standard/mixed rescue channel only when accumulated evidence supports those operators.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T22:57:15.826612",
+  "llm_cost": 0.17764,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_7/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

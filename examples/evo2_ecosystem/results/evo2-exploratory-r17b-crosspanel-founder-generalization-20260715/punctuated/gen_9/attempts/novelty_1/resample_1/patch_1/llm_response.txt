@@ -1,0 +1,67 @@
+<NAME>
+stress_confidence_rescue
+</NAME>
+<DESCRIPTION>
+This edit adds a narrow rescue-confidence channel: increase standard/conservative mutation only when ecological stress, parent vigor, and accumulated clone underperformance agree. It keeps stable and fragile brakes intact, but gives injury-like regimes a slightly stronger path to standard mutation when evidence says cloning is not paying off. The intent is to preserve the current sham safety while lifting the positive shock signal and reducing reliance on unconditional clone selection.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    conservative_edge = jnp.clip(lower_value[1] - clone_floor + 0.22 * evidence[0] * (0.35 - success[0]), 0.0, 1.0)
+    standard_edge = jnp.clip(lower_value[2] - clone_floor + 0.16 * evidence[0] * (0.35 - success[0]), 0.0, 1.0)
+    mixed_edge = jnp.clip(lower_value[5] - clone_floor + 0.10 * evidence[0] * (0.35 - success[0]), 0.0, 1.0)
+=======
+    clone_underperform = jnp.clip(evidence[0] * (0.36 - success[0]), 0.0, 1.0)
+    conservative_edge = jnp.clip(lower_value[1] - clone_floor + 0.24 * clone_underperform, 0.0, 1.0)
+    standard_edge = jnp.clip(lower_value[2] - clone_floor + 0.20 * clone_underperform, 0.0, 1.0)
+    mixed_edge = jnp.clip(lower_value[5] - clone_floor + 0.10 * clone_underperform, 0.0, 1.0)
+    rescue_confidence = jnp.clip(
+        clone_underperform
+        * stress
+        * parent_vigor
+        * (0.42 + 0.58 * injury_signal)
+        * (1.0 - 0.70 * stable_signal * (1.0 - injury_signal))
+        * (1.0 - 0.58 * fragile_signal),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + 0.34 * injury_signal
+        + 0.18 * stress * parent_vigor
+        + 0.10 * conservative_edge
+        - 0.30 * stable_signal * (1.0 - injury_signal)
+=======
+        + 0.32 * injury_signal
+        + 0.18 * stress * parent_vigor
+        + 0.16 * rescue_confidence
+        + 0.10 * conservative_edge
+        - 0.31 * stable_signal * (1.0 - injury_signal)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        * (0.22 + 0.78 * injury_signal)
+        * (0.36 + 0.64 * standard_edge)
+=======
+        * (0.20 + 0.68 * injury_signal + 0.42 * rescue_confidence)
+        * (0.34 + 0.66 * standard_edge)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        * (0.52 + 0.48 * stable_signal)
+        * (0.42 + 0.58 * conservative_edge)
+=======
+        * (0.50 + 0.44 * stable_signal + 0.18 * rescue_confidence)
+        * (0.42 + 0.58 * conservative_edge)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        - 1.65 * mutation_budget
+        - 0.62 * evidence[0] * (0.35 - success[0]),
+=======
+        - 1.55 * mutation_budget
+        - 0.48 * rescue_confidence
+        - 0.58 * clone_underperform,
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.35 * standard_budget + 0.45 * injury_signal * standard_edge,
+=======
+            3.45 * standard_budget + 0.52 * injury_signal * standard_edge + 0.58 * rescue_confidence * standard_edge,
+>>>>>>> REPLACE
+</DIFF>

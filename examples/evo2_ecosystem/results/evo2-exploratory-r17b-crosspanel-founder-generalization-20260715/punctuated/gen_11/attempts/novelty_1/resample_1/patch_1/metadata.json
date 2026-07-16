@@ -1,0 +1,15 @@
+{
+  "generation": 11,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_standard_guarded_reseed",
+  "patch_description": "Shift the current reseed logic away from broad stable-world conservative mutation and toward a narrower injury-rescue standard probe. The current program increased births but lost sham consistency and did not recover the stronger shock gain seen previously. This edit makes conservative reseeding require low birth rate plus actual clone underperformance, while standard tail probing requires stress, injury signal, and standard unused/evidence upside. It also adds a sham guard that suppresses standard/mixed mutation in stable worlds without turning the scheduler into unconditional clone.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T00:27:12.310660",
+  "llm_cost": 0.19205,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_11/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

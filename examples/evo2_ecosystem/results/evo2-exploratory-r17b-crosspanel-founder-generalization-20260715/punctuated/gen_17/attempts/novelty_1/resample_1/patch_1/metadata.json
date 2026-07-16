@@ -1,0 +1,15 @@
+{
+  "generation": 17,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_sieved_standard_probe",
+  "patch_description": "Add a narrow standard-mutation rescue lane that is only active under genuine ecological stress, while adding an explicit stable/sham suppressor. The current scheduler already gets most of its gain from shock worlds, so this edit avoids broad mutation increases: standard gets extra support only when injury_rescue, stress_core, clone underperformance, and unused/low-evidence standard opportunity align. In stable or fragile regimes, the same signal suppresses standard and mixed mutation and nudges clone/conservative back up to reduce negative tails.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T01:49:10.391312",
+  "llm_cost": 0.198945,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_17/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

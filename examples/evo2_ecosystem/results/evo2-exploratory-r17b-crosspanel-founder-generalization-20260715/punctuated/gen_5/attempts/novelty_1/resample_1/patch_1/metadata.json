@@ -1,0 +1,15 @@
+{
+  "generation": 5,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "evidence_fatigue_rescue",
+  "patch_description": "Add an evidence-weighted fatigue signal for over-used conservative mutation, convert it into a stable-world mutation debt, and use that debt to suppress conservative drift where sham/stable founders are fragile. At the same time, add a narrow standard-mutation rescue credit gated by injury stress and low prior standard usage, preserving the observed shock-world benefit without broadly increasing mutation. This targets the current failure mode: conservative mutation is being selected too often despite weak success, harming sham aggregate, while standard mutation remains useful mainly under injury stress.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T22:32:55.924298",
+  "llm_cost": 0.19217,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_5/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

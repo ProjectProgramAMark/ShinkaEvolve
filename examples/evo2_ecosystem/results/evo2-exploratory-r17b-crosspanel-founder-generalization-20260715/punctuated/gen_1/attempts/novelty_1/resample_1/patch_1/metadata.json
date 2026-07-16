@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "evidence_gated_rescue",
+  "patch_description": "This edit reduces the scheduler's unconditional clone lock while keeping mutation tightly gated by ecological stress, operator evidence, and parent fragility. Conservative mutation gets more credit when clone evidence is poor in stable renewal regimes, while standard mutation is concentrated into injury-rescue contexts and suppressed in stable or fragile founders. Exploratory, structural, and mixed actions remain low-probability probes that require both stress and unused operator evidence.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T21:54:20.434858",
+  "llm_cost": 0.30231,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_1/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

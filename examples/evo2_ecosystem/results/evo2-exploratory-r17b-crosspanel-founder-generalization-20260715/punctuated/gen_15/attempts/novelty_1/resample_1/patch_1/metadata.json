@@ -1,0 +1,15 @@
+{
+  "generation": 15,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 5,
+  "patch_name": "clone_pressure_rescue_release",
+  "patch_description": "Add a narrow evidence-conditioned rescue release: when clone has strong evidence but poor success, and the ecology is stressed without looking stable or fragile, give standard parametric mutation a small extra path. This preserves the current clone-heavy stable behavior while allowing injury worlds to escape exact-clone inertia using accumulated operator evidence instead of unconditional mutation. Stable and fragile brakes are slightly tightened to protect worst-founder tails.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T01:31:35.675105",
+  "llm_cost": 0.229505,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_15/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

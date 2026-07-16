@@ -1,0 +1,15 @@
+{
+  "generation": 3,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "persistent_rescue_tail_guard",
+  "patch_description": "Add a persistent-stress gate that separates true injury rescue regimes from stable or fragile worlds, then use it to sharpen standard mutation and reduce conservative overuse when accumulated evidence says conservative is tiring. This keeps the current shock benefit but makes standard mutation more conditional on sustained ecological stress, which should improve worst-founder consistency and avoid paying mutation cost in sham or stable founder regimes.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T22:06:18.626725",
+  "llm_cost": 0.176905,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_3/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

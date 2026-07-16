@@ -1,0 +1,35 @@
+<NAME>
+birth_pressure_rescue
+</NAME>
+<DESCRIPTION>
+Add a narrow reproduction-pressure channel for conservative mutation only when the world is stable, parents are vigorous, births are lagging, and accumulated evidence says conservative mutation beats clone. The current edit protected sham worlds by suppressing stable mutation, but it also lowered mean births. This restores some low-risk conservative renewal without increasing standard/exploratory mutation broadly. A small stress-trial term also lets standard mutation respond to injury pressure when clone is empirically poor, while staying gated away from stable and fragile regimes.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    standard_rescue_credit = jnp.clip(injury_rescue * (0.18 + 0.82 * stress_core) * (0.46 * unused[2] + 0.54 * standard_edge), 0.0, 1.0)
+=======
+    standard_rescue_credit = jnp.clip(injury_rescue * (0.18 + 0.82 * stress_core) * (0.46 * unused[2] + 0.54 * standard_edge), 0.0, 1.0)
+    birth_pressure = jnp.clip(birth_gap * stable_world * parent_vigor * simple_parent * (1.0 - 0.70 * injury_rescue), 0.0, 1.0)
+    conservative_reseed = jnp.clip(birth_pressure * conservative_edge * (0.42 + 0.58 * evidence[1]) * (1.0 - 0.62 * conservative_fatigue), 0.0, 1.0)
+    standard_tail_probe = jnp.clip(injury_rescue * stress_core * clone_bad * unused[2] * (1.0 - 0.76 * stable_world), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    conservative_gate = jnp.clip((1.00 * renewal_param + 0.20 * injury_rescue * conservative_edge + 0.22 * stable_world * clone_bad * conservative_edge + 0.10 * fragile_lock * conservative_edge) * (1.0 - 0.58 * stable_mutation_debt), 0.0, 1.0)
+=======
+    conservative_gate = jnp.clip((1.00 * renewal_param + 0.20 * injury_rescue * conservative_edge + 0.22 * stable_world * clone_bad * conservative_edge + 0.10 * fragile_lock * conservative_edge + 0.36 * conservative_reseed) * (1.0 - 0.58 * stable_mutation_debt), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.36 * probe_world * (0.36 + 0.52 * utility[2]) + 0.62 * rescue_param + 0.22 * standard_rescue_credit)
+=======
+        (0.36 * probe_world * (0.36 + 0.52 * utility[2]) + 0.62 * rescue_param + 0.22 * standard_rescue_credit + 0.18 * standard_tail_probe)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.02 * standard_gate - 0.58 * mixed_gate - 1.26 * renewal_param - 1.12 * clone_bad * injury_rescue - 0.34 * stable_world * clone_bad + 0.34 * fragile_lock + 0.72 * stable_mutation_debt,
+            2.56 * conservative_gate + 0.10 * injury_rescue + 0.22 * stable_lock * conservative_edge + 0.18 * fragile_lock - 1.08 * stable_mutation_debt - 0.46 * conservative_fatigue,
+            2.74 * standard_gate + 0.82 * rescue_param + 0.34 * standard_rescue_credit - 0.54 * stable_lock - 0.44 * fragile_lock,
+=======
+            -1.02 * standard_gate - 0.58 * mixed_gate - 1.26 * renewal_param - 1.12 * clone_bad * injury_rescue - 0.34 * stable_world * clone_bad + 0.34 * fragile_lock + 0.72 * stable_mutation_debt - 0.38 * conservative_reseed - 0.20 * standard_tail_probe,
+            2.56 * conservative_gate + 0.10 * injury_rescue + 0.22 * stable_lock * conservative_edge + 0.18 * fragile_lock - 1.08 * stable_mutation_debt - 0.46 * conservative_fatigue + 0.82 * conservative_reseed,
+            2.74 * standard_gate + 0.82 * rescue_param + 0.34 * standard_rescue_credit + 0.42 * standard_tail_probe - 0.54 * stable_lock - 0.44 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

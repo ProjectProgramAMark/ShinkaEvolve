@@ -1,0 +1,15 @@
+{
+  "generation": 14,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "stress_reopen_standard",
+  "patch_description": "Reopen standard parametric mutation only when injury stress is both persistent and evidence-compatible. The current stable_sham_guard improved sham worlds but also suppresses the standard tail probe in injured worlds, cutting shock gain. This edit keeps the sham guard active in stable regimes, but discounts it under injury-specific stress and gives standard mutation a bounded rescue pulse when clone is performing poorly and standard has either unused capacity or positive edge. Conservative reseeding is slightly restored under low-birth stable conditions without making mutation unconditional.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T01:11:27.578862",
+  "llm_cost": 0.123725,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_14/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

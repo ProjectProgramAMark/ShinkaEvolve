@@ -1,0 +1,15 @@
+{
+  "generation": 2,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "fatigue_gated_conservative",
+  "patch_description": "This edit adds an evidence-based fatigue term for conservative mutation when it is already heavily used but not succeeding enough. The current scheduler improved shock worlds but pays a sham/stable penalty by selecting conservative mutation about a third of the time even after its measured success falls. The change suppresses conservative renewal mainly in stable non-injury regimes, shifts that mass back to clone, and preserves standard mutation under ecological injury/stress where the current program is gaining. This is not unconditional cloning: the brake depends on conservative usage, evidence, and success, while the standard rescue path remains stress/injury gated.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T22:00:22.300924",
+  "llm_cost": 0.101525,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_2/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

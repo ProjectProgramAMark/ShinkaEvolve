@@ -1,0 +1,15 @@
+{
+  "generation": 13,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "injury_standard_trial_gate",
+  "patch_description": "Add a bounded injury-only standard mutation trial gate that treats low standard evidence as uncertainty worth probing only under ecological stress. This should recover some persistent-injury benefit by lifting standard parametric mutation when populations are declining or intake-limited, while adding an explicit learned penalty when standard mutation has accumulated bad evidence. Stable and fragile regimes still push back through stable_caution and fragile_signal, so this does not simply raise mutation everywhere.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T00:56:17.657629",
+  "llm_cost": 0.15993,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_13/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

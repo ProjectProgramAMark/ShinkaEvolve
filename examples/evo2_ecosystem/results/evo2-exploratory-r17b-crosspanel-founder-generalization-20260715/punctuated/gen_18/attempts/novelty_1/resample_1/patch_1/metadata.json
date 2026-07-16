@@ -1,0 +1,15 @@
+{
+  "generation": 18,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "slip_guarded_rescue_probe",
+  "patch_description": "Add an evidence-based conservative-slip guard so stable and fragile regimes stop over-reseeding when conservative mutation has accumulated usage without strong success. Redirect some of that pressure toward tightly gated standard rescue only under injury stress, while explicitly suppressing standard mutation in stable sham-like worlds. This should reduce the current sham drag from excessive conservative use while preserving the injury benefit from rare standard probes.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T02:06:36.742990",
+  "llm_cost": 0.136415,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_18/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

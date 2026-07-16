@@ -1,0 +1,15 @@
+{
+  "generation": 8,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 6,
+  "patch_name": "shock_selective_standard_probe",
+  "patch_description": "Add a narrower rescue window that only spends mutation budget when ecological stress looks injury-like, the parent is viable, and the founder/world is not already fragile. This shifts a small amount of probability from clone into standard and conservative mutation during persistent injury conditions, while strengthening the stable-world brake so sham regimes keep the clone-heavy behavior that was already working.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T23:19:35.523522",
+  "llm_cost": 0.091885,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_8/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

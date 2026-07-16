@@ -1,0 +1,15 @@
+{
+  "generation": 10,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "evidence_gated_injury_rescue",
+  "patch_description": "Add a narrower rescue gate that spends standard mutation mainly when ecological injury stress coincides with weak clone evidence and little accumulated standard usage. The current scheduler is slightly too clone-heavy in shock worlds, while sham remains positive; this edit selectively restores injury exploration without raising baseline mutation in stable or fragile regimes. It also penalizes standard after unlucky accumulated standard evidence, so the scheduler can back off if the operator proves costly.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T00:05:06.224366",
+  "llm_cost": 0.134907,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_10/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

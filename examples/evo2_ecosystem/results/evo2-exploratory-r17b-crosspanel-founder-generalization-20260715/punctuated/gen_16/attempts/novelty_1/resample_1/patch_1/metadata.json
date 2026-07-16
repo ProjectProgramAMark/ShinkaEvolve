@@ -1,0 +1,15 @@
+{
+  "generation": 16,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "regime_portfolio_guard",
+  "patch_description": "This uses a regime-mixture portfolio instead of a mutation budget. It estimates stable, repair, and fragile ecological regimes, then blends operator logits from those regimes with evidence-weighted operator trust. Standard mutation is released mainly in a high-stress repair window with parent vigor and clone underperformance, while stable and fragile regimes collapse back toward clone/conservative protection. This should preserve injury-world gains without letting mutation leak into sham or weak-founder tails.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T01:42:59.475074",
+  "llm_cost": 0.20692,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_16/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

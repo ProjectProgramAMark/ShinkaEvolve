@@ -1,0 +1,15 @@
+{
+  "generation": 4,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 4,
+  "patch_name": "birth_pressure_rescue",
+  "patch_description": "Add a narrow reproduction-pressure channel for conservative mutation only when the world is stable, parents are vigorous, births are lagging, and accumulated evidence says conservative mutation beats clone. The current edit protected sham worlds by suppressing stable mutation, but it also lowered mean births. This restores some low-risk conservative renewal without increasing standard/exploratory mutation broadly. A small stress-trial term also lets standard mutation respond to injury pressure when clone is empirically poor, while staying gated away from stable and fragile regimes.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T22:16:53.195469",
+  "llm_cost": 0.179815,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_4/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

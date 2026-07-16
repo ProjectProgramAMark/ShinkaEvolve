@@ -1,0 +1,50 @@
+<NAME>
+injury_standard_trial_gate
+</NAME>
+<DESCRIPTION>
+Add a bounded injury-only standard mutation trial gate that treats low standard evidence as uncertainty worth probing only under ecological stress. This should recover some persistent-injury benefit by lifting standard parametric mutation when populations are declining or intake-limited, while adding an explicit learned penalty when standard mutation has accumulated bad evidence. Stable and fragile regimes still push back through stable_caution and fragile_signal, so this does not simply raise mutation everywhere.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    mixed_edge = jnp.clip(lower_value[5] - clone_floor + 0.10 * evidence[0] * (0.35 - success[0]), 0.0, 1.0)
+    rescue_window = jnp.clip(
+=======
+    mixed_edge = jnp.clip(lower_value[5] - clone_floor + 0.10 * evidence[0] * (0.35 - success[0]), 0.0, 1.0)
+    standard_bad = jnp.clip(evidence[2] * (0.45 - success[2]) + 0.12 * usage[2], 0.0, 1.0)
+    standard_trial = jnp.clip(
+        injury_signal
+        * stress
+        * parent_vigor
+        * (0.62 + 0.38 * uncertainty[2])
+        * (1.0 - stable_signal)
+        * (1.0 - 0.72 * fragile_signal)
+        * (1.0 - standard_bad),
+        0.0,
+        1.0,
+    )
+    rescue_window = jnp.clip(
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + 0.30 * rescue_window
+        + 0.12 * stress * parent_vigor
+        + 0.08 * conservative_edge
+=======
+        + 0.30 * rescue_window
+        + 0.10 * standard_trial
+        + 0.12 * stress * parent_vigor
+        + 0.08 * conservative_edge
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        * (1.0 - 0.84 * stable_caution)
+        * (0.46 + 0.54 * parent_vigor),
+=======
+        * (1.0 - 0.84 * stable_caution)
+        * (1.0 - 0.58 * standard_bad)
+        * (0.46 + 0.54 * parent_vigor),
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            3.65 * standard_budget + 0.72 * rescue_window * standard_edge,
+=======
+            3.65 * standard_budget + 0.72 * rescue_window * standard_edge + 0.72 * standard_trial,
+>>>>>>> REPLACE
+</DIFF>

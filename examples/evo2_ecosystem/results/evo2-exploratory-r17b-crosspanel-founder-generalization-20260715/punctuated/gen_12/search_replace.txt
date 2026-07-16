@@ -1,0 +1,49 @@
+<NAME>
+stable_fatigue_rescue
+</NAME>
+<DESCRIPTION>
+Adds an evidence-based brake for over-used conservative mutation in stable regimes, while giving standard mutation a narrow rescue credit only when ecological injury stress is present and standard has either unused capacity or learned edge. The current run over-selected conservative mutation and paid a sham penalty; this keeps the injury benefit path but reduces stable-world mutation debt using accumulated success, usage, and evidence rather than a fixed clone fallback.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    mixed_edge = jnp.clip((learned[5] - learned[0]) * (0.36 + 0.64 * evidence[5]) + 0.16 * clone_bad, 0.0, 1.0)
+    stable_lock = jnp.clip(stable_world * (0.72 + 0.22 * growth) * (1.0 - 0.90 * injury_rescue) * (1.0 - 0.34 * clone_bad), 0.0, 1.0)
+    fragile_lock = jnp.clip(stable_world * (1.0 - parent_vigor) * (0.48 + 0.52 * (1.0 - compact)), 0.0, 1.0)
+    renewal_param = jnp.clip(renewal_world * conservative_edge * (1.0 - 0.72 * injury_rescue) * (1.0 - 0.35 * fragile_lock), 0.0, 1.0)
+    rescue_param = jnp.clip((0.74 * stress_core + 1.12 * injury_rescue + 0.18 * low_alive) * standard_edge * (1.0 - 0.52 * stable_lock) * (1.0 - 0.42 * fragile_lock), 0.0, 1.0)
+    conservative_gate = jnp.clip(1.00 * renewal_param + 0.20 * injury_rescue * conservative_edge + 0.22 * stable_world * clone_bad * conservative_edge + 0.10 * fragile_lock * conservative_edge, 0.0, 1.0)
+    standard_gate = jnp.clip(
+        (0.36 * probe_world * (0.36 + 0.52 * utility[2]) + 0.62 * rescue_param)
+        * (1.0 - 0.62 * stable_lock)
+        * (1.0 - 0.64 * fragile_lock),
+        0.0,
+        1.0,
+    )
+=======
+    mixed_edge = jnp.clip((learned[5] - learned[0]) * (0.36 + 0.64 * evidence[5]) + 0.16 * clone_bad, 0.0, 1.0)
+    conservative_fatigue = jnp.clip(evidence[1] * usage[1] * (0.41 - success[1]) + 0.12 * evidence[1] * usage[1] * (learned[2] - learned[1]), 0.0, 1.0)
+    stable_mutation_debt = jnp.clip(stable_world * (1.0 - injury_rescue) * (0.28 + 0.72 * conservative_fatigue), 0.0, 1.0)
+    standard_rescue_credit = jnp.clip(injury_rescue * (0.20 + 0.80 * stress_core) * (0.48 * unused[2] + 0.52 * standard_edge), 0.0, 1.0)
+    stable_lock = jnp.clip(stable_world * (0.72 + 0.22 * growth) * (1.0 - 0.90 * injury_rescue) * (1.0 - 0.34 * clone_bad), 0.0, 1.0)
+    fragile_lock = jnp.clip(stable_world * (1.0 - parent_vigor) * (0.48 + 0.52 * (1.0 - compact)), 0.0, 1.0)
+    renewal_param = jnp.clip(renewal_world * conservative_edge * (1.0 - 0.72 * injury_rescue) * (1.0 - 0.35 * fragile_lock) * (1.0 - 0.68 * conservative_fatigue), 0.0, 1.0)
+    rescue_param = jnp.clip((0.74 * stress_core + 1.12 * injury_rescue + 0.18 * low_alive) * standard_edge * (1.0 - 0.52 * stable_lock) * (1.0 - 0.42 * fragile_lock), 0.0, 1.0)
+    conservative_gate = jnp.clip((1.00 * renewal_param + 0.18 * injury_rescue * conservative_edge + 0.18 * stable_world * clone_bad * conservative_edge + 0.08 * fragile_lock * conservative_edge) * (1.0 - 0.56 * stable_mutation_debt), 0.0, 1.0)
+    standard_gate = jnp.clip(
+        (0.34 * probe_world * (0.36 + 0.52 * utility[2]) + 0.62 * rescue_param + 0.24 * standard_rescue_credit)
+        * (1.0 - 0.56 * stable_lock)
+        * (1.0 - 0.64 * fragile_lock),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.02 * standard_gate - 0.58 * mixed_gate - 1.26 * renewal_param - 1.12 * clone_bad * injury_rescue - 0.34 * stable_world * clone_bad + 0.34 * fragile_lock,
+            2.56 * conservative_gate + 0.10 * injury_rescue + 0.22 * stable_lock * conservative_edge + 0.18 * fragile_lock,
+            2.74 * standard_gate + 0.82 * rescue_param - 0.58 * stable_lock - 0.44 * fragile_lock,
+=======
+            -1.02 * standard_gate - 0.58 * mixed_gate - 1.26 * renewal_param - 1.12 * clone_bad * injury_rescue - 0.34 * stable_world * clone_bad + 0.34 * fragile_lock + 0.68 * stable_mutation_debt,
+            2.56 * conservative_gate + 0.10 * injury_rescue + 0.22 * stable_lock * conservative_edge + 0.18 * fragile_lock - 1.02 * stable_mutation_debt - 0.42 * conservative_fatigue,
+            2.74 * standard_gate + 0.82 * rescue_param + 0.34 * standard_rescue_credit - 0.54 * stable_lock - 0.44 * fragile_lock,
+>>>>>>> REPLACE
+</DIFF>

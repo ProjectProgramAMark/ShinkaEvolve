@@ -1,0 +1,15 @@
+{
+  "generation": 9,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 6,
+  "patch_name": "stress_confidence_rescue",
+  "patch_description": "This edit adds a narrow rescue-confidence channel: increase standard/conservative mutation only when ecological stress, parent vigor, and accumulated clone underperformance agree. It keeps stable and fragile brakes intact, but gives injury-like regimes a slightly stronger path to standard mutation when evidence says cloning is not paying off. The intent is to preserve the current sham safety while lifting the positive shock signal and reducing reliance on unconditional clone selection.",
+  "error_msg": null,
+  "timestamp": "2026-07-15T23:42:07.330726",
+  "llm_cost": 0.170565,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r17b-crosspanel-founder-generalization-20260715/punctuated/gen_9/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

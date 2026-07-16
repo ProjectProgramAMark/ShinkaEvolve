@@ -1,0 +1,45 @@
+<NAME>
+stress_reopen_standard
+</NAME>
+<DESCRIPTION>
+Reopen standard parametric mutation only when injury stress is both persistent and evidence-compatible. The current stable_sham_guard improved sham worlds but also suppresses the standard tail probe in injured worlds, cutting shock gain. This edit keeps the sham guard active in stable regimes, but discounts it under injury-specific stress and gives standard mutation a bounded rescue pulse when clone is performing poorly and standard has either unused capacity or positive edge. Conservative reseeding is slightly restored under low-birth stable conditions without making mutation unconditional.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    stable_sham_guard = jnp.clip(stable_world * (1.0 - injury_rescue) * (0.62 + 0.38 * mean_energy_fraction) * (1.0 - 0.42 * clone_bad), 0.0, 1.0)
+    birth_pressure = jnp.clip(birth_gap * stable_world * parent_vigor * simple_parent * (1.0 - 0.82 * injury_rescue), 0.0, 1.0)
+    conservative_reseed = jnp.clip(birth_pressure * conservative_edge * clone_bad * (0.36 + 0.64 * evidence[1]) * (1.0 - 0.72 * conservative_fatigue), 0.0, 1.0)
+=======
+    stable_sham_guard = jnp.clip(stable_world * (1.0 - injury_rescue) * (0.62 + 0.38 * mean_energy_fraction) * (1.0 - 0.42 * clone_bad), 0.0, 1.0)
+    injury_tail_window = jnp.clip(injury_rescue * stress_core * (0.46 + 0.54 * clone_bad) * (1.0 - 0.44 * stable_sham_guard), 0.0, 1.0)
+    birth_pressure = jnp.clip(birth_gap * stable_world * parent_vigor * simple_parent * (1.0 - 0.76 * injury_rescue), 0.0, 1.0)
+    conservative_reseed = jnp.clip(birth_pressure * conservative_edge * (0.18 + 0.82 * clone_bad) * (0.36 + 0.64 * evidence[1]) * (1.0 - 0.72 * conservative_fatigue), 0.0, 1.0)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        * (0.58 + 0.42 * standard_edge)
+        * (1.0 - 0.86 * stable_sham_guard),
+=======
+        * (0.58 + 0.42 * standard_edge)
+        * (1.0 - 0.62 * stable_sham_guard * (1.0 - 0.72 * injury_tail_window)),
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        (0.32 * probe_world * (0.34 + 0.52 * utility[2]) + 0.66 * rescue_param + 0.24 * standard_rescue_credit + 0.34 * standard_tail_probe)
+        * (1.0 - 0.54 * stable_lock)
+        * (1.0 - 0.64 * fragile_lock)
+        * (1.0 - 0.72 * stable_sham_guard),
+=======
+        (0.30 * probe_world * (0.34 + 0.52 * utility[2]) + 0.66 * rescue_param + 0.24 * standard_rescue_credit + 0.40 * standard_tail_probe + 0.18 * injury_tail_window * (0.42 * unused[2] + 0.58 * standard_edge))
+        * (1.0 - 0.54 * stable_lock)
+        * (1.0 - 0.64 * fragile_lock)
+        * (1.0 - 0.70 * stable_sham_guard * (1.0 - 0.78 * injury_tail_window)),
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            -1.00 * standard_gate - 0.52 * mixed_gate - 1.20 * renewal_param - 1.14 * clone_bad * injury_rescue - 0.30 * stable_world * clone_bad + 0.38 * fragile_lock + 0.86 * stable_mutation_debt + 0.42 * stable_sham_guard - 0.24 * conservative_reseed - 0.34 * standard_tail_probe,
+            2.46 * conservative_gate + 0.08 * injury_rescue + 0.20 * stable_lock * conservative_edge + 0.16 * fragile_lock - 1.14 * stable_mutation_debt - 0.52 * conservative_fatigue + 0.56 * conservative_reseed - 0.18 * stable_sham_guard,
+            2.92 * standard_gate + 0.92 * rescue_param + 0.38 * standard_rescue_credit + 0.74 * standard_tail_probe - 0.64 * stable_lock - 0.46 * fragile_lock - 0.34 * stable_sham_guard,
+=======
+            -1.00 * standard_gate - 0.52 * mixed_gate - 1.20 * renewal_param - 1.14 * clone_bad * injury_rescue - 0.30 * stable_world * clone_bad + 0.38 * fragile_lock + 0.86 * stable_mutation_debt + 0.42 * stable_sham_guard - 0.24 * conservative_reseed - 0.42 * standard_tail_probe - 0.22 * injury_tail_window,
+            2.46 * conservative_gate + 0.08 * injury_rescue + 0.20 * stable_lock * conservative_edge + 0.16 * fragile_lock - 1.14 * stable_mutation_debt - 0.52 * conservative_fatigue + 0.64 * conservative_reseed - 0.18 * stable_sham_guard,
+            2.98 * standard_gate + 0.92 * rescue_param + 0.38 * standard_rescue_credit + 0.88 * standard_tail_probe + 0.34 * injury_tail_window - 0.64 * stable_lock - 0.46 * fragile_lock - 0.30 * stable_sham_guard,
+>>>>>>> REPLACE
+</DIFF>
