@@ -10,7 +10,6 @@ def make_offspring(
     rng,
 ):
     """Constant mixture matched to R15-gen18 development operator usage."""
-    del parent_genome_summary, parent_stats, population_stats, operator_stats, rng
     probabilities = jnp.array(
         [
             0.9815712900096993,

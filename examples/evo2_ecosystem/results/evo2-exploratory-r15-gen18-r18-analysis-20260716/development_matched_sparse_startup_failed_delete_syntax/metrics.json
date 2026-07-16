@@ -1,0 +1,15 @@
+{
+    "combined_score": -2.0,
+    "public": {
+        "score": -2.0
+    },
+    "private": {
+        "candidate_sha256": "ed184e3637944574137b8208be40123c59c7f96382ebbbc107cc1648b474fed8",
+        "error_type": "CandidateValidationError",
+        "error_message": "unsupported syntax: Delete",
+        "exploratory": true,
+        "full_evaluation_performed": false,
+        "integrity_valid": false
+    },
+    "text_feedback": "Exploratory evaluation failed: CandidateValidationError: unsupported syntax: Delete"
+}
