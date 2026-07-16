@@ -1,0 +1,171 @@
+--- a/original.py
++++ b/original.py
+@@ -1,126 +1,154 @@
+ import jax.numpy as jnp
+ 
+ 
+ # EVOLVE-BLOCK-START
+ def make_offspring(
+     parent_genome_summary,
+     parent_stats,
+     population_stats,
+     operator_stats,
+     rng,
+ ):
+     """Homeostatic evidence-bandit scheduler for six heredity operators."""
+     success = operator_stats[0]
+     usage = operator_stats[1]
+     evidence = operator_stats[2]
+     parent_energy = jnp.clip(parent_stats[0], 0.0, 1.0)
+     parent_intake = jnp.clip(parent_stats[1], 0.0, 1.0)
+     parent_age = jnp.clip(parent_stats[2], 0.0, 1.0)
+     node_frac = jnp.clip(parent_genome_summary[0], 0.0, 1.0)
+     conn_frac = jnp.clip(parent_genome_summary[1], 0.0, 1.0)
+     alive = jnp.clip(population_stats[0], 0.0, 1.0)
+     mean_energy = jnp.clip(population_stats[1], 0.0, 1.0)
+     pop_loss = jnp.clip(-population_stats[2], 0.0, 1.0)
+     births = jnp.clip(population_stats[3], 0.0, 1.0)
+     deaths = jnp.clip(population_stats[4], 0.0, 1.0)
+     mean_intake = jnp.clip(population_stats[5], 0.0, 1.0)
+     ready = jnp.clip(
+         0.45 * parent_energy + 0.35 * parent_intake + 0.20 * parent_age,
+         0.0,
+         1.0,
+     )
+     scarcity = jnp.clip(
+         0.55 * jnp.clip(0.55 - mean_energy, 0.0, 1.0)
+         + 0.45 * jnp.clip(0.55 - mean_intake, 0.0, 1.0),
+         0.0,
+         1.0,
+     )
+     demographic = jnp.clip(
+         0.45 * pop_loss
+         + 0.35 * deaths
+         + 0.20 * jnp.clip(0.90 - alive, 0.0, 1.0),
+         0.0,
+         1.0,
+     )
+     stagnation = jnp.clip(
+         jnp.clip(0.12 - births, 0.0, 1.0) * (0.35 + 0.65 * alive),
+         0.0,
+         1.0,
+     )
+     stress = jnp.clip(
+         1.35 * demographic + 0.75 * scarcity + 0.45 * stagnation,
+         0.0,
+         1.0,
+     )
+     compact = jnp.clip(1.0 - 0.55 * node_frac - 0.45 * conn_frac, 0.0, 1.0)
+     large = jnp.clip(0.55 * node_frac + 0.45 * conn_frac, 0.0, 1.0)
++    clone_overstay = jnp.clip(
++        usage[0] * evidence[0] * jnp.clip(0.50 - success[0], 0.0, 1.0),
++        0.0,
++        1.0,
++    )
++    rescue_band = jnp.clip((stress - 0.18) * 2.8, 0.0, 1.0)
++    severe_band = jnp.clip((stress - 0.42) * 2.2, 0.0, 1.0)
++    standard_probe = jnp.clip(
++        (0.55 + 0.45 * jnp.clip(1.0 - evidence[2], 0.0, 1.0))
++        * (0.45 + 0.55 * jnp.clip(success[2] - success[0] + 0.30, 0.0, 1.0))
++        * (0.45 + 0.55 * jnp.clip(1.0 - usage[2], 0.0, 1.0)),
++        0.0,
++        1.0,
++    )
++    rescue_pulse = jnp.clip(
++        ready
++        * rescue_band
++        * standard_probe
++        * (0.55 + 0.45 * compact)
++        * (0.70 + 0.30 * clone_overstay),
++        0.0,
++        1.0,
++    )
+     mutation_budget = jnp.clip(
+         ready
+         * stress
+-        * (0.30 + 0.40 * compact + 0.20 * jnp.clip(success[0], 0.0, 1.0))
+-        * (0.35 + 0.65 * jnp.clip(1.0 - usage[0], 0.0, 1.0)),
++        * (0.24 + 0.36 * compact + 0.16 * jnp.clip(success[0], 0.0, 1.0))
++        * (0.30 + 0.70 * jnp.clip(1.0 - usage[0], 0.0, 1.0))
++        + 0.85 * rescue_pulse,
+         0.0,
+         1.0,
+     )
+     trial = jnp.clip(1.0 - evidence, 0.0, 1.0)
+     reliable = jnp.clip(evidence * success, 0.0, 1.0)
+     clone_edge = jnp.clip(success[0] * evidence[0], 0.0, 1.0)
+     op_advantage = jnp.clip(
+         0.60 * reliable
+         + 0.30 * trial
+         + 0.20 * jnp.clip(success - success[0] + 0.20, 0.0, 1.0)
+         - 0.35 * usage
+         - 0.15 * clone_edge,
+         0.0,
+         1.0,
+     )
+     conservative_gate = jnp.clip(
+-        mutation_budget * (0.65 + 0.35 * scarcity) * (0.55 + 0.45 * op_advantage[1]),
++        mutation_budget * rescue_band * (0.65 + 0.35 * scarcity) * (0.55 + 0.45 * op_advantage[1]),
+         0.0,
+         1.0,
+     )
+     standard_gate = jnp.clip(
+-        mutation_budget * (0.75 + 0.25 * demographic) * (0.50 + 0.50 * op_advantage[2]),
++        mutation_budget * (0.55 + 0.45 * rescue_band) * (0.55 + 0.45 * op_advantage[2])
++        + 0.80 * rescue_pulse,
+         0.0,
+         1.0,
+     )
+     exploratory_gate = jnp.clip(
+-        mutation_budget * demographic * compact * (0.30 + 0.70 * op_advantage[3]),
++        mutation_budget * severe_band * demographic * compact * (0.30 + 0.70 * op_advantage[3]),
+         0.0,
+         1.0,
+     )
+     structural_gate = jnp.clip(
+-        mutation_budget * demographic * compact * (0.20 + 0.80 * op_advantage[4]),
++        mutation_budget * severe_band * demographic * compact * (0.20 + 0.80 * op_advantage[4]),
+         0.0,
+         1.0,
+     )
+     mixed_gate = jnp.clip(
+         mutation_budget
++        * severe_band
+         * stress
+         * jnp.clip(0.75 * compact + 0.25 * large, 0.0, 1.0)
+         * (0.25 + 0.75 * op_advantage[5]),
+         0.0,
+         1.0,
+     )
+     clone_hold = jnp.clip(
+         1.0
+-        - 0.65 * mutation_budget
++        - 0.70 * mutation_budget
++        - 0.55 * rescue_pulse
++        - 0.25 * clone_overstay
+         + 0.25 * jnp.clip(mean_energy - 0.45, 0.0, 1.0)
+         + 0.20 * jnp.clip(mean_intake - 0.45, 0.0, 1.0)
+-        + 0.20 * clone_edge,
++        + 0.18 * clone_edge,
+         0.0,
+         1.0,
+     )
+     logits = jnp.array(
+         [
+-            5.6 + 1.4 * clone_hold - 6.2 * mutation_budget,
+-            -4.2 + 5.0 * conservative_gate + 1.1 * op_advantage[1],
+-            -4.8 + 7.0 * standard_gate + 1.4 * op_advantage[2],
+-            -6.4 + 5.2 * exploratory_gate + 1.0 * op_advantage[3],
+-            -6.8 + 4.6 * structural_gate + 0.8 * op_advantage[4],
+-            -6.5 + 5.4 * mixed_gate + 0.9 * op_advantage[5],
++            5.15 + 1.25 * clone_hold - 6.55 * mutation_budget - 2.40 * rescue_pulse,
++            -4.45 + 4.75 * conservative_gate + 1.05 * op_advantage[1],
++            -4.35 + 8.70 * standard_gate + 1.45 * op_advantage[2] + 2.10 * rescue_pulse,
++            -6.25 + 5.10 * exploratory_gate + 0.95 * op_advantage[3],
++            -6.55 + 4.80 * structural_gate + 0.80 * op_advantage[4],
++            -6.15 + 5.30 * mixed_gate + 0.90 * op_advantage[5],
+         ],
+         dtype=jnp.float32,
+     )
+     return jnp.clip(logits, -7.0, 7.0)
+ # EVOLVE-BLOCK-END
