@@ -1,0 +1,15 @@
+{
+  "generation": 3,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "evidence_gated_recovery",
+  "patch_description": "Use a stricter normalized recovery gate before leaving clone: require ecological need, parent-relative edge, and at least some trusted parametric evidence together. This should reduce founder-specific mutation over-triggering while still allowing conservative and standard parametric heredity to activate when the local ecology is deteriorating and those operators have credible evidence. The edit also softly penalizes clone only when clone has trusted poor evidence, rather than broadly lowering clone everywhere.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T19:40:49.508393",
+  "llm_cost": 0.139672,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_3/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

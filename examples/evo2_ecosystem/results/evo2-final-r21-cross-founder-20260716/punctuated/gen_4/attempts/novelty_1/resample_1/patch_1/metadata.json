@@ -1,0 +1,15 @@
+{
+  "generation": 4,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "trusted_tempered_pressure",
+  "patch_description": "Temper ecology pressure with population viability so injury/founder stress does not automatically unlock broad mutation, while still preserving a real ecology-conditioned response. Add a normalized trusted-evidence gate that favors conservative and standard parametric mutation only when mutation operators have evidence-backed success relative to clone, and when the parent is locally better than the population. This should reduce founder-specific over-triggering while keeping non-clone adaptation alive.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T20:05:08.064019",
+  "llm_cost": 0.160931,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_4/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}
