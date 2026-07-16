@@ -1,4 +1,4 @@
-"""Render the frozen R17 recovery, mechanism, and program-lineage figures."""
+"""Render frozen Evo² recovery, mechanism, and program-lineage figures."""
 
 from __future__ import annotations
 
@@ -31,7 +31,11 @@ def _curve_summary(episodes: list[dict], key: str) -> tuple[np.ndarray, np.ndarr
     return mean, 1.96 * sem
 
 
-def _plot_recovery(trajectory: dict, output_dir: Path) -> dict:
+def _plot_recovery(
+    trajectory: dict,
+    output_dir: Path,
+    candidate_label: str,
+) -> dict:
     groups: dict[str, list[dict]] = {}
     for episode in trajectory["episodes"]:
         groups.setdefault(episode["event_kind"], []).append(episode)
@@ -47,7 +51,7 @@ def _plot_recovery(trajectory: dict, output_dir: Path) -> dict:
             episodes, "reference_productivity"
         )
         x = np.arange(candidate_mean.size)
-        axis.plot(x, candidate_mean, label="Shinka R17", linewidth=2.2)
+        axis.plot(x, candidate_mean, label=candidate_label, linewidth=2.2)
         axis.fill_between(
             x,
             candidate_mean - candidate_ci,
@@ -61,7 +65,7 @@ def _plot_recovery(trajectory: dict, output_dir: Path) -> dict:
             reference_mean + reference_ci,
             alpha=0.18,
         )
-        axis.set_title("injury" if event_kind != "none" else "sham")
+        axis.set_title("sham" if event_kind == "null" else "injury")
         axis.set_xlabel("post-event checkpoint")
         axis.set_ylabel("normalized resource productivity")
         axis.grid(alpha=0.22)
@@ -87,15 +91,20 @@ def _realized_fraction(episodes: list[dict]) -> np.ndarray:
     return counts / counts.sum()
 
 
-def _plot_mechanism(metrics: dict, trajectory: dict, output_dir: Path) -> dict:
+def _plot_mechanism(
+    metrics: dict,
+    trajectory: dict,
+    output_dir: Path,
+    run_label: str,
+) -> dict:
     public = metrics["public"]
     pre = np.asarray(public["pre_selection_probability"], dtype=np.float64)
     post = np.asarray(public["post_selection_probability"], dtype=np.float64)
     sham = _realized_fraction(
-        [episode for episode in trajectory["episodes"] if episode["event_kind"] == "none"]
+        [episode for episode in trajectory["episodes"] if episode["event_kind"] == "null"]
     )
     injury = _realized_fraction(
-        [episode for episode in trajectory["episodes"] if episode["event_kind"] != "none"]
+        [episode for episode in trajectory["episodes"] if episode["event_kind"] != "null"]
     )
     x = np.arange(len(OPERATORS))
     width = 0.20
@@ -106,7 +115,7 @@ def _plot_mechanism(metrics: dict, trajectory: dict, output_dir: Path) -> dict:
     axis.bar(x + 1.5 * width, injury, width, label="injury births")
     axis.set_xticks(x, OPERATORS, rotation=20, ha="right")
     axis.set_ylabel("probability / fraction")
-    axis.set_title("R17 heredity allocation")
+    axis.set_title(f"{run_label} heredity allocation")
     axis.grid(axis="y", alpha=0.22)
     axis.legend(frameon=False)
     figure.tight_layout()
@@ -121,7 +130,11 @@ def _plot_mechanism(metrics: dict, trajectory: dict, output_dir: Path) -> dict:
     }
 
 
-def _plot_lineage(search_dir: Path, output_dir: Path) -> list[dict]:
+def _plot_lineage(
+    search_dir: Path,
+    output_dir: Path,
+    run_label: str,
+) -> list[dict]:
     records = []
     for generation_dir in sorted(
         search_dir.glob("gen_*"), key=lambda path: int(path.name.split("_")[1])
@@ -147,7 +160,7 @@ def _plot_lineage(search_dir: Path, output_dir: Path) -> list[dict]:
     axis.axhline(0.0, color="black", linewidth=1.0, alpha=0.6)
     axis.set_xlabel("Shinka generation")
     axis.set_ylabel("paired robust score vs clone")
-    axis.set_title("R17 program-evolution lineage")
+    axis.set_title(f"{run_label} program-evolution lineage")
     axis.grid(alpha=0.22)
     figure.tight_layout()
     for suffix in ("png", "pdf"):
@@ -162,15 +175,28 @@ def main() -> None:
     parser.add_argument("--metrics-json", type=Path, required=True)
     parser.add_argument("--search-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--candidate-label", default="Shinka policy")
+    parser.add_argument("--run-label", default="Evo²")
     arguments = parser.parse_args()
     arguments.output_dir.mkdir(parents=True, exist_ok=True)
     trajectory = _load(arguments.trajectory_json)
     figure_data = {
-        "recovery": _plot_recovery(trajectory, arguments.output_dir),
-        "mechanism": _plot_mechanism(
-            _load(arguments.metrics_json), trajectory, arguments.output_dir
+        "recovery": _plot_recovery(
+            trajectory,
+            arguments.output_dir,
+            arguments.candidate_label,
         ),
-        "lineage": _plot_lineage(arguments.search_dir, arguments.output_dir),
+        "mechanism": _plot_mechanism(
+            _load(arguments.metrics_json),
+            trajectory,
+            arguments.output_dir,
+            arguments.run_label,
+        ),
+        "lineage": _plot_lineage(
+            arguments.search_dir,
+            arguments.output_dir,
+            arguments.run_label,
+        ),
     }
     (arguments.output_dir / "figure_data.json").write_text(
         json.dumps(figure_data, indent=2, sort_keys=True, allow_nan=False) + "\n"
