@@ -235,12 +235,12 @@ def _plot_lineages(lineages: dict[str, list[dict]], output_dir: Path) -> None:
     for axis, (name, records) in zip(axes, lineages.items(), strict=True):
         valid = [record for record in records if record["valid"] and record["score"] is not None]
         invalid = [record for record in records if not record["valid"]]
-        axis.plot(
+        axis.scatter(
             [record["generation"] for record in valid],
             [record["score"] for record in valid],
             marker="o",
-            linewidth=1.4,
-            label="valid",
+            s=42,
+            label="scored",
         )
         if invalid and valid:
             scores = np.asarray([record["score"] for record in valid], dtype=np.float64)
@@ -253,8 +253,8 @@ def _plot_lineages(lineages: dict[str, list[dict]], output_dir: Path) -> None:
                 label="invalid",
             )
         axis.axhline(0.0, color="black", linewidth=1.0, alpha=0.65)
-        axis.set_title(f"{name} Shinka lineage")
-        axis.set_xlabel("evaluation")
+        axis.set_title(f"{name} training score by evaluation")
+        axis.set_xlabel("evaluation slot")
         axis.set_ylabel("training score vs exact clone")
         axis.grid(alpha=0.22)
         axis.legend(frameon=False)
