@@ -1,0 +1,102 @@
+<NAME>
+viability_relative_trust_gate
+</NAME>
+<DESCRIPTION>
+Replace raw stress pressure with normalized ecology need gated by population viability, then make operator adaptation relative to clone evidence instead of rewarding every unused operator. This keeps ecology-conditioned mutation but reduces founder-specific over-triggering: scarcity/probing only matters when ecology pressure and trusted non-clone operator evidence agree.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    pressure = jnp.clip(stress_raw * (0.42 + 0.58 * parent_edge), 0.0, 1.0)
+    rescue = jnp.clip(
+        intake_gap
+        * (0.38 * decline + 0.28 * death + 0.20 * energy_gap)
+        * (0.35 + 0.65 * parent_edge),
+        0.0,
+        1.0,
+    )
+=======
+    viability = jnp.clip(
+        alive_fraction
+        * (0.45 + 0.55 * mean_energy_fraction)
+        * (1.0 - 0.55 * death),
+        0.0,
+        1.0,
+    )
+    normalized_need = jnp.clip(
+        0.46 * stress_raw
+        + 0.24 * intake_gap * (1.0 - mean_intake_ema)
+        + 0.18 * energy_gap * (1.0 - mean_energy_fraction)
+        + 0.12 * birth_gap * (1.0 - birth_rate_ema),
+        0.0,
+        1.0,
+    )
+    pressure = jnp.clip(
+        normalized_need
+        * (0.35 + 0.65 * parent_edge)
+        * (0.38 + 0.62 * viability),
+        0.0,
+        1.0,
+    )
+    rescue = jnp.clip(
+        intake_gap
+        * (0.28 * decline + 0.22 * death + 0.18 * energy_gap + 0.18 * birth_gap)
+        * (0.42 + 0.58 * parent_edge)
+        * (0.50 + 0.50 * viability),
+        0.0,
+        1.0,
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    trusted = jnp.clip(evidence * (success - 0.30) * 2.50, 0.0, 1.0)
+    mutation_trust = jnp.clip(
+        0.34 * trusted[1]
+        + 0.36 * trusted[2]
+        + 0.10 * trusted[3]
+        + 0.08 * trusted[4]
+        + 0.12 * trusted[5],
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * (0.25 + 0.75 * mutation_trust)
+    op_value = 1.55 * learned + 0.26 * scarce + 0.10 * probe + 0.82 * trusted - 0.30 * usage
+=======
+    trusted = jnp.clip(evidence * (success - 0.34) * 3.20, 0.0, 1.0)
+    clone_trust = jnp.clip(evidence[0] * (success[0] - 0.22) * 2.20, 0.0, 1.0)
+    relative_trust = jnp.clip(trusted - 0.28 * clone_trust, 0.0, 1.0)
+    mutation_trust = jnp.clip(
+        0.46 * relative_trust[1]
+        + 0.40 * relative_trust[2]
+        + 0.04 * relative_trust[3]
+        + 0.03 * relative_trust[4]
+        + 0.07 * relative_trust[5],
+        0.0,
+        1.0,
+    )
+    ecology_gate = jnp.clip(
+        (0.20 + 0.80 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.56 + 0.44 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+    op_value = (
+        1.46 * learned
+        + 0.16 * scarce * ecology_gate
+        + 0.08 * probe
+        + 0.96 * relative_trust
+        - 0.30 * usage
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    base = jnp.array([4.12, -0.82, -1.54, -5.12, -5.92, -5.52], dtype=jnp.float32)
+    calm_gain = jnp.array([2.30, 0.48, 0.10, -0.38, -0.34, -0.28], dtype=jnp.float32)
+    pressure_gain = jnp.array([-1.52, 0.34, 0.92, 1.10, 0.64, 0.88], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.42, 0.58, 0.92, 0.88, 0.38, 0.70], dtype=jnp.float32)
+=======
+    base = jnp.array([4.20, -0.88, -1.62, -5.42, -6.16, -5.78], dtype=jnp.float32)
+    calm_gain = jnp.array([2.38, 0.46, 0.08, -0.44, -0.38, -0.32], dtype=jnp.float32)
+    pressure_gain = jnp.array([-1.22, 0.40, 0.98, 0.70, 0.30, 0.54], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.34, 0.66, 1.02, 0.54, 0.18, 0.42], dtype=jnp.float32)
+>>>>>>> REPLACE
+</DIFF>

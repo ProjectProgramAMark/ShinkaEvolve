@@ -1,0 +1,42 @@
+<NAME>
+anti_overtrigger_trust_gate
+</NAME>
+<DESCRIPTION>
+Add a normalized ecology trust gate that only increases mutation when pressure is real, population calm is low, and operator evidence is both non-clone and better than clone evidence. This keeps the mechanism ecology-conditioned, uses trusted operator evidence directly, and avoids broad probing of unknown exploratory/structural/mixed operators in founder-specific calm regimes.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    cautious_probe = jnp.clip(probe * rescue_window * (1.0 - 0.44 * calm), 0.0, 1.0)
+    probe_gain = jnp.array([-0.24, 0.14, 0.28, 0.86, 0.58, 0.72], dtype=jnp.float32)
+    trust_gain = jnp.array([0.08, 0.48, 0.62, 0.44, 0.38, 0.42], dtype=jnp.float32)
+=======
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    clone_trust = jnp.clip(evidence[0] * (success[0] - prior[0]), -0.28, 0.28)
+    nonclone_edge = jnp.clip(trusted_edge - clone_trust, -0.18, 0.32)
+    transfer_gate = jnp.clip(
+        (0.30 + 0.70 * rescue_window)
+        * (0.22 + 0.78 * jnp.clip(pressure + rescue - 0.55 * calm, 0.0, 1.0))
+        * (0.55 + 0.45 * parent_quality)
+        * (1.0 - 0.50 * growth),
+        0.0,
+        1.0,
+    )
+    cautious_probe = jnp.clip(
+        probe * rescue_window * (1.0 - 0.44 * calm) * (0.18 + 0.82 * transfer_gate),
+        0.0,
+        1.0,
+    )
+    probe_gain = jnp.array([-0.18, 0.10, 0.22, 0.58, 0.38, 0.48], dtype=jnp.float32)
+    trust_gain = jnp.array([0.06, 0.44, 0.58, 0.34, 0.30, 0.34], dtype=jnp.float32)
+    relative_gain = jnp.array([-0.46, 0.42, 0.56, 0.20, 0.16, 0.18], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+=======
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+        + relative_gain * nonclone_edge * transfer_gate
+>>>>>>> REPLACE
+</DIFF>

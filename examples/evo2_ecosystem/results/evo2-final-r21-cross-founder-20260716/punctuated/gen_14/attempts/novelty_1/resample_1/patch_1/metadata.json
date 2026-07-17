@@ -1,0 +1,15 @@
+{
+  "generation": 14,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "recoverable_evidence_window",
+  "patch_description": "Add a bounded transfer-oriented mutation window that only opens under recoverable ecological stress: viable population, non-collapsing survival, meaningful normalized need, and a parent with above-local energy/intake. This should raise conservative and standard parametric use where mutation has trusted evidence, while suppressing founder-specific over-triggering during calm growth or severe decline. The mechanism remains ecology-conditioned and evidence-adaptive, without using identity, seed, time, or hidden partitions.",
+  "error_msg": null,
+  "timestamp": "2026-07-17T00:18:30.217346",
+  "llm_cost": 0.16364,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_14/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

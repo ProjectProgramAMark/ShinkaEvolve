@@ -1,0 +1,15 @@
+{
+  "generation": 17,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 3,
+  "patch_name": "viability_relative_trust_gate",
+  "patch_description": "Replace raw stress pressure with normalized ecology need gated by population viability, then make operator adaptation relative to clone evidence instead of rewarding every unused operator. This keeps ecology-conditioned mutation but reduces founder-specific over-triggering: scarcity/probing only matters when ecology pressure and trusted non-clone operator evidence agree.",
+  "error_msg": null,
+  "timestamp": "2026-07-17T01:31:29.541671",
+  "llm_cost": 0.17846,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_17/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

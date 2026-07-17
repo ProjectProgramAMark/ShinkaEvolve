@@ -1,0 +1,113 @@
+import jax.numpy as jnp
+
+
+# EVOLVE-BLOCK-START
+def make_offspring(
+    parent_genome_summary,
+    parent_stats,
+    population_stats,
+    operator_stats,
+    rng,
+):
+    """Vector-regime sparse heredity scheduler."""
+    success = operator_stats[0]
+    usage = operator_stats[1]
+    evidence = operator_stats[2]
+    node_fraction = parent_genome_summary[0]
+    connection_fraction = parent_genome_summary[1]
+    energy_fraction = parent_stats[0]
+    intake_ema = parent_stats[1]
+    alive_fraction = population_stats[0]
+    mean_energy_fraction = population_stats[1]
+    population_change_ema = population_stats[2]
+    birth_rate_ema = population_stats[3]
+    death_rate_ema = population_stats[4]
+    mean_intake_ema = population_stats[5]
+    decline = jnp.clip(-population_change_ema, 0.0, 1.0)
+    growth = jnp.clip(population_change_ema, 0.0, 1.0)
+    death = jnp.clip(death_rate_ema, 0.0, 1.0)
+    birth_gap = jnp.clip(0.28 - birth_rate_ema, 0.0, 1.0)
+    energy_gap = jnp.clip(0.56 - mean_energy_fraction, 0.0, 1.0)
+    intake_gap = jnp.clip(0.54 - mean_intake_ema, 0.0, 1.0)
+    parent_quality = jnp.clip(0.58 * energy_fraction + 0.42 * intake_ema, 0.0, 1.0)
+    compact = jnp.clip(1.0 - 0.55 * node_fraction - 0.45 * connection_fraction, 0.0, 1.0)
+    calm = jnp.clip(
+        alive_fraction
+        * (1.0 - death)
+        * (1.0 - decline)
+        * (0.58 + 0.42 * mean_energy_fraction),
+        0.0,
+        1.0,
+    )
+    pressure = jnp.clip(
+        0.78 * decline
+        + 0.68 * death
+        + 0.38 * energy_gap
+        + 0.44 * intake_gap
+        + 0.18 * birth_gap
+        + 0.16 * (1.0 - alive_fraction),
+        0.0,
+        1.0,
+    )
+    rescue = jnp.clip(
+        intake_gap * (0.52 * decline + 0.34 * death + 0.24 * energy_gap),
+        0.0,
+        1.0,
+    )
+    prior = jnp.array([0.22, 0.56, 0.50, 0.40, 0.37, 0.39], dtype=jnp.float32)
+    learned = jnp.clip(evidence * success + (1.0 - evidence) * prior, 0.0, 1.0)
+    scarce = jnp.clip(1.0 - usage, 0.0, 1.0)
+    evidence_gap = jnp.clip(1.0 - evidence, 0.0, 1.0)
+    probe = evidence_gap * scarce
+    op_value = 1.85 * learned + 0.38 * scarce + 0.14 * probe - 0.22 * usage
+    base = jnp.array([4.34, -1.12, -2.04, -4.88, -5.58, -5.26], dtype=jnp.float32)
+    calm_gain = jnp.array([2.12, 0.62, 0.22, -0.24, -0.20, -0.18], dtype=jnp.float32)
+    pressure_gain = jnp.array([-2.34, 0.10, 1.18, 1.75, 1.42, 1.55], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.62, 0.52, 1.06, 1.42, 0.82, 1.04], dtype=jnp.float32)
+    quality_gain = jnp.array([0.00, 0.88, 0.44, 0.10, 0.00, 0.06], dtype=jnp.float32)
+    shape_gain = jnp.array([0.00, 0.00, 0.00, 0.12, 0.68, 0.20], dtype=jnp.float32)
+    growth_gain = jnp.array([0.08, 0.04, -0.10, -0.16, -0.10, 0.28], dtype=jnp.float32)
+    value_gain = jnp.array([0.46, 0.78, 0.92, 0.70, 0.68, 0.68], dtype=jnp.float32)
+    rescue_window = jnp.clip(
+        (0.40 + 0.60 * parent_quality)
+        * (0.38 + 0.62 * compact)
+        * (0.34 + 0.66 * birth_gap)
+        * jnp.clip(pressure + rescue - 0.46 * calm, 0.0, 1.0)
+        * (1.0 - 0.58 * death),
+        0.0,
+        1.0,
+    )
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    clone_trust = jnp.clip(evidence[0] * (success[0] - prior[0]), -0.28, 0.28)
+    nonclone_edge = jnp.clip(trusted_edge - clone_trust, -0.18, 0.32)
+    transfer_gate = jnp.clip(
+        (0.30 + 0.70 * rescue_window)
+        * (0.22 + 0.78 * jnp.clip(pressure + rescue - 0.55 * calm, 0.0, 1.0))
+        * (0.55 + 0.45 * parent_quality)
+        * (1.0 - 0.50 * growth),
+        0.0,
+        1.0,
+    )
+    cautious_probe = jnp.clip(
+        probe * rescue_window * (1.0 - 0.44 * calm) * (0.18 + 0.82 * transfer_gate),
+        0.0,
+        1.0,
+    )
+    probe_gain = jnp.array([-0.18, 0.10, 0.22, 0.58, 0.38, 0.48], dtype=jnp.float32)
+    trust_gain = jnp.array([0.06, 0.44, 0.58, 0.34, 0.30, 0.34], dtype=jnp.float32)
+    relative_gain = jnp.array([-0.46, 0.42, 0.56, 0.20, 0.16, 0.18], dtype=jnp.float32)
+    logits = (
+        base
+        + calm_gain * calm
+        + pressure_gain * pressure
+        + rescue_gain * rescue
+        + quality_gain * parent_quality
+        + shape_gain * compact
+        + growth_gain * growth
+        + value_gain * op_value
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+        + relative_gain * nonclone_edge * transfer_gate
+    )
+    return jnp.clip(logits, -7.0, 7.0)
+# EVOLVE-BLOCK-END

@@ -1,0 +1,15 @@
+{
+  "generation": 8,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "trusted_recovery_probe",
+  "patch_description": "Introduce a bounded recovery-probe gate that raises exploratory, structural, and mixed mutation only when ecology is favorable: parent quality is decent, compact genomes have room to vary, pressure is not extreme, and population/birth signals suggest useful adaptation. It also adds an evidence-centered adjustment so trusted operators can gain share while weakly evidenced operators stay mostly exploratory rather than dominating. This keeps the scheduler ecology-conditioned and non-constant, but avoids the sealed-founder failure mode of broad mutation over-triggering.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T21:53:41.555389",
+  "llm_cost": 0.139015,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_8/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

@@ -1,0 +1,47 @@
+<NAME>
+trusted_recovery_probe
+</NAME>
+<DESCRIPTION>
+Introduce a bounded recovery-probe gate that raises exploratory, structural, and mixed mutation only when ecology is favorable: parent quality is decent, compact genomes have room to vary, pressure is not extreme, and population/birth signals suggest useful adaptation. It also adds an evidence-centered adjustment so trusted operators can gain share while weakly evidenced operators stay mostly exploratory rather than dominating. This keeps the scheduler ecology-conditioned and non-constant, but avoids the sealed-founder failure mode of broad mutation over-triggering.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    value_gain = jnp.array([0.46, 0.78, 0.92, 0.70, 0.68, 0.68], dtype=jnp.float32)
+    logits = (
+        base
+        + calm_gain * calm
+        + pressure_gain * pressure
+        + rescue_gain * rescue
+        + quality_gain * parent_quality
+        + shape_gain * compact
+        + growth_gain * growth
+        + value_gain * op_value
+    )
+=======
+    value_gain = jnp.array([0.46, 0.78, 0.92, 0.70, 0.68, 0.68], dtype=jnp.float32)
+    recovery_probe = jnp.clip(
+        (0.42 + 0.58 * parent_quality)
+        * (0.35 + 0.65 * compact)
+        * (0.28 + 0.72 * birth_gap)
+        * (1.0 - 0.62 * death)
+        * (0.52 + 0.48 * jnp.clip(pressure + rescue, 0.0, 1.0)),
+        0.0,
+        1.0,
+    )
+    trust_center = jnp.clip(evidence * (success - prior), -0.35, 0.35)
+    probe_gain = jnp.array([-0.34, 0.18, 0.42, 1.20, 0.86, 1.04], dtype=jnp.float32)
+    trust_gain = jnp.array([0.10, 0.56, 0.74, 0.58, 0.50, 0.54], dtype=jnp.float32)
+    logits = (
+        base
+        + calm_gain * calm
+        + pressure_gain * pressure
+        + rescue_gain * rescue
+        + quality_gain * parent_quality
+        + shape_gain * compact
+        + growth_gain * growth
+        + value_gain * op_value
+        + probe_gain * recovery_probe
+        + trust_gain * trust_center
+    )
+>>>>>>> REPLACE
+</DIFF>

@@ -1,0 +1,15 @@
+{
+  "generation": 19,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "stress_gated_trust_probe",
+  "patch_description": "Replace the broad recovery probe with a stress-excess gate that only lowers clone and boosts mutation when ecology shows normalized rescue pressure beyond calm baseline. This keeps the mechanism ecology-conditioned, but reduces founder-specific over-triggering in healthy founders. It also adds a trusted relative-advantage term against clone, gated by rescue ecology, so operator evidence can help transfer without rewarding unevidenced exploratory/structural operators everywhere.",
+  "error_msg": null,
+  "timestamp": "2026-07-17T02:19:42.738233",
+  "llm_cost": 0.1606,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_19/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

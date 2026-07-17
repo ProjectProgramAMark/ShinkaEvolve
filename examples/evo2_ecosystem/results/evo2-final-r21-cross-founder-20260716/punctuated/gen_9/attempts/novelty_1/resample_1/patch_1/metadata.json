@@ -1,0 +1,15 @@
+{
+  "generation": 9,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "trusted_rescue_probe",
+  "patch_description": "Add a small ecology-gated rescue probe that only raises mutation logits when pressure is real, calm is low, parents are viable, genomes have room to change, and births are lagging. The probe is strongest for exploratory, structural, and mixed operators, but it is tempered by trusted operator evidence so repeatedly poor or overused operators do not keep receiving probability. This should restore a genuine non-clone mechanism without returning to broad founder-specific over-mutation.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T22:17:48.029943",
+  "llm_cost": 0.135506,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_9/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

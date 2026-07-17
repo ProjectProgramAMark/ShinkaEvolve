@@ -237,10 +237,10 @@ def _plot_operator_fractions(records: list[dict], output_dir: Path) -> None:
     axis.set_ylabel("realized birth fraction")
     axis.set_ylim(0.0, 1.0)
     axis.set_title("Realized heredity-operator allocation")
-    axis.legend(frameon=False, ncol=3)
+    axis.legend(frameon=False, loc="center left", bbox_to_anchor=(1.005, 0.5))
     figure.tight_layout()
     for suffix in ("png", "pdf"):
-        figure.savefig(output_dir / f"operator_fractions.{suffix}", dpi=220)
+        figure.savefig(output_dir / f"operator_fractions.{suffix}", dpi=220, bbox_inches="tight")
     plt.close(figure)
 
 

@@ -1,0 +1,15 @@
+{
+  "generation": 10,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "cautious_recovery_probe",
+  "patch_description": "Replace the broad scalar recovery boost with a scarcity-weighted, ecology-gated probe. The current scheduler adds recovery pressure to rare mutation operators even without requiring underuse, missing evidence, or a clear non-calm rescue window. This edit makes mutation exploration conditional on pressure exceeding calm conditions, suppresses it under death-heavy fragility, and weights it by operator uncertainty so clone/conservative behavior remains dominant unless the ecology and evidence justify trying non-clone heredity.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T22:41:52.784895",
+  "llm_cost": 0.15202,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_10/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

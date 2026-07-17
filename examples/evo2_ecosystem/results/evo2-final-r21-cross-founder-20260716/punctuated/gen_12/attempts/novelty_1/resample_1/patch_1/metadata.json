@@ -1,0 +1,15 @@
+{
+  "generation": 12,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "viability_trusted_pressure",
+  "patch_description": "Replace raw stress-driven mutation pressure with founder-normalized ecological need gated by parent advantage and population viability. Operator evidence is also made relative to clone trust, so mutation operators are rewarded only when there is trusted evidence that they outperform clone-like heredity. This keeps ecology-conditioned non-clone heredity through conservative and standard parametric mutation while reducing founder-specific over-triggering of exploratory, structural, and mixed operators under weak evidence.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T23:30:15.848296",
+  "llm_cost": 0.124545,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_12/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

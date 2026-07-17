@@ -1,0 +1,20 @@
+{
+  "api_cost_usd": 2.8492,
+  "development_passed": false,
+  "final_conclusion": "negative cross-founder generalization result",
+  "invalid_candidate_programs": 2,
+  "proposals_generated_after_initial_source": 19,
+  "reported_total_compute_hms": "8h 27m 19s",
+  "sealed_opened": false,
+  "stored_candidate_programs": 20,
+  "target_evaluations": 20,
+  "training_qualifier_development_repeats": [
+    -0.010516779497265816,
+    -0.006196683272719383,
+    -0.0077119083143770695
+  ],
+  "training_qualifier_generation": 4,
+  "valid_candidate_programs": 18,
+  "wall_time_hms": "8h 15m 37s",
+  "wall_time_seconds": 29736.88
+}

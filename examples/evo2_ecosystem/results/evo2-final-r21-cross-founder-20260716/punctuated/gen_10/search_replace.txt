@@ -1,0 +1,47 @@
+<NAME>
+cautious_recovery_probe
+</NAME>
+<DESCRIPTION>
+Replace the broad scalar recovery boost with a scarcity-weighted, ecology-gated probe. The current scheduler adds recovery pressure to rare mutation operators even without requiring underuse, missing evidence, or a clear non-calm rescue window. This edit makes mutation exploration conditional on pressure exceeding calm conditions, suppresses it under death-heavy fragility, and weights it by operator uncertainty so clone/conservative behavior remains dominant unless the ecology and evidence justify trying non-clone heredity.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    recovery_probe = jnp.clip(
+        (0.42 + 0.58 * parent_quality)
+        * (0.35 + 0.65 * compact)
+        * (0.28 + 0.72 * birth_gap)
+        * (1.0 - 0.62 * death)
+        * (0.52 + 0.48 * jnp.clip(pressure + rescue, 0.0, 1.0)),
+        0.0,
+        1.0,
+    )
+    trust_center = jnp.clip(evidence * (success - prior), -0.35, 0.35)
+    probe_gain = jnp.array([-0.34, 0.18, 0.42, 1.20, 0.86, 1.04], dtype=jnp.float32)
+    trust_gain = jnp.array([0.10, 0.56, 0.74, 0.58, 0.50, 0.54], dtype=jnp.float32)
+=======
+    recovery_window = jnp.clip(
+        (0.40 + 0.60 * parent_quality)
+        * (0.34 + 0.66 * compact)
+        * (0.34 + 0.66 * birth_gap)
+        * jnp.clip(pressure + rescue - 0.52 * calm, 0.0, 1.0)
+        * (1.0 - 0.66 * death),
+        0.0,
+        1.0,
+    )
+    trusted_edge = jnp.clip(
+        evidence * (success - prior) * (0.55 + 0.45 * scarce),
+        -0.28,
+        0.28,
+    )
+    targeted_probe = jnp.clip(probe * recovery_window, 0.0, 1.0)
+    probe_gain = jnp.array([-0.22, 0.12, 0.26, 0.92, 0.58, 0.74], dtype=jnp.float32)
+    trust_gain = jnp.array([0.08, 0.50, 0.66, 0.48, 0.40, 0.44], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + probe_gain * recovery_probe
+        + trust_gain * trust_center
+=======
+        + probe_gain * targeted_probe
+        + trust_gain * trusted_edge
+>>>>>>> REPLACE
+</DIFF>

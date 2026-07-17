@@ -1,0 +1,76 @@
+<NAME>
+recoverable_evidence_window
+</NAME>
+<DESCRIPTION>
+Add a bounded transfer-oriented mutation window that only opens under recoverable ecological stress: viable population, non-collapsing survival, meaningful normalized need, and a parent with above-local energy/intake. This should raise conservative and standard parametric use where mutation has trusted evidence, while suppressing founder-specific over-triggering during calm growth or severe decline. The mechanism remains ecology-conditioned and evidence-adaptive, without using identity, seed, time, or hidden partitions.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    ecology_gate = jnp.clip(
+        (0.20 + 0.80 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.56 + 0.44 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+    op_value = (
+        1.46 * learned
+        + 0.16 * scarce * ecology_gate
+        + 0.08 * probe
+        + 0.96 * relative_trust
+        - 0.30 * usage
+    )
+=======
+    recoverable = jnp.clip(
+        pressure
+        * viability
+        * alive_fraction
+        * (1.0 - 0.72 * death)
+        * (0.42 + 0.58 * parent_edge)
+        * (0.62 + 0.38 * parent_quality),
+        0.0,
+        1.0,
+    )
+    transfer_guard = jnp.clip(
+        (0.72 + 0.28 * compact)
+        * (1.0 - 0.48 * calm)
+        * (1.0 - 0.30 * growth),
+        0.0,
+        1.0,
+    )
+    evidence_push = jnp.clip(
+        0.58 * relative_trust[1]
+        + 0.34 * relative_trust[2]
+        + 0.08 * relative_trust[5],
+        0.0,
+        1.0,
+    )
+    ecology_gate = jnp.clip(
+        (0.14 + 0.86 * recoverable)
+        * (0.44 + 0.56 * parent_edge)
+        * (0.52 + 0.48 * mutation_trust)
+        * transfer_guard,
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+    op_value = (
+        1.40 * learned
+        + 0.11 * scarce * ecology_gate
+        + 0.06 * probe
+        + 1.10 * relative_trust
+        + 0.42 * evidence_push * ecology_gate
+        - 0.34 * usage
+    )
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    pressure_gain = jnp.array([-1.22, 0.40, 0.98, 0.70, 0.30, 0.54], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.34, 0.66, 1.02, 0.54, 0.18, 0.42], dtype=jnp.float32)
+    quality_gain = jnp.array([0.00, 0.80, 0.54, 0.10, 0.00, 0.10], dtype=jnp.float32)
+=======
+    pressure_gain = jnp.array([-1.30, 0.48, 1.08, 0.54, 0.18, 0.42], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.38, 0.78, 1.08, 0.38, 0.08, 0.30], dtype=jnp.float32)
+    quality_gain = jnp.array([0.00, 0.88, 0.60, 0.04, -0.04, 0.04], dtype=jnp.float32)
+>>>>>>> REPLACE
+</DIFF>

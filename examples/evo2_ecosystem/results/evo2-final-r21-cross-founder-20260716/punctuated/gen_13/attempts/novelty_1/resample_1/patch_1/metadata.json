@@ -1,0 +1,15 @@
+{
+  "generation": 13,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "anti_overtrigger_trust_gate",
+  "patch_description": "Add a normalized ecology trust gate that only increases mutation when pressure is real, population calm is low, and operator evidence is both non-clone and better than clone evidence. This keeps the mechanism ecology-conditioned, uses trusted operator evidence directly, and avoids broad probing of unknown exploratory/structural/mixed operators in founder-specific calm regimes.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T23:54:22.669137",
+  "llm_cost": 0.139161,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_13/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

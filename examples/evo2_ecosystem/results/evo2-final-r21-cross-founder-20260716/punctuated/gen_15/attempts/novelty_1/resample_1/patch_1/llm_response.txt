@@ -1,0 +1,74 @@
+<NAME>
+injury_gated_trust_scout
+</NAME>
+<DESCRIPTION>
+This edit makes mutation pressure depend more on ecology-normalized distress and cross-operator trust, instead of subtracting clone trust directly. The current relative-trust term appears to have made the policy more clone-heavy and reduced both sham and shock deltas. The replacement adds a bounded injury-like rescue gate from intake deficit, decline/death pressure, low growth, and birth scarcity, then uses evidence-weighted non-clone advantage only when operators have real evidence. It also applies a calm/growth penalty to poorly evidenced operators so exploratory, structural, and mixed mutations do not over-trigger on sealed founders. The mechanism remains ecology-conditioned and non-constant, with small but genuine high-pressure scout boosts.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    clone_trust = jnp.clip(evidence[0] * (success[0] - prior[0]), -0.28, 0.28)
+    nonclone_edge = jnp.clip(trusted_edge - clone_trust, -0.18, 0.32)
+    transfer_gate = jnp.clip(
+        (0.30 + 0.70 * rescue_window)
+        * (0.22 + 0.78 * jnp.clip(pressure + rescue - 0.55 * calm, 0.0, 1.0))
+        * (0.55 + 0.45 * parent_quality)
+        * (1.0 - 0.50 * growth),
+        0.0,
+        1.0,
+    )
+    cautious_probe = jnp.clip(
+        probe * rescue_window * (1.0 - 0.44 * calm) * (0.18 + 0.82 * transfer_gate),
+        0.0,
+        1.0,
+    )
+    probe_gain = jnp.array([-0.18, 0.10, 0.22, 0.58, 0.38, 0.48], dtype=jnp.float32)
+    trust_gain = jnp.array([0.06, 0.44, 0.58, 0.34, 0.30, 0.34], dtype=jnp.float32)
+    relative_gain = jnp.array([-0.46, 0.42, 0.56, 0.20, 0.16, 0.18], dtype=jnp.float32)
+=======
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    trusted_advantage = jnp.clip(evidence * (success - success[0]), -0.22, 0.30)
+    injury_rescue = jnp.clip(
+        intake_gap
+        * (0.30 + 0.70 * pressure)
+        * (0.34 + 0.66 * rescue)
+        * (0.42 + 0.58 * birth_gap)
+        * (1.0 - 0.62 * growth)
+        * (1.0 - 0.46 * calm),
+        0.0,
+        1.0,
+    )
+    transfer_gate = jnp.clip(
+        (0.18 + 0.82 * rescue_window)
+        * (0.20 + 0.80 * injury_rescue)
+        * (0.52 + 0.48 * parent_quality)
+        * (0.36 + 0.64 * compact),
+        0.0,
+        1.0,
+    )
+    calm_uncertainty_penalty = jnp.clip(
+        evidence_gap * (0.54 * calm + 0.32 * growth) * (1.0 - injury_rescue),
+        0.0,
+        1.0,
+    )
+    cautious_probe = jnp.clip(
+        probe * (0.35 * rescue_window + 0.65 * injury_rescue) * (1.0 - 0.50 * calm),
+        0.0,
+        1.0,
+    )
+    probe_gain = jnp.array([-0.20, 0.12, 0.28, 0.78, 0.54, 0.66], dtype=jnp.float32)
+    trust_gain = jnp.array([0.06, 0.48, 0.64, 0.42, 0.36, 0.40], dtype=jnp.float32)
+    relative_gain = jnp.array([-0.34, 0.34, 0.48, 0.34, 0.26, 0.30], dtype=jnp.float32)
+    uncertainty_penalty_gain = jnp.array([0.00, -0.12, -0.18, -0.54, -0.46, -0.50], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+        + relative_gain * nonclone_edge * transfer_gate
+=======
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+        + relative_gain * trusted_advantage * transfer_gate
+        + uncertainty_penalty_gain * calm_uncertainty_penalty
+>>>>>>> REPLACE
+</DIFF>

@@ -1,0 +1,15 @@
+{
+  "generation": 16,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "homeostatic_bandit_window",
+  "patch_description": "This uses a bounded homeostatic bandit instead of additive regime gains. It opens a narrow mutation window only when the parent is locally strong, the ecology is stressed but not crashing, and operator evidence beats a conservative prior. Mutation pressure is normalized by population health and damped under growth/calm states, which should reduce founder-specific over-triggering while still allowing ecology-conditioned non-clone heredity.",
+  "error_msg": null,
+  "timestamp": "2026-07-17T01:07:13.887838",
+  "llm_cost": 0.19658,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_16/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

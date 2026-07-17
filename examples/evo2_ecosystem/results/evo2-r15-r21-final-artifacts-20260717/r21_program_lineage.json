@@ -1,0 +1,402 @@
+[
+  {
+    "api_cost": 0.0,
+    "archive_inspiration_ids": [],
+    "evaluation_seconds": 1417.3276901245117,
+    "generation": 0,
+    "id": "115d4342-4ed9-46b5-9ca0-e0ddc825a61e",
+    "island": 0,
+    "parent_id": null,
+    "patch_description": "Initial program setup",
+    "patch_name": "initial_program",
+    "sampling_seconds": 0.0,
+    "score": -0.007671186700463295,
+    "timestamp": 1784227880.811848,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.0,
+    "archive_inspiration_ids": [],
+    "evaluation_seconds": 1417.3276901245117,
+    "generation": 0,
+    "id": "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa",
+    "island": 1,
+    "parent_id": null,
+    "patch_description": "Initial program setup",
+    "patch_name": "initial_program",
+    "sampling_seconds": 0.0,
+    "score": -0.007671186700463295,
+    "timestamp": 1784227880.811848,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.15997,
+    "archive_inspiration_ids": [],
+    "evaluation_seconds": 1422.3641307353973,
+    "generation": 1,
+    "id": "1dd2d397-0414-4738-a6c5-031f1b535461",
+    "island": 1,
+    "parent_id": "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa",
+    "patch_description": "Shift the scheduler from raw stress-triggered mutation toward relative ecology plus trusted operator evidence. The edit keeps clone dominant in calm, low-evidence states, but gives conservative and standard parametric mutation more probability when the parent is healthier than the local ecology and when operator evidence supports mutation. Exploratory, structural, and mixed remain bounded and only rise under normalized rescue pressure with compact genomes and trusted non-clone evidence, reducing founder-specific over-triggering from raw population stress alone.",
+    "patch_name": "trusted_relative_rescue",
+    "sampling_seconds": 44.44431185722351,
+    "score": -0.007030689623206854,
+    "timestamp": 1784229347.646789,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.084155,
+    "archive_inspiration_ids": [
+      "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa"
+    ],
+    "evaluation_seconds": 1418.1532838344574,
+    "generation": 2,
+    "id": "3f3116cd-5ac2-4991-8210-039acc71e346",
+    "island": 1,
+    "parent_id": "1dd2d397-0414-4738-a6c5-031f1b535461",
+    "patch_description": "Use ecology-normalized stress with a reproductive deficit gate and require parent advantage plus trusted mutation evidence before opening mutation logits. This keeps a real ecology-conditioned scheduler, but reduces founder-specific over-triggering by making mutation pressure depend on normalized population need and actual trusted operator evidence rather than raw stress alone.",
+    "patch_name": "normalized_trust_gate",
+    "sampling_seconds": 35.288758754730225,
+    "score": -0.012750143185257912,
+    "timestamp": 1784230801.122889,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.139672,
+    "archive_inspiration_ids": [
+      "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa"
+    ],
+    "evaluation_seconds": 1416.5203051567078,
+    "generation": 3,
+    "id": "4b80257c-30b8-43ff-9a8b-a766c48a9710",
+    "island": 1,
+    "parent_id": "1dd2d397-0414-4738-a6c5-031f1b535461",
+    "patch_description": "Use a stricter normalized recovery gate before leaving clone: require ecological need, parent-relative edge, and at least some trusted parametric evidence together. This should reduce founder-specific mutation over-triggering while still allowing conservative and standard parametric heredity to activate when the local ecology is deteriorating and those operators have credible evidence. The edit also softly penalizes clone only when clone has trusted poor evidence, rather than broadly lowering clone everywhere.",
+    "patch_name": "evidence_gated_recovery",
+    "sampling_seconds": 48.36159038543701,
+    "score": -0.010991976596415043,
+    "timestamp": 1784232266.039357,
+    "top_k_inspiration_ids": [
+      "3f3116cd-5ac2-4991-8210-039acc71e346"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.160931,
+    "archive_inspiration_ids": [
+      "4b80257c-30b8-43ff-9a8b-a766c48a9710"
+    ],
+    "evaluation_seconds": 1417.1907124519348,
+    "generation": 4,
+    "id": "2cfc12e2-439c-4f8b-99fb-4cf71c411910",
+    "island": 1,
+    "parent_id": "1dd2d397-0414-4738-a6c5-031f1b535461",
+    "patch_description": "Temper ecology pressure with population viability so injury/founder stress does not automatically unlock broad mutation, while still preserving a real ecology-conditioned response. Add a normalized trusted-evidence gate that favors conservative and standard parametric mutation only when mutation operators have evidence-backed success relative to clone, and when the parent is locally better than the population. This should reduce founder-specific over-triggering while keeping non-clone adaptation alive.",
+    "patch_name": "trusted_tempered_pressure",
+    "sampling_seconds": 42.00213074684143,
+    "score": 0.005382193252444267,
+    "timestamp": 1784233725.265062,
+    "top_k_inspiration_ids": [
+      "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.19136,
+    "archive_inspiration_ids": [
+      "2cfc12e2-439c-4f8b-99fb-4cf71c411910"
+    ],
+    "evaluation_seconds": 1747.4185907840729,
+    "generation": 5,
+    "id": "dd3e7b82-cdfa-4b94-bc5c-bee636939355",
+    "island": 1,
+    "parent_id": "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa",
+    "patch_description": "Use founder-normalized ecological pressure instead of raw stress, then gate mutation credit through operator evidence relative to clone trust. This keeps ecology-conditioned non-clone behavior, but reduces transfer failure from scarce or untrusted operators being rewarded just because they are unused. The logits are also softened toward conservative and standard parametric mutation while suppressing exploratory, structural, and mixed mutation unless ecology and evidence both support them.",
+    "patch_name": "trusted_normalized_pressure",
+    "sampling_seconds": 52.99815654754639,
+    "score": 0.0,
+    "timestamp": 1784235525.718726,
+    "top_k_inspiration_ids": [
+      "1dd2d397-0414-4738-a6c5-031f1b535461"
+    ],
+    "valid": false
+  },
+  {
+    "api_cost": 0.1586,
+    "archive_inspiration_ids": [
+      "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa"
+    ],
+    "evaluation_seconds": 1765.0632348060608,
+    "generation": 6,
+    "id": "ace5db02-58d6-4a0b-af4e-7ad0a863f6b4",
+    "island": 1,
+    "parent_id": "2cfc12e2-439c-4f8b-99fb-4cf71c411910",
+    "patch_description": "none",
+    "patch_name": "none",
+    "sampling_seconds": 35.361451625823975,
+    "score": 0.0,
+    "timestamp": 1784237326.175394,
+    "top_k_inspiration_ids": [
+      "1dd2d397-0414-4738-a6c5-031f1b535461"
+    ],
+    "valid": false
+  },
+  {
+    "api_cost": 0.093155,
+    "archive_inspiration_ids": [],
+    "evaluation_seconds": 1417.83251619339,
+    "generation": 7,
+    "id": "25c63a04-85fc-429d-8762-2f64d09cdf66",
+    "island": 0,
+    "parent_id": "115d4342-4ed9-46b5-9ca0-e0ddc825a61e",
+    "patch_description": "Uses an ecology-normalized mutation budget instead of fixed sparse regimes. The scheduler first estimates whether mutation is worth spending from population stress, recovery capacity, parent quality, and genome compactness, then allocates that limited budget through trusted operator evidence relative to clone. Weak or untrusted evidence is shrunk toward conservative priors, so exploratory/structural operators only rise when both ecology and operator evidence support them. This keeps an ecology-conditioned non-clone mechanism while reducing founder-specific over-triggering.",
+    "patch_name": "trusted_budget_scheduler",
+    "sampling_seconds": 50.0578031539917,
+    "score": -0.020823823288083076,
+    "timestamp": 1784238794.100284,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.139015,
+    "archive_inspiration_ids": [
+      "25c63a04-85fc-429d-8762-2f64d09cdf66"
+    ],
+    "evaluation_seconds": 1419.2816417217255,
+    "generation": 8,
+    "id": "18b7eb86-6798-4ecc-a9d0-6084f09a42e1",
+    "island": 0,
+    "parent_id": "115d4342-4ed9-46b5-9ca0-e0ddc825a61e",
+    "patch_description": "Introduce a bounded recovery-probe gate that raises exploratory, structural, and mixed mutation only when ecology is favorable: parent quality is decent, compact genomes have room to vary, pressure is not extreme, and population/birth signals suggest useful adaptation. It also adds an evidence-centered adjustment so trusted operators can gain share while weakly evidenced operators stay mostly exploratory rather than dominating. This keeps the scheduler ecology-conditioned and non-constant, but avoids the sealed-founder failure mode of broad mutation over-triggering.",
+    "patch_name": "trusted_recovery_probe",
+    "sampling_seconds": 27.43191409111023,
+    "score": -0.0047030262649059296,
+    "timestamp": 1784240240.846549,
+    "top_k_inspiration_ids": [],
+    "valid": true
+  },
+  {
+    "api_cost": 0.135506,
+    "archive_inspiration_ids": [
+      "25c63a04-85fc-429d-8762-2f64d09cdf66"
+    ],
+    "evaluation_seconds": 1417.6043481826782,
+    "generation": 9,
+    "id": "ec281437-580d-498d-8baf-cee399db3905",
+    "island": 0,
+    "parent_id": "115d4342-4ed9-46b5-9ca0-e0ddc825a61e",
+    "patch_description": "Add a small ecology-gated rescue probe that only raises mutation logits when pressure is real, calm is low, parents are viable, genomes have room to change, and births are lagging. The probe is strongest for exploratory, structural, and mixed operators, but it is tempered by trusted operator evidence so repeatedly poor or overused operators do not keep receiving probability. This should restore a genuine non-clone mechanism without returning to broad founder-specific over-mutation.",
+    "patch_name": "trusted_rescue_probe",
+    "sampling_seconds": 27.16117811203003,
+    "score": -0.0019009774550795555,
+    "timestamp": 1784241685.64217,
+    "top_k_inspiration_ids": [
+      "18b7eb86-6798-4ecc-a9d0-6084f09a42e1"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.15202,
+    "archive_inspiration_ids": [
+      "25c63a04-85fc-429d-8762-2f64d09cdf66"
+    ],
+    "evaluation_seconds": 1411.183585882187,
+    "generation": 10,
+    "id": "58527a80-6445-4647-8100-3a638e380b77",
+    "island": 0,
+    "parent_id": "18b7eb86-6798-4ecc-a9d0-6084f09a42e1",
+    "patch_description": "Replace the broad scalar recovery boost with a scarcity-weighted, ecology-gated probe. The current scheduler adds recovery pressure to rare mutation operators even without requiring underuse, missing evidence, or a clear non-calm rescue window. This edit makes mutation exploration conditional on pressure exceeding calm conditions, suppresses it under death-heavy fragility, and weights it by operator uncertainty so clone/conservative behavior remains dominant unless the ecology and evidence justify trying non-clone heredity.",
+    "patch_name": "cautious_recovery_probe",
+    "sampling_seconds": 27.11900758743286,
+    "score": -0.011848632246255875,
+    "timestamp": 1784243123.979267,
+    "top_k_inspiration_ids": [
+      "ec281437-580d-498d-8baf-cee399db3905"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.150005,
+    "archive_inspiration_ids": [
+      "4b80257c-30b8-43ff-9a8b-a766c48a9710"
+    ],
+    "evaluation_seconds": 1415.0719618797302,
+    "generation": 11,
+    "id": "1d0cd111-cd26-4d80-ab8b-48a27899b2cc",
+    "island": 1,
+    "parent_id": "2cfc12e2-439c-4f8b-99fb-4cf71c411910",
+    "patch_description": "Add a bounded operator-evidence escape signal when clone has substantial evidence and low success, but gate it through normalized ecological pressure and mutation trust. This keeps the scheduler ecology-conditioned and evidence-adaptive while shifting only modestly toward conservative and standard parametric mutation, the two operators with observed success. Exploratory, structural, and mixed remain strongly suppressed unless their own evidence improves.",
+    "patch_name": "clone_bad_parametric_release",
+    "sampling_seconds": 25.508864164352417,
+    "score": -0.0012475661933422089,
+    "timestamp": 1784244564.595151,
+    "top_k_inspiration_ids": [
+      "1dd2d397-0414-4738-a6c5-031f1b535461"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.124545,
+    "archive_inspiration_ids": [
+      "2cfc12e2-439c-4f8b-99fb-4cf71c411910"
+    ],
+    "evaluation_seconds": 1419.7997012138367,
+    "generation": 12,
+    "id": "d6057d79-0b83-4332-915a-495d3d998575",
+    "island": 1,
+    "parent_id": "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa",
+    "patch_description": "Replace raw stress-driven mutation pressure with founder-normalized ecological need gated by parent advantage and population viability. Operator evidence is also made relative to clone trust, so mutation operators are rewarded only when there is trusted evidence that they outperform clone-like heredity. This keeps ecology-conditioned non-clone heredity through conservative and standard parametric mutation while reducing founder-specific over-triggering of exploratory, structural, and mixed operators under weak evidence.",
+    "patch_name": "viability_trusted_pressure",
+    "sampling_seconds": 51.2006413936615,
+    "score": -0.0018195935990661383,
+    "timestamp": 1784246035.655208,
+    "top_k_inspiration_ids": [
+      "1d0cd111-cd26-4d80-ab8b-48a27899b2cc"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.139161,
+    "archive_inspiration_ids": [
+      "115d4342-4ed9-46b5-9ca0-e0ddc825a61e"
+    ],
+    "evaluation_seconds": 1416.7392117977142,
+    "generation": 13,
+    "id": "aaf69ce0-3fcc-4304-a018-6e518d26c6fe",
+    "island": 0,
+    "parent_id": "ec281437-580d-498d-8baf-cee399db3905",
+    "patch_description": "Add a normalized ecology trust gate that only increases mutation when pressure is real, population calm is low, and operator evidence is both non-clone and better than clone evidence. This keeps the mechanism ecology-conditioned, uses trusted operator evidence directly, and avoids broad probing of unknown exploratory/structural/mixed operators in founder-specific calm regimes.",
+    "patch_name": "anti_overtrigger_trust_gate",
+    "sampling_seconds": 26.987363576889038,
+    "score": -0.004022226668894291,
+    "timestamp": 1784247479.41816,
+    "top_k_inspiration_ids": [
+      "18b7eb86-6798-4ecc-a9d0-6084f09a42e1"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.16364,
+    "archive_inspiration_ids": [
+      "2cfc12e2-439c-4f8b-99fb-4cf71c411910"
+    ],
+    "evaluation_seconds": 1419.686991930008,
+    "generation": 14,
+    "id": "c48d3c87-7725-460d-83a6-5b00732fcbd5",
+    "island": 1,
+    "parent_id": "d6057d79-0b83-4332-915a-495d3d998575",
+    "patch_description": "Add a bounded transfer-oriented mutation window that only opens under recoverable ecological stress: viable population, non-collapsing survival, meaningful normalized need, and a parent with above-local energy/intake. This should raise conservative and standard parametric use where mutation has trusted evidence, while suppressing founder-specific over-triggering during calm growth or severe decline. The mechanism remains ecology-conditioned and evidence-adaptive, without using identity, seed, time, or hidden partitions.",
+    "patch_name": "recoverable_evidence_window",
+    "sampling_seconds": 30.77225685119629,
+    "score": -0.009318375028669834,
+    "timestamp": 1784248929.911277,
+    "top_k_inspiration_ids": [
+      "1d0cd111-cd26-4d80-ab8b-48a27899b2cc"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.166865,
+    "archive_inspiration_ids": [
+      "ec281437-580d-498d-8baf-cee399db3905"
+    ],
+    "evaluation_seconds": 1415.2794499397278,
+    "generation": 15,
+    "id": "ac64db43-4d20-450c-8b7c-28e8a8e295f2",
+    "island": 0,
+    "parent_id": "aaf69ce0-3fcc-4304-a018-6e518d26c6fe",
+    "patch_description": "This edit makes mutation pressure depend more on ecology-normalized distress and cross-operator trust, instead of subtracting clone trust directly. The current relative-trust term appears to have made the policy more clone-heavy and reduced both sham and shock deltas. The replacement adds a bounded injury-like rescue gate from intake deficit, decline/death pressure, low growth, and birth scarcity, then uses evidence-weighted non-clone advantage only when operators have real evidence. It also applies a calm/growth penalty to poorly evidenced operators so exploratory, structural, and mixed mutations do not over-trigger on sealed founders. The mechanism remains ecology-conditioned and non-constant, with small but genuine high-pressure scout boosts.",
+    "patch_name": "injury_gated_trust_scout",
+    "sampling_seconds": 36.110743284225464,
+    "score": -0.005542980972677469,
+    "timestamp": 1784250381.333741,
+    "top_k_inspiration_ids": [
+      "18b7eb86-6798-4ecc-a9d0-6084f09a42e1"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.19658,
+    "archive_inspiration_ids": [
+      "ec281437-580d-498d-8baf-cee399db3905"
+    ],
+    "evaluation_seconds": 1416.5592391490936,
+    "generation": 16,
+    "id": "e1f02cf7-668c-4a22-bcb8-14657e6d5908",
+    "island": 0,
+    "parent_id": "aaf69ce0-3fcc-4304-a018-6e518d26c6fe",
+    "patch_description": "This uses a bounded homeostatic bandit instead of additive regime gains. It opens a narrow mutation window only when the parent is locally strong, the ecology is stressed but not crashing, and operator evidence beats a conservative prior. Mutation pressure is normalized by population health and damped under growth/calm states, which should reduce founder-specific over-triggering while still allowing ecology-conditioned non-clone heredity.",
+    "patch_name": "homeostatic_bandit_window",
+    "sampling_seconds": 52.560216426849365,
+    "score": -0.006960661616176367,
+    "timestamp": 1784251850.454558,
+    "top_k_inspiration_ids": [
+      "18b7eb86-6798-4ecc-a9d0-6084f09a42e1"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.17846,
+    "archive_inspiration_ids": [
+      "2cfc12e2-439c-4f8b-99fb-4cf71c411910"
+    ],
+    "evaluation_seconds": 1414.4687342643738,
+    "generation": 17,
+    "id": "f52e77fb-d84b-42b0-820a-026ab751563f",
+    "island": 1,
+    "parent_id": "1dd2d397-0414-4738-a6c5-031f1b535461",
+    "patch_description": "Replace raw stress pressure with normalized ecology need gated by population viability, then make operator adaptation relative to clone evidence instead of rewarding every unused operator. This keeps ecology-conditioned mutation but reduces founder-specific over-triggering: scarcity/probing only matters when ecology pressure and trusted non-clone operator evidence agree.",
+    "patch_name": "viability_relative_trust_gate",
+    "sampling_seconds": 39.06527066230774,
+    "score": 0.0003390955680515617,
+    "timestamp": 1784253304.017705,
+    "top_k_inspiration_ids": [
+      "1d0cd111-cd26-4d80-ab8b-48a27899b2cc"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.154985,
+    "archive_inspiration_ids": [
+      "e13ed5cc-ac33-41ca-b00e-71faf42ec8fa"
+    ],
+    "evaluation_seconds": 1417.2586846351624,
+    "generation": 18,
+    "id": "5c286b4d-6f9c-4c53-9905-4a1c67225f1e",
+    "island": 1,
+    "parent_id": "2cfc12e2-439c-4f8b-99fb-4cf71c411910",
+    "patch_description": "Add a narrow trusted-innovation pulse that only activates when normalized ecological pressure, parent-relative fitness, viability, and observed mutation trust align. This keeps clone dominant in calm or weak-evidence founder states, but shifts a small amount of probability from clone/conservative toward standard and mixed mutation when the ecosystem is stressed and operator evidence supports mutation. The mixed/structural channels remain strongly gated, avoiding the earlier founder-specific over-triggering failure mode.",
+    "patch_name": "trusted_pulse_standard_mixed",
+    "sampling_seconds": 29.173194646835327,
+    "score": 0.0024207443930208683,
+    "timestamp": 1784254750.485233,
+    "top_k_inspiration_ids": [
+      "f52e77fb-d84b-42b0-820a-026ab751563f"
+    ],
+    "valid": true
+  },
+  {
+    "api_cost": 0.1606,
+    "archive_inspiration_ids": [
+      "ac64db43-4d20-450c-8b7c-28e8a8e295f2"
+    ],
+    "evaluation_seconds": 1417.037900686264,
+    "generation": 19,
+    "id": "3f1a9e8d-6012-45a1-8a99-2233c9793a92",
+    "island": 0,
+    "parent_id": "18b7eb86-6798-4ecc-a9d0-6084f09a42e1",
+    "patch_description": "Replace the broad recovery probe with a stress-excess gate that only lowers clone and boosts mutation when ecology shows normalized rescue pressure beyond calm baseline. This keeps the mechanism ecology-conditioned, but reduces founder-specific over-triggering in healthy founders. It also adds a trusted relative-advantage term against clone, gated by rescue ecology, so operator evidence can help transfer without rewarding unevidenced exploratory/structural operators everywhere.",
+    "patch_name": "stress_gated_trust_probe",
+    "sampling_seconds": 32.21459174156189,
+    "score": -0.009458555839955807,
+    "timestamp": 1784256199.784224,
+    "top_k_inspiration_ids": [
+      "ec281437-580d-498d-8baf-cee399db3905"
+    ],
+    "valid": true
+  }
+]

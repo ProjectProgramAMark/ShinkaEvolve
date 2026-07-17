@@ -1,0 +1,63 @@
+<trusted_parametric_relief>
+A targeted boost for conservative and standard parametric mutation when two transferable signals agree: normalized ecological need is present, and observed parametric evidence is beating clone evidence. This keeps clone dominant in calm/low-need regimes, avoids founder identity or event timing, and gives the scheduler a little more room to exploit the only operators with measured success above clone instead of leaving mutation nearly absent.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    ecology_gate = jnp.clip(
+        (0.20 + 0.80 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.56 + 0.44 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+    op_value = (
+=======
+    parametric_edge = jnp.clip(
+        0.52 * relative_trust[1]
+        + 0.48 * relative_trust[2]
+        + 0.32 * evidence[1] * jnp.clip(success[1] - success[0], 0.0, 1.0)
+        + 0.36 * evidence[2] * jnp.clip(success[2] - success[0], 0.0, 1.0),
+        0.0,
+        1.0,
+    )
+    ecology_gate = jnp.clip(
+        (0.16 + 0.84 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.54 + 0.46 * mutation_trust)
+        * (0.76 + 0.24 * viability),
+        0.0,
+        1.0,
+    )
+    repair_gate = jnp.clip(
+        ecology_gate
+        * (0.35 + 0.65 * normalized_need)
+        * (0.42 + 0.58 * parametric_edge),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+    op_value = (
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+    base = jnp.array([4.20, -0.88, -1.62, -5.42, -6.16, -5.78], dtype=jnp.float32)
+    calm_gain = jnp.array([2.38, 0.46, 0.08, -0.44, -0.38, -0.32], dtype=jnp.float32)
+    pressure_gain = jnp.array([-1.22, 0.40, 0.98, 0.70, 0.30, 0.54], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.34, 0.66, 1.02, 0.54, 0.18, 0.42], dtype=jnp.float32)
+=======
+    base = jnp.array([4.16, -0.78, -1.46, -5.48, -6.18, -5.82], dtype=jnp.float32)
+    calm_gain = jnp.array([2.42, 0.36, -0.02, -0.48, -0.40, -0.34], dtype=jnp.float32)
+    pressure_gain = jnp.array([-1.18, 0.52, 1.14, 0.62, 0.24, 0.48], dtype=jnp.float32)
+    rescue_gain = jnp.array([-0.38, 0.76, 1.18, 0.46, 0.14, 0.36], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + growth_gain * growth
+        + value_gain * op_value
+    )
+=======
+        + growth_gain * growth
+        + value_gain * op_value
+        + repair_gate * jnp.array([-0.24, 0.54, 0.72, 0.10, 0.02, 0.08], dtype=jnp.float32)
+    )
+>>>>>>> REPLACE
+</DIFF>

@@ -1,0 +1,15 @@
+{
+  "generation": 11,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "clone_bad_parametric_release",
+  "patch_description": "Add a bounded operator-evidence escape signal when clone has substantial evidence and low success, but gate it through normalized ecological pressure and mutation trust. This keeps the scheduler ecology-conditioned and evidence-adaptive while shifting only modestly toward conservative and standard parametric mutation, the two operators with observed success. Exploratory, structural, and mixed remain strongly suppressed unless their own evidence improves.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T23:05:49.512735",
+  "llm_cost": 0.150005,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_11/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

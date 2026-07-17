@@ -1,0 +1,59 @@
+<NAME>
+stress_gated_trust_probe
+</NAME>
+<DESCRIPTION>
+Replace the broad recovery probe with a stress-excess gate that only lowers clone and boosts mutation when ecology shows normalized rescue pressure beyond calm baseline. This keeps the mechanism ecology-conditioned, but reduces founder-specific over-triggering in healthy founders. It also adds a trusted relative-advantage term against clone, gated by rescue ecology, so operator evidence can help transfer without rewarding unevidenced exploratory/structural operators everywhere.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    recovery_probe = jnp.clip(
+        (0.42 + 0.58 * parent_quality)
+        * (0.35 + 0.65 * compact)
+        * (0.28 + 0.72 * birth_gap)
+        * (1.0 - 0.62 * death)
+        * (0.52 + 0.48 * jnp.clip(pressure + rescue, 0.0, 1.0)),
+        0.0,
+        1.0,
+    )
+    trust_center = jnp.clip(evidence * (success - prior), -0.35, 0.35)
+    probe_gain = jnp.array([-0.34, 0.18, 0.42, 1.20, 0.86, 1.04], dtype=jnp.float32)
+    trust_gain = jnp.array([0.10, 0.56, 0.74, 0.58, 0.50, 0.54], dtype=jnp.float32)
+=======
+    stress_excess = jnp.clip(pressure + 0.72 * rescue - 0.52 * calm - 0.08 * growth, 0.0, 1.0)
+    recovery_probe = jnp.clip(
+        stress_excess
+        * (0.42 + 0.58 * parent_quality)
+        * (0.35 + 0.65 * compact)
+        * (0.30 + 0.70 * birth_gap)
+        * (0.42 + 0.58 * intake_gap)
+        * (1.0 - 0.58 * death),
+        0.0,
+        1.0,
+    )
+    evidence_probe = jnp.clip(probe * recovery_probe * (1.0 - 0.45 * calm), 0.0, 1.0)
+    trust_center = jnp.clip(evidence * (success - prior), -0.35, 0.35)
+    trusted_advantage = jnp.clip(evidence * (success - success[0]), -0.24, 0.30)
+    transfer_gate = jnp.clip(
+        recovery_probe
+        * (0.44 + 0.56 * parent_quality)
+        * (0.34 + 0.66 * compact)
+        * (1.0 - 0.50 * growth),
+        0.0,
+        1.0,
+    )
+    calm_uncertainty = jnp.clip(evidence_gap * calm * (1.0 - recovery_probe), 0.0, 1.0)
+    probe_gain = jnp.array([-0.18, 0.12, 0.30, 0.92, 0.62, 0.76], dtype=jnp.float32)
+    trust_gain = jnp.array([0.08, 0.52, 0.70, 0.46, 0.40, 0.44], dtype=jnp.float32)
+    relative_gain = jnp.array([-0.22, 0.28, 0.40, 0.30, 0.22, 0.26], dtype=jnp.float32)
+    uncertainty_gain = jnp.array([0.00, -0.08, -0.12, -0.42, -0.34, -0.38], dtype=jnp.float32)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + probe_gain * recovery_probe
+        + trust_gain * trust_center
+=======
+        + probe_gain * evidence_probe
+        + trust_gain * trust_center
+        + relative_gain * trusted_advantage * transfer_gate
+        + uncertainty_gain * calm_uncertainty
+>>>>>>> REPLACE
+</DIFF>

@@ -1,0 +1,42 @@
+<NAME>
+clone_bad_parametric_release
+</NAME>
+<DESCRIPTION>
+Add a bounded operator-evidence escape signal when clone has substantial evidence and low success, but gate it through normalized ecological pressure and mutation trust. This keeps the scheduler ecology-conditioned and evidence-adaptive while shifting only modestly toward conservative and standard parametric mutation, the two operators with observed success. Exploratory, structural, and mixed remain strongly suppressed unless their own evidence improves.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    ecology_gate = jnp.clip(
+        (0.20 + 0.80 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.56 + 0.44 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+=======
+    ecology_gate = jnp.clip(
+        (0.20 + 0.80 * pressure)
+        * (0.48 + 0.52 * parent_edge)
+        * (0.56 + 0.44 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    clone_bad = jnp.clip(evidence[0] * (0.30 - success[0]) * 2.40, 0.0, 1.0)
+    parametric_release = jnp.clip(
+        clone_bad
+        * (0.24 + 0.76 * ecology_gate)
+        * (0.64 + 0.36 * mutation_trust),
+        0.0,
+        1.0,
+    )
+    probe = evidence_gap * scarce * ecology_gate
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+        + value_gain * op_value
+=======
+        + value_gain * op_value
+        + parametric_release
+        * jnp.array([-0.54, 0.82, 0.92, 0.08, 0.04, 0.06], dtype=jnp.float32)
+>>>>>>> REPLACE
+</DIFF>

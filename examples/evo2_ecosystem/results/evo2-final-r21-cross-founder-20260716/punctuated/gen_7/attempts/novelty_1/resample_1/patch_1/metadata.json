@@ -1,0 +1,15 @@
+{
+  "generation": 7,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 1,
+  "patch_name": "trusted_budget_scheduler",
+  "patch_description": "Uses an ecology-normalized mutation budget instead of fixed sparse regimes. The scheduler first estimates whether mutation is worth spending from population stress, recovery capacity, parent quality, and genome compactness, then allocates that limited budget through trusted operator evidence relative to clone. Weak or untrusted evidence is shrunk toward conservative priors, so exploratory/structural operators only rise when both ecology and operator evidence support them. This keeps an ecology-conditioned non-clone mechanism while reducing founder-specific over-triggering.",
+  "error_msg": null,
+  "timestamp": "2026-07-16T21:29:36.258595",
+  "llm_cost": 0.093155,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_7/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

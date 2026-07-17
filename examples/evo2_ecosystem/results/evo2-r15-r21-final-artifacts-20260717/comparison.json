@@ -1,0 +1,242 @@
+[
+  {
+    "ancestor_survival_rate": 0.75,
+    "candidate": "R20 gen16",
+    "injury_effect": 0.0001103915274143219,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-compact-stress-20260716/punctuated/gen_16/results/metrics.json",
+    "metrics_sha256": "99515bb7b3033f4dd367ff0c9e4a4b7de5a80f020ca233e4410a3aa26c10cc86",
+    "operator_fraction": {
+      "clone": 0.9969040247678018,
+      "mixed": 0.0,
+      "parametric_conservative": 0.0,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 0.0030959752321981426,
+      "structural": 0.0
+    },
+    "partition": "hard training",
+    "repeat_scores": [
+      9.488765499554574e-05,
+      -0.00022659196110907942,
+      0.00011836352496175095
+    ],
+    "robust_score": 9.488765499554574e-05,
+    "sham_effect": 0.007004402577877045,
+    "survival_rate": 0.75
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "R20 gen16",
+    "injury_effect": -0.006873933598399162,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/evaluation_shinka_gen_16/metrics.json",
+    "metrics_sha256": "7c341bf05311e465ab64bf13c0dab4c2ffb2fd50593d276b3b6331c2081bf9c8",
+    "operator_fraction": {
+      "clone": 0.9980506822612085,
+      "mixed": 0.0,
+      "parametric_conservative": 0.0,
+      "parametric_exploratory": 0.001949317738791423,
+      "parametric_standard": 0.0,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      -0.0040694731287658215,
+      -0.01449345238506794,
+      -0.003983900882303715
+    ],
+    "robust_score": -0.0040694731287658215,
+    "sham_effect": 0.0006463751196861267,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "fixed standard",
+    "injury_effect": -0.01994219608604908,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/baselines/fixed_standard/metrics.json",
+    "metrics_sha256": "792eb63ca5d4890edf02617af5714840bb3cf34dd0087c010c5c08f6d8f0529c",
+    "operator_fraction": {
+      "clone": 0.0,
+      "mixed": 0.0,
+      "parametric_conservative": 0.0,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 1.0,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      -0.05753933638334274,
+      -0.0515146404504776,
+      -0.07861444354057312
+    ],
+    "robust_score": -0.05753933638334274,
+    "sham_effect": -0.020111825317144394,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "fixed conservative",
+    "injury_effect": -0.08618178963661194,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/baselines/fixed_conservative/metrics.json",
+    "metrics_sha256": "71a481adc61a702820516584e31f86c12ebf879defe98b09650d704798512706",
+    "operator_fraction": {
+      "clone": 0.0,
+      "mixed": 0.0,
+      "parametric_conservative": 1.0,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 0.0,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      -0.08753631263971329,
+      -0.09367779642343521,
+      -0.07510621845722198
+    ],
+    "robust_score": -0.08753631263971329,
+    "sham_effect": -0.044942378997802734,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "R15 gen18",
+    "injury_effect": 0.041902102530002594,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r20-gen16-r18-development-20260716/baselines/r15_gen18/metrics.json",
+    "metrics_sha256": "d748ff468c25abb615c836d71dedabaaa186d168a1a4a084217ef2781423479e",
+    "operator_fraction": {
+      "clone": 0.9815712900096993,
+      "mixed": 0.0,
+      "parametric_conservative": 0.011639185257032008,
+      "parametric_exploratory": 0.0019398642095053346,
+      "parametric_standard": 0.004849660523763337,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      0.0011058661621063948,
+      0.02016245201230049,
+      0.009245743975043297
+    ],
+    "robust_score": 0.009245743975043297,
+    "sham_effect": 0.0155559740960598,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "matched sparse",
+    "injury_effect": -0.004810277372598648,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r15-gen18-r18-analysis-20260716/development_matched_sparse/metrics.json",
+    "metrics_sha256": "a6dfcb1379b6620b3fa61833d5bd8c6576f9372c42d255653c7fe6a1b63ea009",
+    "operator_fraction": {
+      "clone": 0.9805735430157262,
+      "mixed": 0.0,
+      "parametric_conservative": 0.012025901942645698,
+      "parametric_exploratory": 0.0027752081406105457,
+      "parametric_standard": 0.004625346901017576,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      -0.024063507094979286,
+      -0.026398619636893272,
+      -0.007038202602416277
+    ],
+    "robust_score": -0.024063507094979286,
+    "sham_effect": -0.025338973850011826,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "no-crisis ablation",
+    "injury_effect": -0.0059247612953186035,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r15-gen18-r18-analysis-20260716/development_no_crisis_signal/metrics.json",
+    "metrics_sha256": "a68da40840ce9499bfd8ec9bcb7cf7f05b25bf43c37bc46e45a529d89cae9157",
+    "operator_fraction": {
+      "clone": 0.9897959183673469,
+      "mixed": 0.0,
+      "parametric_conservative": 0.008348794063079777,
+      "parametric_exploratory": 0.0018552875695732839,
+      "parametric_standard": 0.0,
+      "structural": 0.0
+    },
+    "partition": "R18 development",
+    "repeat_scores": [
+      -0.019043466076254845,
+      -0.02817373536527157,
+      -0.008733447641134262
+    ],
+    "robust_score": -0.019043466076254845,
+    "sham_effect": -0.023405995219945908,
+    "survival_rate": 1.0
+  },
+  {
+    "ancestor_survival_rate": 0.5625,
+    "candidate": "R15 gen18",
+    "injury_effect": -0.006053144112229347,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-exploratory-r15-gen18-r18-sealed-20260716/evaluation_r15_gen18/metrics.json",
+    "metrics_sha256": "2d1ccfbb818568db3b96b322c248165e22d4f1761dd054adade3384410bc170e",
+    "operator_fraction": {
+      "clone": 0.9533468559837728,
+      "mixed": 0.0,
+      "parametric_conservative": 0.032454361054766734,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 0.014198782961460446,
+      "structural": 0.0
+    },
+    "partition": "R18 sealed",
+    "repeat_scores": [
+      -0.0009333317284472287,
+      -0.001146429916843772,
+      -0.00030125255580060184
+    ],
+    "robust_score": -0.0009333317284472287,
+    "sham_effect": 0.0084783174097538,
+    "survival_rate": 0.5625
+  },
+  {
+    "ancestor_survival_rate": 0.96875,
+    "candidate": "R21 gen4",
+    "injury_effect": 0.01668298989534378,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_4/results/metrics.json",
+    "metrics_sha256": "681343ff895927ec1eca4ee44139e3adb001bdccc16bbb5e475660a96be2564b",
+    "operator_fraction": {
+      "clone": 0.972972972972973,
+      "mixed": 0.0,
+      "parametric_conservative": 0.018243243243243244,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 0.008783783783783784,
+      "structural": 0.0
+    },
+    "partition": "R21 training",
+    "repeat_scores": [
+      0.009664639830589294,
+      0.005382193252444267,
+      0.002813815139234066
+    ],
+    "robust_score": 0.005382193252444267,
+    "sham_effect": 0.007798161823302507,
+    "survival_rate": 0.96875
+  },
+  {
+    "ancestor_survival_rate": 1.0,
+    "candidate": "R21 gen4",
+    "injury_effect": -0.02251792699098587,
+    "metrics_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-gen4-development-20260716/evaluation_gen4/metrics.json",
+    "metrics_sha256": "0309c045f2f5294077b0daa9da0fce6cf5d8ab153e4cc530e500f182b68d8e4d",
+    "operator_fraction": {
+      "clone": 0.9849624060150376,
+      "mixed": 0.0,
+      "parametric_conservative": 0.013784461152882205,
+      "parametric_exploratory": 0.0,
+      "parametric_standard": 0.0012531328320802004,
+      "structural": 0.0
+    },
+    "partition": "R21 development",
+    "repeat_scores": [
+      -0.010516779497265816,
+      -0.006196683272719383,
+      -0.0077119083143770695
+    ],
+    "robust_score": -0.0077119083143770695,
+    "sham_effect": 0.018829915672540665,
+    "survival_rate": 1.0
+  }
+]

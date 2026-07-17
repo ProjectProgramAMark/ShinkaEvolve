@@ -1,0 +1,15 @@
+{
+  "generation": 15,
+  "novelty_attempt": 1,
+  "resample_attempt": 1,
+  "patch_attempt": 1,
+  "success": true,
+  "num_applied": 2,
+  "patch_name": "injury_gated_trust_scout",
+  "patch_description": "This edit makes mutation pressure depend more on ecology-normalized distress and cross-operator trust, instead of subtracting clone trust directly. The current relative-trust term appears to have made the policy more clone-heavy and reduced both sham and shock deltas. The replacement adds a bounded injury-like rescue gate from intake deficit, decline/death pressure, low growth, and birth scarcity, then uses evidence-weighted non-clone advantage only when operators have real evidence. It also applies a calm/growth penalty to poorly evidenced operators so exploratory, structural, and mixed mutations do not over-trigger on sealed founders. The mechanism remains ecology-conditioned and non-constant, with small but genuine high-pressure scout boosts.",
+  "error_msg": null,
+  "timestamp": "2026-07-17T00:42:46.045858",
+  "llm_cost": 0.166865,
+  "llm_model": "headless/codex@gpt-5.5?effort=high",
+  "headless_prompt_path": "/home/mmmoussa/Programming/sakana/origins-of-life/ShinkaEvolve/examples/evo2_ecosystem/results/evo2-final-r21-cross-founder-20260716/punctuated/gen_15/attempts/novelty_1/resample_1/patch_1/headless_prompt.md"
+}

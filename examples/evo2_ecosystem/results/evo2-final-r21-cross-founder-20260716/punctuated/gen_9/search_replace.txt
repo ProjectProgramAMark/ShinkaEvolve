@@ -1,0 +1,48 @@
+<NAME>
+trusted_rescue_probe
+</NAME>
+<DESCRIPTION>
+Add a small ecology-gated rescue probe that only raises mutation logits when pressure is real, calm is low, parents are viable, genomes have room to change, and births are lagging. The probe is strongest for exploratory, structural, and mixed operators, but it is tempered by trusted operator evidence so repeatedly poor or overused operators do not keep receiving probability. This should restore a genuine non-clone mechanism without returning to broad founder-specific over-mutation.
+</DESCRIPTION>
+<DIFF>
+<<<<<<< SEARCH
+    value_gain = jnp.array([0.46, 0.78, 0.92, 0.70, 0.68, 0.68], dtype=jnp.float32)
+    logits = (
+        base
+        + calm_gain * calm
+        + pressure_gain * pressure
+        + rescue_gain * rescue
+        + quality_gain * parent_quality
+        + shape_gain * compact
+        + growth_gain * growth
+        + value_gain * op_value
+    )
+=======
+    value_gain = jnp.array([0.46, 0.78, 0.92, 0.70, 0.68, 0.68], dtype=jnp.float32)
+    rescue_window = jnp.clip(
+        (0.40 + 0.60 * parent_quality)
+        * (0.38 + 0.62 * compact)
+        * (0.34 + 0.66 * birth_gap)
+        * jnp.clip(pressure + rescue - 0.46 * calm, 0.0, 1.0)
+        * (1.0 - 0.58 * death),
+        0.0,
+        1.0,
+    )
+    trusted_edge = jnp.clip(evidence * (success - prior), -0.28, 0.28)
+    cautious_probe = jnp.clip(probe * rescue_window * (1.0 - 0.44 * calm), 0.0, 1.0)
+    probe_gain = jnp.array([-0.24, 0.14, 0.28, 0.86, 0.58, 0.72], dtype=jnp.float32)
+    trust_gain = jnp.array([0.08, 0.48, 0.62, 0.44, 0.38, 0.42], dtype=jnp.float32)
+    logits = (
+        base
+        + calm_gain * calm
+        + pressure_gain * pressure
+        + rescue_gain * rescue
+        + quality_gain * parent_quality
+        + shape_gain * compact
+        + growth_gain * growth
+        + value_gain * op_value
+        + probe_gain * cautious_probe
+        + trust_gain * trusted_edge
+    )
+>>>>>>> REPLACE
+</DIFF>
